@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================
+   Theme Variables
+   ================================ */
+:root {
+  --background: #f3f7fb;
+  --foreground: #082033;
+  --card: #ffffff;
+  --card-foreground: #082033;
+  --popover: #ffffff;
+  --popover-foreground: #082033;
+  --primary: #0287be;
+  --primary-foreground: #f5f8fa;
+  --secondary: #0b2746;
+  --secondary-foreground: #f5f8fa;
+  --muted: #e7edf4;
+  --muted-foreground: #3a5269;
+  --accent: #00c2ff;
+  --accent-foreground: #031423;
+  --destructive: #ef4444;
+  --destructive-foreground: #f5f8fa;
+  --border: rgba(8, 32, 51, 0.14);
+  --input: rgba(8, 32, 51, 0.18);
+  --ring: rgba(2, 135, 190, 0.38);
+  --radius: 1.5rem;
+
+  /* 🩵 Light mode glass adjustments (only change for light mode) */
+  --glass-bg: rgba(8, 32, 51, 0.06);
+  --glass-border: rgba(8, 32, 51, 0.12);
+  --glass-hover: rgba(8, 32, 51, 0.1);
+}
+
+/* ================================
+   Dark Mode (unchanged)
+   ================================ */
+.dark {
+  --background: #061222;
+  --foreground: #f5f8fa;
+  --card: #0b1f36;
+  --card-foreground: #f5f8fa;
+  --popover: #0b1f36;
+  --popover-foreground: #f5f8fa;
+  --primary: #00c2ff;
+  --primary-foreground: #061222;
+  --secondary: #123559;
+  --secondary-foreground: #f5f8fa;
+  --muted: #112033;
+  --muted-foreground: #c9d6e5;
+  --accent: #0287be;
+  --accent-foreground: #f5f8fa;
+  --destructive: #f87171;
+  --destructive-foreground: #061222;
+  --border: rgba(245, 248, 250, 0.12);
+  --input: rgba(245, 248, 250, 0.16);
+  --ring: rgba(0, 194, 255, 0.55);
+}
+
+/* ================================
+   Base Layer
+   ================================ */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    background-image: radial-gradient(
+        circle at 0% 0%,
+        rgba(2, 135, 190, 0.08),
+        transparent 46%
+      ),
+      radial-gradient(
+        circle at 100% 0%,
+        rgba(2, 135, 190, 0.06),
+        transparent 44%
+      );
+  }
+
+  .dark body {
+    background-image: radial-gradient(
+        circle at 0% 0%,
+        rgba(0, 194, 255, 0.18),
+        transparent 46%
+      ),
+      radial-gradient(
+        circle at 100% 0%,
+        rgba(2, 135, 190, 0.16),
+        transparent 44%
+      );
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading text-foreground;
+  }
+}
