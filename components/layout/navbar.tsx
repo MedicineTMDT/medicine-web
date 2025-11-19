@@ -11,12 +11,10 @@ import { usePathname } from "next/navigation";
 import * as React from "react";
 
 const NAV_LINKS = [
-  { name: "Drugs", href: "/drugs" },
-  { name: "Supplements", href: "/supplements" },
-  { name: "Pill Identifier", href: "/pill-identifier" },
-  { name: "News", href: "/news" },
-  { name: "Tools", href: "/tools" },
-  { name: "Resources", href: "/guides" },
+  { name: "Home", href: "/" },
+  { name: "Drug Info", href: "/drugs-info" },
+  { name: "Drug Interaction", href: "/drug-interaction" },
+  { name: "Prescription", href: "/prescription" },
 ];
 
 export function Navbar() {

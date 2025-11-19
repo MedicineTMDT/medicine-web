@@ -5,9 +5,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
-import { Eye, EyeOff, Github, IdCard, Lock, Mail, Facebook, Chrome } from "lucide-react";
+import { Eye, EyeOff, IdCard, Lock, Mail } from "lucide-react";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { GoogleIcon } from "@/components/icons/google";
 import {
   Form,
   FormControl,
@@ -40,21 +41,9 @@ type SignUpValues = z.infer<typeof signUpSchema>;
 const socialProviders = [
   {
     name: "Google",
-    icon: Chrome,
+    icon: GoogleIcon,
     href: "/api/auth/google",
-    className: "bg-[#FCEFD1] text-[#5F3400] hover:bg-[#f3e8cb]",
-  },
-  {
-    name: "Facebook",
-    icon: Facebook,
-    href: "/api/auth/facebook",
-    className: "bg-[#E8F0FF] text-[#0A4EB7] hover:bg-[#dce7ff]",
-  },
-  {
-    name: "GitHub",
-    icon: Github,
-    href: "/api/auth/github",
-    className: "bg-[#F1F5F9] text-[#0F172A] hover:bg-[#e5ebf4]",
+    className: "border border-border/60 bg-white text-secondary hover:bg-muted/50",
   },
 ];
 
@@ -78,12 +67,12 @@ export function SignUpForm() {
 
   return (
     <motion.div
-      className="w-full max-w-md rounded-[calc(var(--radius)_+_0.75rem)] border border-border/20 bg-white/95 p-10 shadow-card dark:bg-secondary/80 dark:text-white"
+      className="w-full max-w-md rounded-[calc(var(--radius)_+_0.6rem)] border border-border/20 bg-white/95 p-6 shadow-card dark:bg-secondary/80 dark:text-white"
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.45 }}
     >
-      <div className="mb-8 space-y-3">
+      <div className="mb-6 space-y-2">
         <div className="flex items-center justify-between text-sm">
           <span className="font-medium text-muted-foreground">
             Create your AnalyticsPill account
@@ -104,7 +93,7 @@ export function SignUpForm() {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
           <FormField
             control={form.control}
             name="name"
@@ -218,14 +207,14 @@ export function SignUpForm() {
         </form>
       </Form>
 
-      <div className="mt-8 space-y-6">
+      <div className="mt-6 space-y-4">
         <div className="relative">
           <Separator />
           <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">
             Or register with
           </span>
         </div>
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3">
           {socialProviders.map((provider) => {
             const Icon = provider.icon;
             return (

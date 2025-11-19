@@ -1,23 +1,25 @@
 "use client";
 
-import * as React from "react";
 import { cn } from "@/lib/utils";
+import * as React from "react";
 
 export interface InputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   leadingIcon?: React.ReactNode;
   trailingIcon?: React.ReactNode;
+  wrapperClassName?: string;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
-    { className, type, leadingIcon, trailingIcon, disabled, ...props },
+    { className, wrapperClassName, type, leadingIcon, trailingIcon, disabled, ...props },
     ref
   ) => {
     return (
       <div
         className={cn(
           "relative flex items-center rounded-[calc(var(--radius)_-_0.5rem)] border border-input/80 bg-white/80 px-4 shadow-sm ring-offset-background transition focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 dark:bg-card/80",
+          wrapperClassName,
           disabled && "opacity-60"
         )}
       >
