@@ -1,9 +1,12 @@
-import Image from "next/image";
-import Link from "next/link";
-import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+
+const FALLBACK_NEWS_IMAGE =
+  "https://images.unsplash.com/photo-1582719478173-c9fdd6fd1c8d?auto=format&fit=crop&w=1200&q=80";
 
 export type NewsCardProps = {
   title: string;
@@ -11,7 +14,7 @@ export type NewsCardProps = {
   href: string;
   tag: string;
   timestamp: string;
-  image: string;
+  image?: string;
   index?: number;
 };
 
@@ -24,6 +27,8 @@ export function NewsCard({
   image,
   index = 0,
 }: NewsCardProps) {
+  const imageSrc = image ?? FALLBACK_NEWS_IMAGE;
+
   return (
     <motion.article
       initial={{ opacity: 0, y: 30 }}
@@ -34,7 +39,7 @@ export function NewsCard({
       <Card className="group h-full overflow-hidden border-none bg-white/95 shadow-card ring-1 ring-border/30 transition hover:-translate-y-1 hover:ring-primary/40 dark:bg-secondary/70">
         <div className="relative h-44 overflow-hidden">
           <Image
-            src={image}
+            src={imageSrc}
             alt={title}
             fill
             className="object-cover transition duration-500 group-hover:scale-105"

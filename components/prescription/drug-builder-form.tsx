@@ -1,20 +1,25 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { Plus, Trash2 } from "lucide-react";
-import { Control, UseFieldArrayAppend, UseFieldArrayRemove, FieldErrors } from "react-hook-form";
+import type { FormValues } from "@/components/pages/prescription-page";
 import { Button } from "@/components/ui/button";
 import {
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import type { DrugInfo } from "@/lib/mockData";
-import type { FormValues } from "@/app/(site)/prescription/page";
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { Plus, Trash2 } from "lucide-react";
+import {
+  Control,
+  FieldErrors,
+  UseFieldArrayAppend,
+  UseFieldArrayRemove,
+} from "react-hook-form";
 
 type Props = {
   control: Control<FormValues>;
@@ -25,7 +30,14 @@ type Props = {
   drugs: DrugInfo[];
 };
 
-export function DrugBuilderForm({ control, fields, append, remove, errors, drugs }: Props) {
+export function DrugBuilderForm({
+  control,
+  fields,
+  append,
+  remove,
+  errors,
+  drugs,
+}: Props) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -34,7 +46,14 @@ export function DrugBuilderForm({ control, fields, append, remove, errors, drugs
           type="button"
           variant="ghost"
           className="gap-2 rounded-full"
-          onClick={() => append({ drugId: "", quantity: 30, dosage: "500 mg", schedule: "Once daily" })}
+          onClick={() =>
+            append({
+              drugId: "",
+              quantity: 30,
+              dosage: "500 mg",
+              schedule: "Once daily",
+            })
+          }
         >
           <Plus className="h-4 w-4" aria-hidden />
           Add drug
@@ -128,7 +147,9 @@ export function DrugBuilderForm({ control, fields, append, remove, errors, drugs
                       >
                         <option value="Once daily">Once daily</option>
                         <option value="Twice daily">Twice daily</option>
-                        <option value="Three times daily">Three times daily</option>
+                        <option value="Three times daily">
+                          Three times daily
+                        </option>
                         <option value="As needed">As needed</option>
                         <option value="Every other day">Every other day</option>
                       </select>
