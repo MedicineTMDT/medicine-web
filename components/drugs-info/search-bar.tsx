@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 export type DrugInfoSuggestion = {
   id: string;
@@ -29,15 +30,18 @@ export function DrugInfoSearchBar({
   onValueChange,
   suggestions,
   onSelect,
-  placeholder = "Search for drugs, categories, or compounds...",
+  placeholder,
   debounceMs = 300,
   loading = false,
-  ariaLabel = "Drug search",
+  ariaLabel,
 }: SearchBarProps) {
   const [internal, setInternal] = useState(value);
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState<number>(-1);
   const listRef = useRef<HTMLUListElement | null>(null);
+  const { t } = useTranslation();
+  const resolvedPlaceholder = placeholder ?? t("drugsInfo.searchPlaceholder");
+  const resolvedAriaLabel = ariaLabel ?? t("drugsInfo.searchAria");
 
   useEffect(() => setInternal(value), [value]);
 
@@ -89,7 +93,7 @@ export function DrugInfoSearchBar({
       <div className="relative">
         <Input
           value={internal}
-          aria-label={ariaLabel}
+          aria-label={resolvedAriaLabel}
           aria-autocomplete="list"
           aria-expanded={hasSuggestions}
           onChange={(e) => {
@@ -98,7 +102,7 @@ export function DrugInfoSearchBar({
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={resolvedPlaceholder}
           wrapperClassName="rounded-[calc(var(--radius)_-_0.35rem)] border-[var(--input)] bg-white/85 px-0 shadow-lg dark:border-white/20 dark:bg-white/90"
           className="h-14 rounded-[calc(var(--radius)_-_0.35rem)] border-none bg-transparent px-4 pr-24 text-base text-secondary placeholder:text-secondary/60 focus-visible:ring-0 dark:text-secondary dark:placeholder:text-secondary/60"
         />
@@ -120,7 +124,7 @@ export function DrugInfoSearchBar({
               setOpen(false);
             }}
             className="absolute right-12 top-1/2 -translate-y-1/2 rounded-full"
-            aria-label="Clear search"
+            aria-label={t("actions.clearSearch")}
           >
             <X className="h-4 w-4" aria-hidden />
           </Button>

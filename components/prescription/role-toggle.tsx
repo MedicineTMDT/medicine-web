@@ -3,6 +3,7 @@
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { User, UserCheck } from "lucide-react";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 export type PrescriptionRole = "patient" | "pharmacist";
 
@@ -12,9 +13,10 @@ type RoleToggleProps = {
 };
 
 export function PrescriptionRoleToggle({ value, onChange }: RoleToggleProps) {
+  const { t } = useTranslation();
   const options: { value: PrescriptionRole; label: string; icon: typeof User }[] = [
-    { value: "patient", label: "Patient View", icon: User },
-    { value: "pharmacist", label: "Pharmacist View", icon: UserCheck },
+    { value: "patient", label: t("prescription.role.patient"), icon: User },
+    { value: "pharmacist", label: t("prescription.role.pharmacist"), icon: UserCheck },
   ];
 
   return (

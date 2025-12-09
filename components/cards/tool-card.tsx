@@ -1,9 +1,12 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 export type ToolCardProps = {
   title: string;
@@ -12,6 +15,7 @@ export type ToolCardProps = {
   icon: LucideIcon;
   accent?: string;
   delay?: number;
+  translationKey?: string;
 };
 
 export function ToolCard({
@@ -21,7 +25,15 @@ export function ToolCard({
   icon: Icon,
   accent = "from-primary/12 to-accent/12",
   delay = 0,
+  translationKey,
 }: ToolCardProps) {
+  const { t } = useTranslation();
+  const baseKey = translationKey ?? "";
+  const titleText = baseKey ? t(`${baseKey}.title`, { fallback: title }) : t(title, { fallback: title });
+  const descriptionText = baseKey
+    ? t(`${baseKey}.description`, { fallback: description })
+    : t(description, { fallback: description });
+
   return (
     <motion.article
       className="h-full"
@@ -39,17 +51,17 @@ export function ToolCard({
           >
             <Icon className="h-6 w-6" aria-hidden />
           </span>
-          <CardTitle className="text-xl dark:text-white">{title}</CardTitle>
+          <CardTitle className="text-xl dark:text-white">{titleText}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-5">
           <p className="text-sm text-secondary/80 dark:text-muted-foreground">
-            {description}
+            {descriptionText}
           </p>
           <Link
             href={href}
             className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:gap-3"
           >
-            Launch Tool
+            {t("actions.launchTool")}
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
           </Link>
         </CardContent>

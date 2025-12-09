@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { DrugInteractionRule, DrugInfo } from "@/lib/mockData";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 const severityStyles: Record<DrugInteractionRule["severity"], string> = {
   severe: "ring-red-500/40 bg-red-500/10 text-red-800 dark:text-red-200",
@@ -24,8 +25,10 @@ type InteractionCardProps = {
 
 export function InteractionCard({ rule, drugLookup, context }: InteractionCardProps) {
   const [open, setOpen] = useState(false);
+  const { t } = useTranslation();
 
   const names = rule.drugs.map((id) => drugLookup[id]?.name ?? id).join(" + ");
+  const severityLabel = t(`drugInteraction.severity.${rule.severity}`, { fallback: rule.severity });
 
   return (
     <Card className="h-full border-none bg-white/95 shadow-card ring-1 ring-border/20 backdrop-blur-sm transition hover:-translate-y-0.5 hover:ring-primary/30 dark:bg-secondary/70">
@@ -37,10 +40,10 @@ export function InteractionCard({ rule, drugLookup, context }: InteractionCardPr
               severityStyles[rule.severity]
             )}
           >
-            {rule.severity}
+            {severityLabel}
           </span>
           <span className="rounded-full bg-[var(--muted)]/60 px-3 py-1 text-[11px] font-semibold text-secondary dark:bg-white/10 dark:text-white/80">
-            {rule.effect}
+            {t(rule.effect, { fallback: rule.effect })}
           </span>
           {context ? (
             <span className="rounded-full bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-primary">
@@ -75,11 +78,11 @@ export function InteractionCard({ rule, drugLookup, context }: InteractionCardPr
         >
           {open ? (
             <>
-              Hide details <ChevronUp className="h-4 w-4" aria-hidden />
+              {t("drugInteraction.hideDetails")} <ChevronUp className="h-4 w-4" aria-hidden />
             </>
           ) : (
             <>
-              More details <ChevronDown className="h-4 w-4" aria-hidden />
+              {t("drugInteraction.moreDetails")} <ChevronDown className="h-4 w-4" aria-hidden />
             </>
           )}
         </button>

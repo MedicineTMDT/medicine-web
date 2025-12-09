@@ -19,6 +19,7 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 type SectionPageScreenProps = {
   slug: string;
@@ -32,6 +33,7 @@ export function SectionPageScreen({
   showTools = false,
 }: SectionPageScreenProps) {
   const content = sectionContent[slug];
+  const { t } = useTranslation();
 
   if (!content) {
     throw new Error(`Section content for "${slug}" not found.`);
@@ -68,11 +70,11 @@ export function SectionPageScreen({
             </span>
 
             <h1 className="text-4xl font-heading font-semibold leading-tight text-secondary dark:text-white md:text-5xl">
-              {content.title}
+              {t(content.title, { fallback: content.title })}
             </h1>
 
             <p className="text-lg text-foreground/80 dark:text-white/90">
-              {content.description}
+              {t(content.description, { fallback: content.description })}
             </p>
 
             <div className="flex flex-wrap gap-3">
@@ -83,7 +85,7 @@ export function SectionPageScreen({
                   asChild
                 >
                   <Link href={action.href}>
-                    {action.label}
+                    {t(action.label, { fallback: action.label })}
                     <ArrowRight className="ml-2 h-4 w-4" aria-hidden />
                   </Link>
                 </Button>
@@ -99,11 +101,10 @@ export function SectionPageScreen({
             className="rounded-[calc(var(--radius)_+_0.75rem)] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-8 shadow-glass backdrop-blur-lg dark:border-white/15 dark:bg-white/10"
           >
             <h2 className="text-2xl font-semibold text-foreground dark:text-white">
-              What&apos;s inside
+              {t("section.whatsInside")}
             </h2>
             <p className="mt-3 text-sm text-foreground/80 dark:text-white/80">
-              Evidence-backed insights curated by pharmacists, physicians, and
-              clinical researchers.
+              {t("section.whatsInsideDescription")}
             </p>
 
             <div className="mt-6 space-y-4">
@@ -119,10 +120,10 @@ export function SectionPageScreen({
                     </span>
                     <div>
                       <p className="font-semibold text-foreground dark:text-white">
-                        {highlight.title}
+                        {t(highlight.title, { fallback: highlight.title })}
                       </p>
                       <p className="text-sm text-foreground/70 dark:text-white/70">
-                        {highlight.description}
+                        {t(highlight.description, { fallback: highlight.description })}
                       </p>
                     </div>
                   </div>
@@ -137,11 +138,10 @@ export function SectionPageScreen({
       <section className="container mt-20 space-y-12">
         <div className="space-y-3">
           <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">
-            Essential Highlights
+            {t("section.essentialHighlights")}
           </h2>
           <p className="text-secondary/80 dark:text-muted-foreground">
-            Explore the core capabilities and resources available within this
-            section.
+            {t("section.essentialHighlightsDescription")}
           </p>
         </div>
 
@@ -158,10 +158,10 @@ export function SectionPageScreen({
                     <Icon className="h-6 w-6" aria-hidden />
                   </span>
                   <CardTitle className="text-xl text-secondary dark:text-white">
-                    {highlight.title}
+                    {t(highlight.title, { fallback: highlight.title })}
                   </CardTitle>
                   <CardDescription className="text-secondary/80 dark:text-muted-foreground">
-                    {highlight.description}
+                    {t(highlight.description, { fallback: highlight.description })}
                   </CardDescription>
                 </CardHeader>
               </Card>
@@ -177,15 +177,14 @@ export function SectionPageScreen({
             <header className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
               <div>
                 <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">
-                  Latest Coverage
+                  {t("section.latestCoverage")}
                 </h2>
                 <p className="text-secondary/80 dark:text-muted-foreground">
-                  Breaking news and deep dives sourced from medical journals and
-                  agencies.
+                  {t("section.latestCoverageDescription")}
                 </p>
               </div>
               <Button variant="ghost" asChild className="text-primary">
-                <Link href="/news/archive">View Archive</Link>
+                <Link href="/news/archive">{t("section.viewArchive")}</Link>
               </Button>
             </header>
 
@@ -199,11 +198,10 @@ export function SectionPageScreen({
           <>
             <header className="space-y-3">
               <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">
-                Featured Tools
+                {t("section.featuredTools")}
               </h2>
               <p className="text-secondary/80 dark:text-muted-foreground">
-                Launch interactive calculators, identifiers, and clinical
-                workflow aids.
+                {t("section.featuredToolsDescription")}
               </p>
             </header>
             <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -217,31 +215,21 @@ export function SectionPageScreen({
             <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
               <CardHeader className="space-y-3">
                 <CardTitle className="text-2xl text-secondary dark:text-white">
-                  In-depth Resources
+                  {t("section.inDepthResources")}
                 </CardTitle>
                 <CardDescription className="text-secondary/80 dark:text-muted-foreground">
-                  Dive into curated resources designed to support clinicians,
-                  researchers, and informed patients.
+                  {t("section.inDepthDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 text-sm text-secondary/80 dark:text-muted-foreground">
-                <p>
-                  Each entry is peer-reviewed and cross-referenced with
-                  authoritative sources including the FDA, EMA, WHO, and AHFS.
-                  Bookmark key references and receive notifications when new
-                  evidence emerges.
-                </p>
-                <p>
-                  Customize your feed, export citations, and collaborate with
-                  colleagues to build a tailored knowledge base for your care
-                  teams.
-                </p>
+                <p>{t("section.inDepthBody1")}</p>
+                <p>{t("section.inDepthBody2")}</p>
               </CardContent>
             </Card>
 
             <Card className="border-none bg-muted/60 p-6 shadow-sm ring-1 ring-border/10 dark:bg-secondary/50">
               <h3 className="text-lg font-semibold text-secondary dark:text-white">
-                Ready to explore deeper?
+                {t("section.readyTitle")}
               </h3>
               <ul className="mt-4 space-y-3 text-sm text-secondary/80 dark:text-muted-foreground">
                 {content.actions.map((action) => (
@@ -250,7 +238,7 @@ export function SectionPageScreen({
                       href={action.href}
                       className="flex items-center justify-between rounded-2xl bg-white/60 px-4 py-3 font-semibold text-secondary transition hover:bg-white"
                     >
-                      {action.label}
+                      {t(action.label, { fallback: action.label })}
                       <ArrowRight className="h-4 w-4" aria-hidden />
                     </Link>
                   </li>

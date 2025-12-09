@@ -9,24 +9,32 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
+import { useTranslation } from "@/components/i18n/translation-provider";
+import { LanguageToggle } from "@/components/language-toggle";
 
 const NAV_LINKS = [
-  { name: "Home", href: "/" },
-  { name: "Drug Info", href: "/drugs-info" },
-  { name: "Drug Interaction", href: "/drug-interaction" },
-  { name: "Prescription", href: "/prescription" },
+  { nameKey: "nav.home", href: "/" },
+  { nameKey: "nav.drugInfo", href: "/drugs-info" },
+  { nameKey: "nav.drugInteraction", href: "/drug-interaction" },
+  { nameKey: "nav.prescription", href: "/prescription" },
 ];
 
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
+  const { t, language } = useTranslation();
 
   React.useEffect(() => {
     setOpen(false);
   }, [pathname]);
 
   return (
-    <header className="sticky top-4 z-50 mx-auto w-full max-w-6xl px-4">
+    <header
+      className={cn(
+        "sticky top-4 z-50 mx-auto w-full px-4",
+        language === "vi" ? "max-w-7xl" : "max-w-6xl"
+      )}
+    >
       <div className="relative rounded-[calc(var(--radius)_+_0.5rem)] border border-white/50 bg-white/90 shadow-[0_24px_80px_-40px_rgba(12,39,60,0.55)] backdrop-blur-md transition-colors dark:border-white/10 dark:bg-secondary/80">
         <nav className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4">
           <Logo />
@@ -40,14 +48,14 @@ export function Navbar() {
                     : pathname?.startsWith(link.href);
                 return (
                   <Link
-                    key={link.name}
+                    key={link.nameKey}
                     href={link.href}
                     className={cn(
                       "relative text-sm font-semibold text-secondary transition hover:text-primary dark:text-white/75",
                       isActive && "text-primary dark:text-accent"
                     )}
                   >
-                    {link.name}
+                    {t(link.nameKey)}
                     {isActive ? (
                       <motion.span
                         layoutId="nav-underline"
@@ -62,17 +70,19 @@ export function Navbar() {
 
             <div className="flex items-center gap-2">
               <ThemeToggle />
+              <LanguageToggle />
               <Button variant="ghost" asChild className="text-sm font-semibold">
-                <Link href="/signin">Sign in</Link>
+                <Link href="/signin">{t("nav.signIn")}</Link>
               </Button>
               <Button size="sm" className="rounded-full px-5 text-sm">
-                <Link href="/signup">Register</Link>
+                <Link href="/signup">{t("nav.register")}</Link>
               </Button>
             </div>
           </div>
 
           <div className="flex items-center gap-2 md:hidden">
             <ThemeToggle />
+            <LanguageToggle />
             <Button
               variant="ghost"
               size="icon"
@@ -103,7 +113,7 @@ export function Navbar() {
                         : pathname?.startsWith(link.href);
                     return (
                       <Link
-                        key={link.name}
+                        key={link.nameKey}
                         href={link.href}
                         className={cn(
                           "rounded-2xl border border-transparent px-4 py-3 text-sm font-semibold text-secondary transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary",
@@ -111,7 +121,7 @@ export function Navbar() {
                             "border-primary/30 bg-primary/10 text-primary"
                         )}
                       >
-                        {link.name}
+                        {t(link.nameKey)}
                       </Link>
                     );
                   })}
@@ -122,10 +132,10 @@ export function Navbar() {
                     className="flex-1 rounded-full"
                     asChild
                   >
-                    <Link href="/signin">Sign in</Link>
+                    <Link href="/signin">{t("nav.signIn")}</Link>
                   </Button>
                   <Button className="flex-1 rounded-full" asChild>
-                    <Link href="/signup">Register</Link>
+                    <Link href="/signup">{t("nav.register")}</Link>
                   </Button>
                 </div>
               </div>

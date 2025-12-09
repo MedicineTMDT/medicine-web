@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { DrugInfoSearchBar, type DrugInfoSuggestion } from "@/components/drugs-info/search-bar";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 type MultiDrugSearchProps = {
   suggestions: DrugInfoSuggestion[];
@@ -27,6 +28,7 @@ export function MultiDrugSearch({
   const [query, setQuery] = useState("");
   const atLimit = useMemo(() => selected.length >= max, [selected.length, max]);
   const warning = selected.length > 10;
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (query) onQueryChange(query);
@@ -45,7 +47,7 @@ export function MultiDrugSearch({
           setQuery("");
         }}
         loading={loading}
-        placeholder={atLimit ? "Limit reached" : "Add a drug to check"}
+        placeholder={atLimit ? t("drugsInfo.limitReached") : t("drugsInfo.addDrugPrompt")}
       />
 
       <div className="flex flex-wrap gap-2">
@@ -57,28 +59,26 @@ export function MultiDrugSearch({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               className="inline-flex items-center gap-2 rounded-full border border-[var(--glass-border)] bg-white/80 px-3 py-1 text-sm font-semibold text-secondary shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/10 dark:text-white/80"
-            >
-              {item.label}
-              <button
-                type="button"
-                aria-label={`Remove ${item.label}`}
-                onClick={() => onRemove(item.id)}
-                className="rounded-full p-1 text-muted-foreground transition hover:bg-primary/10"
               >
-                <X className="h-4 w-4" aria-hidden />
-              </button>
+                {item.label}
+                <button
+                  type="button"
+                  aria-label={t("drugsInfo.removeItem", { values: { item: item.label } })}
+                  onClick={() => onRemove(item.id)}
+                  className="rounded-full p-1 text-muted-foreground transition hover:bg-primary/10"
+                >
+                  <X className="h-4 w-4" aria-hidden />
+                </button>
             </motion.span>
           ))}
         </AnimatePresence>
       </div>
 
       <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>
-          {selected.length} selected / {max} limit
-        </span>
+        <span>{t("drugsInfo.selectedCount", { values: { selected: selected.length, max } })}</span>
         {warning ? (
           <span className="rounded-full bg-amber-500/15 px-3 py-1 font-semibold text-amber-700 dark:text-amber-200">
-            Limit exceeded, remove items.
+            {t("drugsInfo.limitExceeded")}
           </span>
         ) : null}
       </div>

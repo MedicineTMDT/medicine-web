@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 type FilterTagsProps = {
   tags: string[];
@@ -12,6 +13,7 @@ type FilterTagsProps = {
 
 export function FilterTags({ tags, active, onToggle, onClear }: FilterTagsProps) {
   const hasActive = active.length > 0;
+  const { t } = useTranslation();
   return (
     <div className="flex flex-wrap items-center gap-2">
       {tags.map((tag) => {
@@ -29,7 +31,7 @@ export function FilterTags({ tags, active, onToggle, onClear }: FilterTagsProps)
             )}
             aria-pressed={selected}
           >
-            {tag}
+            {t(tag, { fallback: tag })}
           </button>
         );
       })}
@@ -41,7 +43,7 @@ export function FilterTags({ tags, active, onToggle, onClear }: FilterTagsProps)
           className="rounded-full text-xs font-semibold"
           onClick={onClear}
         >
-          Clear filters
+          {t("actions.clearFilters")}
         </Button>
       ) : null}
     </div>

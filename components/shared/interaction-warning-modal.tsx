@@ -6,6 +6,7 @@ import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import type { DrugInteractionRule, DrugInfo } from "@/lib/mockData";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 type InteractionWarningModalProps = {
   open: boolean;
@@ -23,6 +24,7 @@ export function InteractionWarningModal({
   drugLookup,
 }: InteractionWarningModalProps) {
   const firstButtonRef = useRef<HTMLButtonElement | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (open) firstButtonRef.current?.focus();
@@ -49,10 +51,10 @@ export function InteractionWarningModal({
               <AlertTriangle className="mt-1 h-6 w-6 text-amber-500" aria-hidden />
               <div className="space-y-2">
                 <h2 className="text-xl font-semibold text-secondary dark:text-white">
-                  Interaction warnings detected
+                  {t("prescription.modalTitle")}
                 </h2>
                 <p className="text-sm text-secondary/80 dark:text-muted-foreground">
-                  Review these interactions before finalizing the prescription.
+                  {t("prescription.modalDescription")}
                 </p>
               </div>
             </div>
@@ -67,7 +69,7 @@ export function InteractionWarningModal({
                   >
                     <p className="font-semibold">{names}</p>
                     <p className="text-xs uppercase tracking-wide text-amber-700 dark:text-amber-200">
-                      {alert.severity}
+                      {t(`drugInteraction.severity.${alert.severity}`, { fallback: alert.severity })}
                     </p>
                     <p className="mt-1 text-sm text-secondary/85 dark:text-white/80">
                       {alert.recommendation}
@@ -78,10 +80,10 @@ export function InteractionWarningModal({
             </div>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
               <Button ref={firstButtonRef} variant="outline" className="rounded-full" onClick={onCancel}>
-                Cancel
+                {t("actions.cancel")}
               </Button>
               <Button className="rounded-full" onClick={onConfirm}>
-                Continue Anyway
+                {t("actions.continueAnyway")}
               </Button>
             </div>
           </motion.div>

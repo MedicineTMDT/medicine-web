@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { PrescriptionRecord, DrugInfo } from "@/lib/mockData";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 const statusStyles: Record<PrescriptionRecord["status"], string> = {
   active: "bg-emerald-500/10 text-emerald-800 ring-emerald-500/30 dark:text-emerald-200",
@@ -28,7 +29,9 @@ type Props = {
 };
 
 export function PrescriptionCard({ rx, drugLookup, href, index = 0, onClick }: Props) {
+  const { t } = useTranslation();
   const Icon = statusIcon[rx.status];
+  const statusLabel = t(`prescription.status.${rx.status}`, { fallback: rx.status });
   return (
     <motion.article
       initial={{ opacity: 0, y: 16 }}
@@ -41,7 +44,9 @@ export function PrescriptionCard({ rx, drugLookup, href, index = 0, onClick }: P
       >
         <CardHeader className="space-y-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-xl text-secondary dark:text-white">Rx {rx.id}</CardTitle>
+            <CardTitle className="text-xl text-secondary dark:text-white">
+              {t("prescription.rxPrefix")} {rx.id}
+            </CardTitle>
             <span
               className={cn(
                 "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1",
@@ -49,7 +54,7 @@ export function PrescriptionCard({ rx, drugLookup, href, index = 0, onClick }: P
               )}
             >
               <Icon className="h-4 w-4" aria-hidden />
-              {rx.status}
+              {statusLabel}
             </span>
           </div>
           <CardDescription className="text-secondary/80 dark:text-muted-foreground">
@@ -72,7 +77,7 @@ export function PrescriptionCard({ rx, drugLookup, href, index = 0, onClick }: P
               href={href}
               className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3"
             >
-              View details
+              {t("prescription.viewDetails")}
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           ) : (
@@ -81,7 +86,7 @@ export function PrescriptionCard({ rx, drugLookup, href, index = 0, onClick }: P
               onClick={onClick}
               className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:gap-3"
             >
-              View details
+              {t("prescription.viewDetails")}
               <ArrowRight className="h-4 w-4" aria-hidden />
             </button>
           )}

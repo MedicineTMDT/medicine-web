@@ -38,6 +38,7 @@ import {
   type DrugInteractionRule,
   type PrescriptionRecord,
 } from "@/lib/mockData";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 const builderSchema = z.object({
   patientName: z.string().min(2, "Enter patient name"),
@@ -65,6 +66,7 @@ export function PrescriptionPageScreen() {
   const [selectedRx, setSelectedRx] = useState<PrescriptionRecord | null>(null);
   const [builderQuery, setBuilderQuery] = useState("");
   const [loadingCheck, setLoadingCheck] = useState(false);
+  const { t } = useTranslation();
 
   const drugLookup: Record<string, DrugInfo> = useMemo(
     () => Object.fromEntries(drugInfoList.map((d) => [d.id, d])),
@@ -118,7 +120,7 @@ export function PrescriptionPageScreen() {
   };
 
   const finalize = () => {
-    setSuccessMessage("Prescription created (mock). No data was persisted.");
+    setSuccessMessage(t("prescription.successMessage"));
     reset();
   };
 
@@ -132,31 +134,31 @@ export function PrescriptionPageScreen() {
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-            className="mx-auto max-w-2xl space-y-4"
-          >
-            <p className="inline-flex items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/80 px-5 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-secondary dark:border-white/20 dark:bg-white/10 dark:text-white">
-              Prescription Workspace
-            </p>
-            <h1 className="text-3xl font-heading font-semibold leading-tight text-secondary dark:text-white md:text-4xl">
-              Role-based prescription view
-            </h1>
-            <p className="text-sm text-secondary/80 dark:text-white/80 md:text-base">
-              Switch between patient and pharmacist modes with inline interaction checks before anything is signed off.
-            </p>
-          </motion.div>
+          transition={{ duration: 0.45 }}
+          className="mx-auto max-w-2xl space-y-4"
+        >
+          <p className="inline-flex items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/80 px-5 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-secondary dark:border-white/20 dark:bg-white/10 dark:text-white">
+            {t("prescription.badge")}
+          </p>
+          <h1 className="text-3xl font-heading font-semibold leading-tight text-secondary dark:text-white md:text-4xl">
+            {t("prescription.title")}
+          </h1>
+          <p className="text-sm text-secondary/80 dark:text-white/80 md:text-base">
+            {t("prescription.description")}
+          </p>
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 32 }}
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.08 }}
-            className="flex flex-col items-center gap-2"
-          >
-            <PrescriptionRoleToggle value={role} onChange={setRole} />
-            <p className="text-xs text-secondary/70 dark:text-white/70">Switch perspectives to preview each workflow mode.</p>
-          </motion.div>
-        </div>
-      </section>
+          transition={{ duration: 0.45, delay: 0.08 }}
+          className="flex flex-col items-center gap-2"
+        >
+          <PrescriptionRoleToggle value={role} onChange={setRole} />
+          <p className="text-xs text-secondary/70 dark:text-white/70">{t("prescription.switchHint")}</p>
+        </motion.div>
+      </div>
+    </section>
 
       {role === "patient" ? (
         <section className="container mt-12">
@@ -178,9 +180,11 @@ export function PrescriptionPageScreen() {
           <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
             <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
               <CardHeader>
-                <CardTitle className="text-2xl text-secondary dark:text-white">Create prescription</CardTitle>
+                <CardTitle className="text-2xl text-secondary dark:text-white">
+                  {t("prescription.createTitle")}
+                </CardTitle>
                 <CardDescription className="text-secondary/75 dark:text-muted-foreground">
-                  Add patient details and build a drug list. Interaction checks run before creation.
+                  {t("prescription.createDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -192,9 +196,9 @@ export function PrescriptionPageScreen() {
                         name="patientName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Patient name</FormLabel>
+                            <FormLabel>{t("prescription.patientName")}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="e.g., Jordan Smith" />
+                              <Input {...field} placeholder={t("prescription.patientName.placeholder")} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -205,7 +209,7 @@ export function PrescriptionPageScreen() {
                         name="dob"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Date of birth</FormLabel>
+                            <FormLabel>{t("prescription.dob")}</FormLabel>
                             <FormControl>
                               <Input {...field} type="date" />
                             </FormControl>
@@ -218,9 +222,9 @@ export function PrescriptionPageScreen() {
                         name="patientId"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Patient ID</FormLabel>
+                            <FormLabel>{t("prescription.patientId")}</FormLabel>
                             <FormControl>
-                              <Input {...field} placeholder="Optional ID" />
+                              <Input {...field} placeholder={t("prescription.patientId.placeholder")} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -229,7 +233,7 @@ export function PrescriptionPageScreen() {
                     </div>
 
                     <div className="space-y-5 rounded-[2rem] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-5 text-center shadow-glass backdrop-blur dark:border-white/10 dark:bg-white/5">
-                      <p className="text-sm font-semibold text-secondary dark:text-white">Quick add</p>
+                      <p className="text-sm font-semibold text-secondary dark:text-white">{t("prescription.quickAdd")}</p>
                       <div className="mx-auto max-w-3xl">
                         <MultiDrugSearch
                           suggestions={suggestions}
@@ -269,11 +273,13 @@ export function PrescriptionPageScreen() {
 
                     <div className="flex items-center justify-between gap-3 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-4 text-sm text-muted-foreground dark:border-white/10 dark:bg-white/5">
                       <div>
-                        <p className="font-semibold text-secondary dark:text-white">Interaction preview</p>
+                        <p className="font-semibold text-secondary dark:text-white">
+                          {t("prescription.interactionPreview")}
+                        </p>
                         <p>
                           {alerts.length
-                            ? "Potential alerts detected."
-                            : "No alerts yet. A full check runs on submission."}
+                            ? t("prescription.alertsDetected")
+                            : t("prescription.noAlerts")}
                         </p>
                       </div>
                       <span
@@ -284,14 +290,16 @@ export function PrescriptionPageScreen() {
                             : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-200"
                         )}
                       >
-                        {alerts.length} alert{alerts.length === 1 ? "" : "s"}
+                        {t("prescription.alertCount", {
+                          values: { count: alerts.length, suffix: alerts.length === 1 ? "" : "s" },
+                        })}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-end gap-3">
                       <Button type="submit" size="lg" className="rounded-full px-8" disabled={loadingCheck}>
                         {loadingCheck ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
-                        Create Prescription
+                        {t("prescription.submit")}
                       </Button>
                     </div>
                   </form>
@@ -301,9 +309,9 @@ export function PrescriptionPageScreen() {
 
             <Card className="border-none bg-white/90 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/60">
               <CardHeader>
-                <CardTitle className="text-xl text-secondary dark:text-white">Mock interaction logic</CardTitle>
+                <CardTitle className="text-xl text-secondary dark:text-white">{t("prescription.mockLogicTitle")}</CardTitle>
                 <CardDescription className="text-secondary/75 dark:text-muted-foreground">
-                  Example pairs that will raise warnings during creation.
+                  {t("prescription.mockLogicDescription")}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 text-sm text-secondary/80 dark:text-muted-foreground">
@@ -374,13 +382,15 @@ export function PrescriptionPageScreen() {
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <h2 className="text-xl font-semibold text-secondary dark:text-white">Prescription {selectedRx.id}</h2>
+                  <h2 className="text-xl font-semibold text-secondary dark:text-white">
+                    {t("prescription.rxLabel", { values: { id: selectedRx.id } })}
+                  </h2>
                   <p className="text-sm text-muted-foreground">
                     {selectedRx.pharmacistName} • {selectedRx.createdAt}
                   </p>
                 </div>
                 <Button variant="ghost" onClick={() => setSelectedRx(null)}>
-                  Close
+                  {t("actions.close")}
                 </Button>
               </div>
               <Separator className="my-4 border-[var(--glass-border)] bg-[var(--glass-border)] dark:border-white/10 dark:bg-white/10" />
@@ -401,7 +411,7 @@ export function PrescriptionPageScreen() {
                 ))}
               </div>
               <div className="mt-4 rounded-2xl bg-[var(--muted)]/40 px-4 py-3 text-sm text-secondary/80 dark:bg-white/10 dark:text-white/80">
-                Refill info and pharmacy contact are mock placeholders in this demo.
+                {t("prescription.refillInfo")}
               </div>
             </motion.div>
           </motion.div>

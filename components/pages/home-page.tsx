@@ -18,15 +18,17 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { FormEvent } from "react";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 const heroActions = [
-  { icon: Pill, label: "Drug Info", href: "/drugs" },
-  { icon: Microscope, label: "Interactions", href: "/interactions" },
-  { icon: HeartPulse, label: "Pill ID", href: "/pill-identifier" },
-  { icon: BookOpenCheck, label: "Health Tools", href: "/tools" },
+  { icon: Pill, labelKey: "home.actions.drugInfo", href: "/drugs" },
+  { icon: Microscope, labelKey: "home.actions.interactions", href: "/interactions" },
+  { icon: HeartPulse, labelKey: "home.actions.pillId", href: "/pill-identifier" },
+  { icon: BookOpenCheck, labelKey: "home.actions.healthTools", href: "/tools" },
 ];
 
 export function HomePageScreen() {
+  const { t } = useTranslation();
   const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   };
@@ -53,18 +55,18 @@ export function HomePageScreen() {
             className="mx-auto max-w-4xl space-y-6"
           >
             <span className="inline-flex items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/70 px-5 py-2 text-xs font-semibold uppercase tracking-[0.4em] text-secondary dark:border-white/20 dark:bg-white/5 dark:text-white">
-              Trusted • Accurate • Up-to-date
+              {t("home.trustTagline")}
             </span>
             <h1 className="font-heading text-4xl font-semibold leading-tight text-secondary dark:text-white md:text-5xl">
-              Your trusted medical intelligence hub
+              {t("home.heroTitle")}
             </h1>
             <p className="text-lg text-secondary/85 dark:text-white/85">
-              Search medications, interactions, and tools from a single clinical-grade workspace built for clarity.
+              {t("home.heroSubtitle")}
             </p>
             <div className="flex flex-wrap justify-center gap-3 text-xs font-semibold text-secondary/70 dark:text-white/70">
-              <span className="rounded-full bg-white/10 px-4 py-1">Drug monographs</span>
-              <span className="rounded-full bg-white/10 px-4 py-1">Interaction alerts</span>
-              <span className="rounded-full bg-white/10 px-4 py-1">Clinical tools</span>
+              <span className="rounded-full bg-white/10 px-4 py-1">{t("home.heroChip.monographs")}</span>
+              <span className="rounded-full bg-white/10 px-4 py-1">{t("home.heroChip.interactionAlerts")}</span>
+              <span className="rounded-full bg-white/10 px-4 py-1">{t("home.heroChip.clinicalTools")}</span>
             </div>
           </motion.div>
 
@@ -77,7 +79,7 @@ export function HomePageScreen() {
           >
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <Input
-                placeholder="Search for medications, interactions, or tools..."
+                placeholder={t("home.searchPlaceholder")}
                 className="h-14 flex-1 rounded-full border-white/30 bg-white/90 text-base text-secondary placeholder:text-secondary/70 focus-visible:ring-0"
               />
               <Button
@@ -86,7 +88,7 @@ export function HomePageScreen() {
                 className="h-14 rounded-full bg-primary px-8 text-secondary hover:bg-primary/90"
               >
                 <Search className="mr-2 h-5 w-5" aria-hidden />
-                Search
+                {t("actions.search")}
               </Button>
             </div>
           </motion.form>
@@ -101,7 +103,7 @@ export function HomePageScreen() {
               const Icon = action.icon;
               return (
                 <motion.div
-                  key={action.label}
+                  key={action.labelKey}
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.45, delay: 0.05 * index }}
@@ -114,7 +116,7 @@ export function HomePageScreen() {
                     <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15">
                       <Icon className="h-5 w-5" aria-hidden />
                     </span>
-                    <span className="text-base font-semibold">{action.label}</span>
+                    <span className="text-base font-semibold">{t(action.labelKey)}</span>
                   </Link>
                 </motion.div>
               );
@@ -126,18 +128,19 @@ export function HomePageScreen() {
       <section className="container space-y-10">
         <div className="mx-auto max-w-3xl space-y-3 text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-            Why clinicians choose us
+            {t("home.whyTagline")}
           </p>
           <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">
-            Clinical-grade insights for everyone
+            {t("home.whyTitle")}
           </h2>
           <p className="text-secondary/80 dark:text-muted-foreground">
-            Daily-updated content, pharmacist review, and workflow-friendly tools keep every care decision aligned.
+            {t("home.whyDescription")}
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {featureHighlights.map((feature, index) => {
             const Icon = feature.icon;
+            const baseKey = feature.translationKey;
             return (
               <motion.div
                 key={feature.title}
@@ -150,8 +153,14 @@ export function HomePageScreen() {
                 <span className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[var(--muted)]/50 text-secondary dark:bg-white/10 dark:text-white">
                   <Icon className="h-5 w-5" aria-hidden />
                 </span>
-                <h3 className="text-xl font-semibold text-secondary dark:text-white">{feature.title}</h3>
-                <p className="mt-2 text-sm text-secondary/80 dark:text-muted-foreground">{feature.description}</p>
+                <h3 className="text-xl font-semibold text-secondary dark:text-white">
+                  {baseKey ? t(`${baseKey}.title`, { fallback: feature.title }) : t(feature.title, { fallback: feature.title })}
+                </h3>
+                <p className="mt-2 text-sm text-secondary/80 dark:text-muted-foreground">
+                  {baseKey
+                    ? t(`${baseKey}.description`, { fallback: feature.description })
+                    : t(feature.description, { fallback: feature.description })}
+                </p>
               </motion.div>
             );
           })}
@@ -163,7 +172,7 @@ export function HomePageScreen() {
             asChild
           >
             <Link href="/guides">
-              Explore our resources
+              {t("home.ctaResources")}
               <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
           </Button>
@@ -172,10 +181,10 @@ export function HomePageScreen() {
 
       <section className="container space-y-6">
         <div className="mx-auto max-w-3xl space-y-3 text-center">
-          <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">Popular categories</h2>
-          <p className="text-secondary/80 dark:text-muted-foreground">
-            Quick access to the most searched medical information curated by our clinical experts.
-          </p>
+          <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">
+            {t("home.categoriesTitle")}
+          </h2>
+          <p className="text-secondary/80 dark:text-muted-foreground">{t("home.categoriesDescription")}</p>
         </div>
         <div className="rounded-[2.5rem] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-8 shadow-glass backdrop-blur dark:border-white/10 dark:bg-white/5">
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -189,13 +198,13 @@ export function HomePageScreen() {
       <section className="container space-y-8">
         <div className="flex flex-col items-center gap-3 text-center md:flex-row md:items-end md:justify-between md:text-left">
           <div className="space-y-2">
-            <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">Latest medical news</h2>
-            <p className="text-secondary/80 dark:text-muted-foreground">
-              Stay updated with the latest healthcare developments and regulatory alerts.
-            </p>
+            <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">
+              {t("home.newsTitle")}
+            </h2>
+            <p className="text-secondary/80 dark:text-muted-foreground">{t("home.newsDescription")}</p>
           </div>
           <Button variant="ghost" asChild className="text-primary">
-            <Link href="/news">View all →</Link>
+            <Link href="/news">{t("home.newsViewAll")}</Link>
           </Button>
         </div>
         <div className="rounded-[2.5rem] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-8 shadow-glass backdrop-blur dark:border-white/10 dark:bg-white/5">
@@ -210,11 +219,9 @@ export function HomePageScreen() {
       <section className="container space-y-6">
         <div className="mx-auto max-w-3xl space-y-3 text-center">
           <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">
-            Medical tools & resources
+            {t("home.toolsTitle")}
           </h2>
-          <p className="text-secondary/80 dark:text-muted-foreground">
-            Essential tools for medication management, dosage calculations, and interaction checks.
-          </p>
+          <p className="text-secondary/80 dark:text-muted-foreground">{t("home.toolsDescription")}</p>
         </div>
         <div className="rounded-[2.5rem] border border-[var(--glass-border)] bg-[var(--glass-bg)] p-8 shadow-glass backdrop-blur dark:border-white/10 dark:bg-white/5">
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">

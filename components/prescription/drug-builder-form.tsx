@@ -20,6 +20,7 @@ import {
   UseFieldArrayAppend,
   UseFieldArrayRemove,
 } from "react-hook-form";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 type Props = {
   control: Control<FormValues>;
@@ -38,10 +39,11 @@ export function DrugBuilderForm({
   errors,
   drugs,
 }: Props) {
+  const { t } = useTranslation();
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <FormLabel className="text-base">Medications</FormLabel>
+        <FormLabel className="text-base">{t("drugBuilder.title")}</FormLabel>
         <Button
           type="button"
           variant="ghost"
@@ -56,7 +58,7 @@ export function DrugBuilderForm({
           }
         >
           <Plus className="h-4 w-4" aria-hidden />
-          Add drug
+          {t("drugBuilder.addDrug")}
         </Button>
       </div>
 
@@ -74,7 +76,7 @@ export function DrugBuilderForm({
                 name={`items.${index}.drugId`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Drug</FormLabel>
+                    <FormLabel>{t("drugBuilder.drug")}</FormLabel>
                     <FormControl>
                       <select
                         {...field}
@@ -84,7 +86,7 @@ export function DrugBuilderForm({
                         )}
                         aria-invalid={!!errors.items?.[index]?.drugId}
                       >
-                        <option value="">Select a drug</option>
+                        <option value="">{t("drugBuilder.selectDrug")}</option>
                         {drugs.map((drug) => (
                           <option key={drug.id} value={drug.id}>
                             {drug.name} — {drug.category}
@@ -102,7 +104,7 @@ export function DrugBuilderForm({
                 name={`items.${index}.quantity`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quantity</FormLabel>
+                    <FormLabel>{t("drugBuilder.quantity")}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
@@ -121,11 +123,11 @@ export function DrugBuilderForm({
                 name={`items.${index}.dosage`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Dosage</FormLabel>
+                    <FormLabel>{t("drugBuilder.dosage")}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="e.g., 500mg"
+                        placeholder={t("drugBuilder.dosage.placeholder")}
                         aria-invalid={!!errors.items?.[index]?.dosage}
                       />
                     </FormControl>
@@ -139,19 +141,19 @@ export function DrugBuilderForm({
                 name={`items.${index}.schedule`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Schedule</FormLabel>
+                    <FormLabel>{t("drugBuilder.schedule")}</FormLabel>
                     <FormControl>
                       <select
                         {...field}
                         className="h-11 w-full rounded-xl border border-[var(--input)] bg-white/80 px-3 text-sm text-secondary shadow-sm transition focus:border-[var(--ring)] focus:outline-none dark:border-white/15 dark:bg-secondary/40 dark:text-white"
                       >
-                        <option value="Once daily">Once daily</option>
-                        <option value="Twice daily">Twice daily</option>
+                        <option value="Once daily">{t("drugBuilder.schedule.onceDaily")}</option>
+                        <option value="Twice daily">{t("drugBuilder.schedule.twiceDaily")}</option>
                         <option value="Three times daily">
-                          Three times daily
+                          {t("drugBuilder.schedule.threeTimesDaily")}
                         </option>
-                        <option value="As needed">As needed</option>
-                        <option value="Every other day">Every other day</option>
+                        <option value="As needed">{t("drugBuilder.schedule.asNeeded")}</option>
+                        <option value="Every other day">{t("drugBuilder.schedule.everyOtherDay")}</option>
                       </select>
                     </FormControl>
                     <FormMessage />
@@ -166,7 +168,7 @@ export function DrugBuilderForm({
                 size="icon"
                 className="mt-8"
                 onClick={() => remove(index)}
-                aria-label="Remove medication"
+                aria-label={t("drugBuilder.removeMedication")}
               >
                 <Trash2 className="h-4 w-4" aria-hidden />
               </Button>

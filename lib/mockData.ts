@@ -27,6 +27,7 @@ export type Category = {
   cta: string;
   icon: LucideIcon;
   accent?: string;
+  translationKey?: string;
 };
 
 export type NewsItem = {
@@ -36,6 +37,7 @@ export type NewsItem = {
   tag: string;
   timestamp: string;
   image?: string;
+  translationKey?: string;
 };
 
 export type ToolItem = {
@@ -44,10 +46,12 @@ export type ToolItem = {
   href: string;
   icon: LucideIcon;
   gradient?: string;
+  translationKey?: string;
 };
 
 export const categories: Category[] = [
   {
+    translationKey: "category.topMedications",
     title: "Top Medications",
     description:
       "Most prescribed and researched medications with clinical guidance and patient tips.",
@@ -57,6 +61,7 @@ export const categories: Category[] = [
     accent: "from-[#D8F2FF] via-[#F0FAFF] to-[#E0F6FF]",
   },
   {
+    translationKey: "category.healthConditions",
     title: "Health Conditions",
     description:
       "Evidence-based summaries covering symptoms, diagnostics, and treatment pathways.",
@@ -66,6 +71,7 @@ export const categories: Category[] = [
     accent: "from-[#E6EBFF] via-[#EEF1FF] to-[#F5F8FF]",
   },
   {
+    translationKey: "category.drugInteractions",
     title: "Drug Interactions",
     description:
       "Check for medication conflicts, contraindications, and clinical monitoring guidance.",
@@ -75,6 +81,7 @@ export const categories: Category[] = [
     accent: "from-[#FFE7EE] via-[#FFF3F6] to-[#FFEFF3]",
   },
   {
+    translationKey: "category.healthGuides",
     title: "Health Guides",
     description:
       "Expert-written guides to support treatment adherence and lifestyle recommendations.",
@@ -87,6 +94,7 @@ export const categories: Category[] = [
 
 export const news: NewsItem[] = [
   {
+    translationKey: "news.breakthroughCancer",
     title: "New Breakthrough in Cancer Treatment Shows Promise",
     description:
       "Researchers have identified a targeted therapy that significantly improves remission rates in aggressive solid tumors.",
@@ -97,6 +105,7 @@ export const news: NewsItem[] = [
       "https://images.unsplash.com/photo-1579154204601-01588f351e67?auto=format&fit=crop&w=1200&q=80",
   },
   {
+    translationKey: "news.fdaDiabetes",
     title: "FDA Approves New Diabetes Medication",
     description:
       "A once-weekly injection for type 2 diabetes has received approval after demonstrating durable glucose control.",
@@ -107,6 +116,7 @@ export const news: NewsItem[] = [
       "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=1200&q=80",
   },
   {
+    translationKey: "news.drugRecall",
     title: "Important Drug Recall Notice Issued",
     description:
       "The FDA has issued a recall for specific blood pressure medications due to potential contamination concerns.",
@@ -120,6 +130,7 @@ export const news: NewsItem[] = [
 
 export const tools: ToolItem[] = [
   {
+    translationKey: "tools.pillIdentifier",
     title: "Pill Identifier",
     description:
       "Identify medications by color, shape, and imprint codes with detailed references.",
@@ -128,6 +139,7 @@ export const tools: ToolItem[] = [
     gradient: "from-[#D7E8FF] via-[#E8F3FF] to-[#F1F8FF]",
   },
   {
+    translationKey: "tools.interactionChecker",
     title: "Interaction Checker",
     description:
       "Quickly evaluate potential interactions between prescription and OTC medications.",
@@ -136,6 +148,7 @@ export const tools: ToolItem[] = [
     gradient: "from-[#DAFFF3] via-[#E8FFF8] to-[#F2FFFA]",
   },
   {
+    translationKey: "tools.dosageCalculator",
     title: "Dosage Calculator",
     description:
       "Calculate weight-based or renal-adjusted medication dosages with clinical safeguards.",
@@ -144,6 +157,7 @@ export const tools: ToolItem[] = [
     gradient: "from-[#FFEBD8] via-[#FFF2E6] to-[#FFF6EE]",
   },
   {
+    translationKey: "tools.labReference",
     title: "Lab Reference Ranges",
     description:
       "Search age-specific and condition-specific laboratory reference ranges instantly.",
@@ -152,6 +166,7 @@ export const tools: ToolItem[] = [
     gradient: "from-[#EAE6FF] via-[#F4F2FF] to-[#F8F6FF]",
   },
   {
+    translationKey: "tools.immunization",
     title: "Immunization Schedules",
     description:
       "Stay updated with CDC-recommended immunization schedules tailored for each age group.",
@@ -160,6 +175,7 @@ export const tools: ToolItem[] = [
     gradient: "from-[#E6FFF2] via-[#F1FFF8] to-[#F5FFF9]",
   },
   {
+    translationKey: "tools.symptomChecker",
     title: "Symptom Checker",
     description:
       "Assess symptoms with evidence-backed decision trees and next-step guidance.",
@@ -171,18 +187,21 @@ export const tools: ToolItem[] = [
 
 export const featureHighlights = [
   {
+    translationKey: "feature.clinicalAccuracy",
     title: "Clinical Accuracy",
     description:
       "Reviewed by pharmacists and physicians with daily data refreshes from FDA and EMA resources.",
     icon: Stethoscope,
   },
   {
+    translationKey: "feature.personalizedExperience",
     title: "Personalized Experience",
     description:
       "Bookmark medications, set reminders, and tailor dashboards with patient or provider modes.",
     icon: PillBottle,
   },
   {
+    translationKey: "feature.decisionSupport",
     title: "Decision Support",
     description:
       "Smart calculators, risk scores, and alerts designed to support confident clinical decisions.",

@@ -8,10 +8,12 @@ import { FilterTags } from "@/components/drugs-info/filter-tags";
 import { DrugInfoCard } from "@/components/drugs-info/drug-card";
 import { Separator } from "@/components/ui/separator";
 import { drugInfoList, drugInfoTags, type DrugInfo } from "@/lib/mockData";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 export function DrugsInfoPageScreen() {
   const [query, setQuery] = useState("");
   const [activeTags, setActiveTags] = useState<string[]>([]);
+  const { t } = useTranslation();
 
   const suggestions: DrugInfoSuggestion[] = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -62,13 +64,13 @@ export function DrugsInfoPageScreen() {
             className="mx-auto max-w-2xl space-y-4"
           >
             <span className="inline-flex items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/80 px-5 py-1 text-xs font-semibold uppercase tracking-[0.4em] text-secondary dark:border-white/30 dark:bg-white/10 dark:text-white">
-              Drug Info
+              {t("drugsInfo.badge")}
             </span>
             <h1 className="text-3xl font-heading font-semibold leading-tight text-secondary dark:text-white md:text-4xl">
-              Explore medications with confidence
+              {t("drugsInfo.title")}
             </h1>
             <p className="text-sm text-secondary/80 dark:text-white/80 md:text-base">
-              Find medications fast with live suggestions and lightweight filters for dosing or safety notes.
+              {t("drugsInfo.description")}
             </p>
           </motion.div>
 
@@ -94,9 +96,13 @@ export function DrugsInfoPageScreen() {
       <section className="container mt-16 space-y-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">Results</h2>
+            <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">
+              {t("drugsInfo.results")}
+            </h2>
             <p className="text-secondary/80 dark:text-muted-foreground">
-              {filtered.length} match{filtered.length === 1 ? "" : "es"} found
+              {t("drugsInfo.matchesFound", {
+                values: { count: filtered.length, suffix: filtered.length === 1 ? "" : "es" },
+              })}
             </p>
           </div>
         </div>
@@ -113,8 +119,8 @@ export function DrugsInfoPageScreen() {
               <BookOpen className="h-10 w-10" aria-hidden />
             </div>
             <div className="space-y-1">
-              <p className="text-lg font-semibold text-secondary dark:text-white">No matches found</p>
-              <p className="text-sm text-muted-foreground">Try a different keyword or clear filters.</p>
+              <p className="text-lg font-semibold text-secondary dark:text-white">{t("drugsInfo.noMatchesTitle")}</p>
+              <p className="text-sm text-muted-foreground">{t("drugsInfo.noMatchesDescription")}</p>
             </div>
             <button
               type="button"
@@ -125,7 +131,7 @@ export function DrugsInfoPageScreen() {
               }}
             >
               <Search className="h-4 w-4" aria-hidden />
-              Reset search
+              {t("actions.clearSearch")}
             </button>
           </div>
         )}

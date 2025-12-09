@@ -1,27 +1,30 @@
+"use client";
+
 import Link from "next/link";
 import { Mail, MapPin, Phone, Facebook, Twitter, Linkedin, Youtube } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 const FOOTER_LINKS = [
   {
-    title: "Quick Links",
+    titleKey: "footer.quickLinks",
     links: [
-      { label: "Drug Information", href: "/drugs" },
-      { label: "Health Conditions", href: "/supplements" },
-      { label: "Medical News", href: "/news" },
-      { label: "Health Tools", href: "/tools" },
-      { label: "Drug Interactions", href: "/interactions" },
+      { labelKey: "footer.drugInformation", href: "/drugs" },
+      { labelKey: "footer.healthConditions", href: "/supplements" },
+      { labelKey: "footer.medicalNews", href: "/news" },
+      { labelKey: "footer.healthTools", href: "/tools" },
+      { labelKey: "footer.drugInteractions", href: "/interactions" },
     ],
   },
   {
-    title: "Legal",
+    titleKey: "footer.legal",
     links: [
-      { label: "Privacy Policy", href: "/legal/privacy" },
-      { label: "Terms of Use", href: "/legal/terms" },
-      { label: "About Us", href: "/guides/about" },
-      { label: "Contact", href: "/support/contact" },
-      { label: "Disclaimer", href: "/legal/disclaimer" },
+      { labelKey: "footer.privacyPolicy", href: "/legal/privacy" },
+      { labelKey: "footer.termsOfUse", href: "/legal/terms" },
+      { labelKey: "footer.aboutUs", href: "/guides/about" },
+      { labelKey: "footer.contact", href: "/support/contact" },
+      { labelKey: "footer.disclaimer", href: "/legal/disclaimer" },
     ],
   },
 ];
@@ -34,6 +37,8 @@ const SOCIAL_LINKS = [
 ];
 
 export function Footer({ className }: { className?: string }) {
+  const { t } = useTranslation();
+
   return (
     <footer
       className={cn(
@@ -45,38 +50,34 @@ export function Footer({ className }: { className?: string }) {
         <div className="space-y-6">
           <Logo className="text-[rgb(229,243,255)] dark:text-white" />
           <p className="max-w-md text-sm text-[rgba(229,243,255,0.75)] dark:text-white/70">
-            Your trusted source for accurate, up-to-date medical and pharmaceutical
-            information. Always consult healthcare professionals for medical advice.
+            {t("footer.description")}
           </p>
           <div className="grid gap-3 text-sm text-[rgba(229,243,255,0.75)] dark:text-white/70">
             <span className="flex items-center gap-2">
               <Mail className="h-4 w-4 text-accent" aria-hidden />
-              support@analyticspill.com
+              {t("footer.email")}
             </span>
             <span className="flex items-center gap-2">
               <Phone className="h-4 w-4 text-accent" aria-hidden />
-              +1 (800) 555-1024
+              {t("footer.phone")}
             </span>
             <span className="flex items-center gap-2">
               <MapPin className="h-4 w-4 text-accent" aria-hidden />
-              221B Health Avenue, Suite 12, Boston, MA
+              {t("footer.address")}
             </span>
           </div>
         </div>
 
         {FOOTER_LINKS.map((section) => (
-          <div key={section.title} className="space-y-5">
+          <div key={section.titleKey} className="space-y-5">
             <h3 className="text-base font-semibold text-[rgb(229,243,255)] dark:text-white">
-              {section.title}
+              {t(section.titleKey)}
             </h3>
             <ul className="space-y-3 text-sm text-[rgba(229,243,255,0.75)] dark:text-white/70">
               {section.links.map((link) => (
                 <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="transition hover:text-accent"
-                  >
-                    {link.label}
+                  <Link href={link.href} className="transition hover:text-accent">
+                    {t(link.labelKey)}
                   </Link>
                 </li>
               ))}
@@ -87,7 +88,9 @@ export function Footer({ className }: { className?: string }) {
 
       <div className="border-t border-white/10">
         <div className="container flex flex-col gap-4 py-6 text-sm text-[rgba(229,243,255,0.68)] dark:text-white/60 md:flex-row md:items-center md:justify-between">
-          <p>© {new Date().getFullYear()} AnalyticsPill. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} AnalyticsPill. {t("footer.allRights")}
+          </p>
           <div className="flex gap-3">
             {SOCIAL_LINKS.map((social) => {
               const Icon = social.icon;

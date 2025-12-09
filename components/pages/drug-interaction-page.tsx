@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { drugInfoList, drugInteractionRules, type DrugInteractionRule, type DrugInfo } from "@/lib/mockData";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 type Summary = {
   total: number;
@@ -30,6 +31,7 @@ export function DrugInteractionPageScreen() {
   const [results, setResults] = useState<DrugInteractionRule[]>([]);
   const [compoundResults, setCompoundResults] = useState<CompoundInsight[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const { t } = useTranslation();
 
   const drugLookup: Record<string, DrugInfo> = useMemo(
     () => Object.fromEntries(drugInfoList.map((d) => [d.id, d])),
@@ -140,13 +142,13 @@ export function DrugInteractionPageScreen() {
             className="mx-auto max-w-2xl space-y-4"
           >
             <span className="inline-flex items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/80 px-5 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-secondary dark:border-white/30 dark:bg-white/10 dark:text-white">
-              Drug Interaction
+              {t("drugInteraction.badge")}
             </span>
             <h1 className="text-3xl font-heading font-semibold leading-tight text-secondary dark:text-white md:text-4xl">
-              Evaluate multi-drug interactions
+              {t("drugInteraction.title")}
             </h1>
             <p className="text-sm text-secondary/80 dark:text-white/80 md:text-base">
-              Select up to ten meds and instantly surface severity badges, risks, and quick recommendations.
+              {t("drugInteraction.description")}
             </p>
           </motion.div>
 
@@ -167,7 +169,7 @@ export function DrugInteractionPageScreen() {
               />
             </div>
             <div className="flex flex-col items-center gap-3 text-center text-sm text-secondary/80 sm:flex-row sm:justify-between sm:text-left dark:text-white/80">
-              <p>Select 1–10 drugs to enable the checker. Current: {selected.length}</p>
+              <p>{t("drugInteraction.selectPrompt", { values: { count: selected.length } })}</p>
               <Button
                 size="lg"
                 className="w-full rounded-full sm:w-auto"
@@ -175,7 +177,7 @@ export function DrugInteractionPageScreen() {
                 onClick={runCheck}
               >
                 {loading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
-                Check interactions
+                {t("drugInteraction.checkButton")}
               </Button>
             </div>
           </motion.div>
@@ -186,38 +188,38 @@ export function DrugInteractionPageScreen() {
         <div className="flex items-center gap-3">
           <Separator className="flex-1 border-[var(--glass-border)] bg-[var(--glass-border)] dark:border-white/10 dark:bg-white/10" />
           <span className="text-sm font-semibold uppercase tracking-[0.28em] text-secondary/70 dark:text-white/60">
-            Results
+            {t("drugInteraction.results")}
           </span>
           <Separator className="flex-1 border-[var(--glass-border)] bg-[var(--glass-border)] dark:border-white/10 dark:bg-white/10" />
         </div>
 
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap gap-2 text-xs font-semibold text-secondary/80 dark:text-white/70">
-            <SeverityBadge label="Severe" count={summary.severe} tone="severe" />
-            <SeverityBadge label="Moderate" count={summary.moderate} tone="moderate" />
-            <SeverityBadge label="Mild" count={summary.mild} tone="mild" />
+            <SeverityBadge label={t("drugInteraction.severity.severe")} count={summary.severe} tone="severe" />
+            <SeverityBadge label={t("drugInteraction.severity.moderate")} count={summary.moderate} tone="moderate" />
+            <SeverityBadge label={t("drugInteraction.severity.mild")} count={summary.mild} tone="mild" />
           </div>
           {hasSearched ? (
             <div className="sticky top-4 flex items-center gap-2 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-4 py-2 text-sm font-semibold text-secondary shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-white">
               <ShieldAlert className="h-4 w-4 text-primary" aria-hidden />
-              {summary.total} interactions found
+              {t("drugInteraction.interactionsFound", { values: { count: summary.total } })}
             </div>
           ) : null}
         </div>
 
         {!hasSearched ? (
           <div className="rounded-2xl border border-dashed border-[var(--glass-border)] bg-[var(--glass-bg)] p-10 text-center text-muted-foreground dark:border-white/10 dark:bg-white/5">
-            Add at least one drug to check interactions.
+            {t("drugInteraction.addDrugs")}
           </div>
         ) : loading ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-10 text-center dark:border-white/10 dark:bg-white/5">
             <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />
-            <p className="text-sm text-muted-foreground">Checking mock interactions...</p>
+            <p className="text-sm text-muted-foreground">{t("drugInteraction.checking")}</p>
           </div>
         ) : results.length === 0 ? (
           <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-10 text-center text-emerald-700 dark:border-white/10 dark:bg-white/5 dark:text-emerald-200">
             <CheckCircle2 className="mx-auto mb-2 h-6 w-6" aria-hidden />
-            No known interactions found between selected drugs.
+            {t("drugInteraction.noInteractions")}
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{interactionCards}</div>
@@ -228,11 +230,9 @@ export function DrugInteractionPageScreen() {
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.25em] text-secondary/70 dark:text-white/70">
-                  Ingredient interactions
+                  {t("drugInteraction.ingredientInteractions")}
                 </p>
-                <p className="text-sm text-muted-foreground">
-                  Based on shared compounds with related medications.
-                </p>
+                <p className="text-sm text-muted-foreground">{t("drugInteraction.ingredientDescription")}</p>
               </div>
             </div>
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -242,7 +242,7 @@ export function DrugInteractionPageScreen() {
                   rule={item.rule}
                   drugLookup={drugLookup}
                   context={{
-                    label: `Ingredient: ${item.compound}`,
+                    label: t("drugInteraction.ingredientLabel", { values: { compound: item.compound } }),
                     description: drugLookup[item.sourceDrugId]?.name ?? item.sourceDrugId,
                   }}
                 />

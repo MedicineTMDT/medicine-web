@@ -1,9 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { ArrowRight } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/components/i18n/translation-provider";
 
 export type CategoryCardProps = {
   title: string;
@@ -13,6 +16,7 @@ export type CategoryCardProps = {
   icon: LucideIcon;
   accent?: string;
   delay?: number;
+  translationKey?: string;
 };
 
 export function CategoryCard({
@@ -23,7 +27,16 @@ export function CategoryCard({
   icon: Icon,
   accent = "from-primary/12 to-accent/12",
   delay = 0,
+  translationKey,
 }: CategoryCardProps) {
+  const { t } = useTranslation();
+  const baseKey = translationKey ?? "";
+  const titleText = baseKey ? t(`${baseKey}.title`, { fallback: title }) : t(title, { fallback: title });
+  const descriptionText = baseKey
+    ? t(`${baseKey}.description`, { fallback: description })
+    : t(description, { fallback: description });
+  const ctaText = baseKey ? t(`${baseKey}.cta`, { fallback: cta }) : t(cta, { fallback: cta });
+
   return (
     <motion.article
       className="h-full"
@@ -41,9 +54,9 @@ export function CategoryCard({
           >
             <Icon className="h-6 w-6" aria-hidden />
           </span>
-          <CardTitle className="text-xl">{title}</CardTitle>
+          <CardTitle className="text-xl">{titleText}</CardTitle>
           <CardDescription className="text-secondary/80 dark:text-muted-foreground">
-            {description}
+            {descriptionText}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -51,7 +64,7 @@ export function CategoryCard({
             href={href}
             className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:gap-3"
           >
-            {cta}
+            {ctaText}
             <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
           </Link>
         </CardContent>
