@@ -5,12 +5,13 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
 import { useTranslation } from "@/components/i18n/translation-provider";
 import { LanguageToggle } from "@/components/language-toggle";
+import { useAuth } from "@/features/auth";
 
 const NAV_LINKS = [
   { nameKey: "nav.home", href: "/" },
@@ -23,6 +24,7 @@ export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const { t, language } = useTranslation();
+  const { user, isAuthenticated, logout, isLoggingOut } = useAuth();
 
   React.useEffect(() => {
     setOpen(false);
@@ -71,12 +73,38 @@ export function Navbar() {
             <div className="flex items-center gap-2">
               <ThemeToggle />
               <LanguageToggle />
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    href="/account"
+                    className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 transition hover:bg-primary/10"
+                  >
+                    <User className="h-4 w-4 text-primary" />
+                    <span className="text-sm font-medium text-secondary dark:text-white">
+                      {user?.firstName || user?.username}
+                    </span>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-sm font-semibold"
+                    onClick={() => logout()}
+                    disabled={isLoggingOut}
+                  >
+                    <LogOut className="mr-1 h-4 w-4" />
+                    {t("nav.signOut")}
+                  </Button>
+                </>
+              ) : (
+                <>
               <Button variant="ghost" asChild className="text-sm font-semibold">
                 <Link href="/signin">{t("nav.signIn")}</Link>
               </Button>
               <Button size="sm" className="rounded-full px-5 text-sm">
                 <Link href="/signup">{t("nav.register")}</Link>
               </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -127,6 +155,29 @@ export function Navbar() {
                   })}
                 </div>
                 <div className="flex gap-3">
+                  {isAuthenticated ? (
+                    <>
+                      <Link
+                        href="/account"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-2 transition hover:bg-primary/10"
+                      >
+                        <User className="h-4 w-4 text-primary" />
+                        <span className="text-sm font-medium text-secondary dark:text-white">
+                          {user?.firstName || user?.username}
+                        </span>
+                      </Link>
+                      <Button
+                        variant="outline"
+                        className="flex-1 rounded-full"
+                        onClick={() => logout()}
+                        disabled={isLoggingOut}
+                      >
+                        <LogOut className="mr-1 h-4 w-4" />
+                        {t("nav.signOut")}
+                      </Button>
+                    </>
+                  ) : (
+                    <>
                   <Button
                     variant="outline"
                     className="flex-1 rounded-full"
@@ -137,6 +188,8 @@ export function Navbar() {
                   <Button className="flex-1 rounded-full" asChild>
                     <Link href="/signup">{t("nav.register")}</Link>
                   </Button>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>

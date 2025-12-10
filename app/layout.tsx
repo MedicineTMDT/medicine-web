@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { cn } from "@/lib/utils";
 import { TranslationProvider } from "@/components/i18n/translation-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
+import { AuthProvider } from "@/features/auth";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -75,6 +77,8 @@ export default function RootLayout({
           poppins.variable
         )}
       >
+        <QueryProvider>
+          <AuthProvider>
         <TranslationProvider>
           <ThemeProvider
             attribute="class"
@@ -85,6 +89,8 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </TranslationProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
