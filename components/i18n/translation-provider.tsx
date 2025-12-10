@@ -29,6 +29,7 @@ const enTranslations = {
   "nav.prescription": "Prescription",
   "nav.signIn": "Sign in",
   "nav.register": "Register",
+  "nav.signOut": "Sign out",
 
   "actions.search": "Search",
   "actions.readMore": "Read More",
@@ -289,6 +290,7 @@ const viTranslations: { [K in TranslationKey]: string } = {
   "nav.prescription": "Đơn thuốc",
   "nav.signIn": "Đăng nhập",
   "nav.register": "Đăng ký",
+  "nav.signOut": "Đăng xuất",
 
   "actions.search": "Tìm kiếm",
   "actions.readMore": "Đọc thêm",

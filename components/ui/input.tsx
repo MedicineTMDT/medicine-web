@@ -18,7 +18,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div
         className={cn(
-          "relative flex items-center rounded-[calc(var(--radius)_-_0.5rem)] border border-input/80 bg-white/80 px-4 shadow-sm ring-offset-background transition focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 dark:bg-card/80",
+          "relative flex items-center rounded-[calc(var(--radius)_-_0.5rem)] border border-input/80 bg-white px-4 shadow-sm ring-offset-background transition focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 dark:border-white/20 dark:bg-slate-800",
           wrapperClassName,
           disabled && "opacity-60"
         )}
@@ -31,7 +31,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         <input
           type={type}
           className={cn(
-            "flex h-12 w-full bg-transparent text-base text-foreground placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed",
+            "flex h-12 w-full bg-transparent text-base text-secondary placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed dark:text-white",
             className
           )}
           ref={ref}
