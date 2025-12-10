@@ -18,4 +18,18 @@ export const API_ENDPOINTS = {
     UPDATE_AVATAR: "/api/v1/users/update-avatar-img",
     FORGOT_PASSWORD: "/api/v1/users/forgot-password",
   },
+  DRUGS: {
+    GET_ALL: "/api/v1/drugs",
+    GET_BY_ID: "/api/v1/drugs",
+    SEARCH: "/api/v1/drugs/search",
+    TOP10: "/api/v1/drugs/top10",
+    INGREDIENTS: "/api/v1/drugs",
+    BY_CATEGORY: "/api/v1/drugs/by-category",
+  },
+  CATEGORIES: {
+    GET_ALL: "/api/v1/categories",
+    GET_BY_ID: "/api/v1/categories",
+    SEARCH: "/api/v1/categories/search",
+  },
 } as const;
+

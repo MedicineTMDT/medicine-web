@@ -3,6 +3,7 @@
 import { CategoryCard } from "@/components/cards/category-card";
 import { NewsCard } from "@/components/cards/news-card";
 import { ToolCard } from "@/components/cards/tool-card";
+import { useTranslation } from "@/components/i18n/translation-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { categories, featureHighlights, news, tools } from "@/lib/mockData";
@@ -18,7 +19,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import type { FormEvent } from "react";
-import { useTranslation } from "@/components/i18n/translation-provider";
 
 const heroActions = [
   { icon: Pill, labelKey: "home.actions.drugInfo", href: "/drugs" },
@@ -80,7 +80,8 @@ export function HomePageScreen() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <Input
                 placeholder={t("home.searchPlaceholder")}
-                className="h-14 flex-1 rounded-full border-white/30 bg-white/90 text-base text-secondary placeholder:text-secondary/70 focus-visible:ring-0"
+                wrapperClassName="h-14 flex-1 rounded-[calc(var(--radius)_-_0.35rem)] border-[var(--input)] bg-white/85 px-0 shadow-lg dark:border-white/20 dark:bg-white/90"
+                className="rounded-[calc(var(--radius)_-_0.35rem)] border-none bg-transparent px-4 text-base text-secondary placeholder:text-secondary/60 focus-visible:ring-0 dark:text-secondary dark:placeholder:text-secondary/60"
               />
               <Button
                 type="submit"

@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useState,
 } from "react";
 
 export type Language = "en" | "vi";
@@ -169,6 +169,13 @@ const enTranslations = {
     "Search for drugs, categories, or compounds...",
   "drugsInfo.searchAria": "Drug search",
   "drugsInfo.fdaApproved": "FDA Approved",
+  "drugsInfo.loading": "Loading...",
+  "drugsInfo.pagination": "Page {{current}} of {{total}}",
+  "drugsInfo.filterByCategory": "Filter by category",
+
+  "actions.clear": "Clear",
+  "actions.previous": "Previous",
+  "actions.next": "Next",
 
   "drugInteraction.badge": "Drug Interaction",
   "drugInteraction.title": "Evaluate multi-drug interactions",
@@ -431,6 +438,13 @@ const viTranslations: { [K in TranslationKey]: string } = {
   "drugsInfo.searchPlaceholder": "Tìm thuốc, nhóm thuốc hoặc hoạt chất...",
   "drugsInfo.searchAria": "Tìm kiếm thuốc",
   "drugsInfo.fdaApproved": "Được FDA phê duyệt",
+  "drugsInfo.loading": "Đang tải...",
+  "drugsInfo.pagination": "Trang {{current}} / {{total}}",
+  "drugsInfo.filterByCategory": "Lọc theo danh mục",
+
+  "actions.clear": "Xóa",
+  "actions.previous": "Trước",
+  "actions.next": "Tiếp",
 
   "drugInteraction.badge": "Tương tác thuốc",
   "drugInteraction.title": "Đánh giá tương tác đa thuốc",
