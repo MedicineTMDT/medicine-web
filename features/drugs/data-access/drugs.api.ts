@@ -1,6 +1,10 @@
+import { tokenStorage } from "@/features/auth";
 import type { ApiError } from "@/features/auth/types";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api.cofig";
 import type {
+    CategoryDetailApiResponse,
+    CategoryDetailByCategoryApiResponse,
+    CategoryDetailListApiResponse,
     CategoryListApiResponse,
     DrugDetailApiResponse,
     DrugIngredientsApiResponse,
@@ -49,6 +53,14 @@ function buildPageableParams(pageable: Pageable): URLSearchParams {
   return params;
 }
 
+function getAuthHeaders(): HeadersInit {
+  const token = tokenStorage.getToken();
+  return {
+    "Content-Type": "application/json",
+    ...(token && { Authorization: `Bearer ${token}` }),
+  };
+}
+
 // ============================================
 // Drug API Functions
 // ============================================
@@ -62,7 +74,7 @@ export async function getAllDrugs(
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.GET_ALL}?${params}`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
     }
   );
 
@@ -74,7 +86,7 @@ export async function getDrugById(id: number): Promise<DrugDetailApiResponse> {
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.GET_BY_ID}/${id}`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
     }
   );
 
@@ -92,7 +104,7 @@ export async function searchDrugs(
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.SEARCH}?${params}`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
     }
   );
 
@@ -106,7 +118,7 @@ export async function getTop10Drugs(name: string): Promise<DrugTop10ApiResponse>
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.TOP10}?${params}`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
     }
   );
 
@@ -120,7 +132,7 @@ export async function getDrugIngredients(
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.INGREDIENTS}/${id}/ingredients`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
     }
   );
 
@@ -137,7 +149,7 @@ export async function getDrugsByCategory(
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.BY_CATEGORY}/${categoryId}?${params}`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
     }
   );
 
@@ -157,9 +169,90 @@ export async function getAllCategories(
     `${API_BASE_URL}${API_ENDPOINTS.CATEGORIES.GET_ALL}?${params}`,
     {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
     }
   );
 
   return handleResponse<CategoryListApiResponse>(response);
+}
+
+// ============================================
+// CategoryDetail API Functions
+// ============================================
+
+/**
+ * Get a single category detail by ID
+ */
+export async function getCategoryDetailById(
+  id: number
+): Promise<CategoryDetailApiResponse> {
+  const response = await fetch(
+    `${API_BASE_URL}${API_ENDPOINTS.CATEGORY_DETAIL.GET_BY_ID}/${id}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+
+  return handleResponse<CategoryDetailApiResponse>(response);
+}
+
+/**
+ * Get all category details with pagination
+ */
+export async function getAllCategoryDetails(
+  pageable: Pageable
+): Promise<CategoryDetailListApiResponse> {
+  const params = buildPageableParams(pageable);
+
+  const response = await fetch(
+    `${API_BASE_URL}${API_ENDPOINTS.CATEGORY_DETAIL.GET_ALL}?${params}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+
+  return handleResponse<CategoryDetailListApiResponse>(response);
+}
+
+/**
+ * Get category details by category ID with pagination
+ */
+export async function getCategoryDetailsByCategory(
+  categoryId: number,
+  pageable: Pageable
+): Promise<CategoryDetailByCategoryApiResponse> {
+  const params = buildPageableParams(pageable);
+
+  const response = await fetch(
+    `${API_BASE_URL}${API_ENDPOINTS.CATEGORY_DETAIL.BY_CATEGORY}/${categoryId}?${params}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+
+  return handleResponse<CategoryDetailByCategoryApiResponse>(response);
+}
+
+/**
+ * Search category details by name with pagination
+ */
+export async function searchCategoryDetails(
+  name: string,
+  pageable: Pageable
+): Promise<CategoryDetailByCategoryApiResponse> {
+  const params = buildPageableParams(pageable);
+  params.set("name", name);
+
+  const response = await fetch(
+    `${API_BASE_URL}${API_ENDPOINTS.CATEGORY_DETAIL.SEARCH}?${params}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+
+  return handleResponse<CategoryDetailByCategoryApiResponse>(response);
 }

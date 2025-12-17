@@ -1,11 +1,10 @@
 "use client";
 
-import { Suspense } from "react";
-import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { getMyInfo, getUserInfoFromToken, tokenStorage } from "@/features/auth";
 import { motion } from "framer-motion";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
-import { tokenStorage } from "@/features/auth";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
 
 function OAuth2SuccessContent() {
   const router = useRouter();
@@ -14,33 +13,73 @@ function OAuth2SuccessContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const token = searchParams.get("token");
+    const handleOAuth2Success = async () => {
+      const token = searchParams.get("token");
 
-    if (!token) {
-      setStatus("error");
-      setError("No token received from authentication");
-      return;
-    }
+      if (!token) {
+        setStatus("error");
+        setError("No token received from authentication");
+        return;
+      }
 
-    try {
-      // Store the token
-      tokenStorage.setToken(token);
+      try {
+        // Store the token first
+        tokenStorage.setToken(token);
 
-      // Store basic user info (we'll fetch full user data on next page load)
-      localStorage.setItem("auth_user", JSON.stringify({ authenticated: true }));
+        let userData: Record<string, unknown> | null = null;
 
-      setStatus("success");
+        try {
+          // Try to fetch full user info from API
+          const userResponse = await getMyInfo();
+          if (userResponse.result) {
+            userData = {
+              ...userResponse.result,
+              token: token,
+              authenticated: true,
+            };
+          }
+        } catch (apiError) {
+          console.warn("Could not fetch user from API, trying JWT claims:", apiError);
+          
+          // Fallback: Extract user info directly from JWT claims
+          const jwtUserInfo = getUserInfoFromToken();
+          if (jwtUserInfo) {
+            userData = {
+              id: jwtUserInfo.userId || "",
+              email: jwtUserInfo.email || "",
+              username: jwtUserInfo.username || jwtUserInfo.email?.split("@")[0] || "",
+              firstName: jwtUserInfo.firstName || "",
+              lastName: jwtUserInfo.lastName || "",
+              role: jwtUserInfo.role || "USER",
+              token: token,
+              authenticated: true,
+            };
+            console.log("Using user info from JWT claims:", userData);
+          }
+        }
 
-      // Redirect to home after a short delay
-      setTimeout(() => {
-        // Force a page reload to refresh auth state
-        window.location.href = "/";
-      }, 1500);
-    } catch (err) {
-      setStatus("error");
-      setError("Failed to process authentication");
-      console.error("OAuth2 error:", err);
-    }
+        if (userData) {
+          localStorage.setItem("auth_user", JSON.stringify(userData));
+          setStatus("success");
+
+          // Redirect to home after a short delay
+          setTimeout(() => {
+            // Force a page reload to refresh auth state
+            window.location.href = "/";
+          }, 1500);
+        } else {
+          throw new Error("Could not get user information");
+        }
+      } catch (err) {
+        setStatus("error");
+        setError("Failed to process authentication");
+        console.error("OAuth2 error:", err);
+        // Clear token if processing failed
+        tokenStorage.clearToken();
+      }
+    };
+
+    handleOAuth2Success();
   }, [searchParams, router]);
 
   return (
