@@ -7,59 +7,59 @@ import { QRScanner } from "@/components/prescription/qr-scanner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/features/auth";
 import {
-  createPrescriptionSchema,
-  DosageUnitLabels,
-  MedicineFormLabels,
-  NoteLabels,
-  TimingLabels,
-  UsageLabels,
-  useCreatePrescription,
-  useReviewPrescription,
-  useSearchPrescriptionsByDate,
-  useSearchPrescriptionsByName,
-  type CreatePrescriptionFormValues,
-  type DrugInteractionDetail,
-  type IntakeRequest,
+    createPrescriptionSchema,
+    DosageUnitLabels,
+    MedicineFormLabels,
+    NoteLabels,
+    TimingLabels,
+    UsageLabels,
+    useCreatePrescription,
+    useReviewPrescription,
+    useSearchPrescriptionsByDate,
+    useSearchPrescriptionsByName,
+    type CreatePrescriptionFormValues,
+    type DrugInteractionDetail,
+    type IntakeRequest,
 } from "@/features/prescriptions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertTriangle,
-  CheckCircle2,
-  Clock,
-  Eye,
-  FileText,
-  Loader2,
-  Pill,
-  Plus,
-  Search,
-  Trash2,
+    AlertTriangle,
+    CheckCircle2,
+    Clock,
+    Eye,
+    FileText,
+    Loader2,
+    Pill,
+    Plus,
+    Search,
+    Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -117,7 +117,7 @@ export function PrescriptionPageScreen() {
     data: nameSearchResults,
     isLoading: nameSearchLoading,
   } = useSearchPrescriptionsByName(
-    user?.id ? parseInt(user.id) : 0,
+    user?.id || "",
     searchQuery || "",
     { page: 0, size: 20 },
     isAuthenticated && !isMedRole && !!searchQuery
@@ -128,7 +128,7 @@ export function PrescriptionPageScreen() {
     data: dateSearchResults,
     isLoading: dateSearchLoading,
   } = useSearchPrescriptionsByDate(
-    user?.id ? parseInt(user.id) : 0,
+    user?.id || "",
     pastDate.toISOString().split('T')[0],
     futureDate.toISOString().split('T')[0],
     { page: 0, size: 20 },
@@ -136,8 +136,8 @@ export function PrescriptionPageScreen() {
   );
 
   const prescriptions = searchQuery 
-    ? nameSearchResults?.result?.content || []
-    : dateSearchResults?.result?.content || [];
+    ? nameSearchResults?.content || []
+    : dateSearchResults?.content || [];
 
   const prescriptionsLoading = searchQuery ? nameSearchLoading : dateSearchLoading;
 

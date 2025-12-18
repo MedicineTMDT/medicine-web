@@ -302,8 +302,8 @@ export async function getMyInfo(): Promise<UserApiResponse> {
     throw { code: 401, message: "Invalid token format" } as ApiError;
   }
 
-  // The sub claim contains the username
-  return getUserByUsername(payload.sub);
+  // The sub claim contains the user ID (UUID)
+  return getUserById(payload.sub);
 }
 
 

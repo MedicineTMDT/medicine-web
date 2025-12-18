@@ -7,7 +7,7 @@ import { useCopyPrescription } from "@/features/prescriptions";
 import { AlertTriangle, CheckCircle2, Loader2, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function ClaimPrescriptionPage() {
   const params = useParams();
@@ -19,6 +19,9 @@ export default function ClaimPrescriptionPage() {
   const [claimStatus, setClaimStatus] = useState<"idle" | "claiming" | "success" | "error">("idle");
   const [claimedId, setClaimedId] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  
+  // Ref to prevent double execution in React Strict Mode
+  const hasClaimedRef = useRef(false);
 
   // Auto-claim when authenticated
   useEffect(() => {
@@ -30,6 +33,10 @@ export default function ClaimPrescriptionPage() {
     }
 
     if (claimStatus !== "idle") return;
+    
+    // Prevent double execution
+    if (hasClaimedRef.current) return;
+    hasClaimedRef.current = true;
 
     // Start claiming
     const claimPrescription = async () => {
@@ -52,6 +59,8 @@ export default function ClaimPrescriptionPage() {
       } catch (error: any) {
         setClaimStatus("error");
         setErrorMessage(error?.message || "Đã xảy ra lỗi khi nhận đơn thuốc");
+        // Reset ref so user can retry
+        hasClaimedRef.current = false;
       }
     };
 

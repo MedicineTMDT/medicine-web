@@ -29,9 +29,9 @@ export function PrescriptionListCard({ prescription, index = 0 }: Props) {
       >
         <CardHeader className="space-y-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2 text-xl text-secondary dark:text-white">
-              <FileText className="h-5 w-5" />
-              {prescription.name}
+            <CardTitle className="flex items-center gap-2 text-xl text-secondary dark:text-white break-words">
+              <FileText className="h-5 w-5 shrink-0" />
+              <span className="break-all line-clamp-2">{prescription.name}</span>
             </CardTitle>
             <span
               className={cn(

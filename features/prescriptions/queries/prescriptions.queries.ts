@@ -1,16 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-    copyPrescription,
-    createPrescription,
-    getPrescriptionById,
-    reviewPrescription,
-    searchPrescriptionsByDate,
-    searchPrescriptionsByName,
-    updateIntakeStatus,
+  copyPrescription,
+  createPrescription,
+  getPrescriptionById,
+  reviewPrescription,
+  searchPrescriptionsByDate,
+  searchPrescriptionsByName,
+  updateIntakeStatus,
 } from "../data-access/prescriptions.api";
 import type {
-    CreatePrescriptionRequest,
-    Pageable,
+  CreatePrescriptionRequest,
+  Pageable,
 } from "../types";
 
 // ============================================
@@ -48,7 +48,7 @@ export function usePrescriptionById(id: string, enabled = true) {
  * Search prescriptions by name
  */
 export function useSearchPrescriptionsByName(
-  userId: number,
+  userId: string,
   name: string,
   pageable: Pageable,
   enabled = true
@@ -65,7 +65,7 @@ export function useSearchPrescriptionsByName(
  * Search prescriptions by date range
  */
 export function useSearchPrescriptionsByDate(
-  userId: number,
+  userId: string,
   start: string,
   end: string,
   pageable: Pageable,

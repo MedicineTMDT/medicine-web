@@ -119,12 +119,12 @@ export async function copyPrescription(
  * Search prescriptions by name
  */
 export async function searchPrescriptionsByName(
-  userId: number,
+  userId: string,
   name: string,
   pageable: Pageable
-): Promise<{ result: Page<PrescriptionProjection> }> {
+): Promise<Page<PrescriptionProjection>> {
   const params = buildPageableParams(pageable);
-  params.set("userId", userId.toString());
+  params.set("userId", userId);
   params.set("name", name);
 
   const response = await fetch(
@@ -135,20 +135,20 @@ export async function searchPrescriptionsByName(
     }
   );
 
-  return handleResponse<{ result: Page<PrescriptionProjection> }>(response);
+  return handleResponse<Page<PrescriptionProjection>>(response);
 }
 
 /**
  * Search prescriptions by date range
  */
 export async function searchPrescriptionsByDate(
-  userId: number,
+  userId: string,
   start: string,
   end: string,
   pageable: Pageable
-): Promise<{ result: Page<PrescriptionProjection> }> {
+): Promise<Page<PrescriptionProjection>> {
   const params = buildPageableParams(pageable);
-  params.set("userId", userId.toString());
+  params.set("userId", userId);
   params.set("start", start);
   params.set("end", end);
 
@@ -160,7 +160,7 @@ export async function searchPrescriptionsByDate(
     }
   );
 
-  return handleResponse<{ result: Page<PrescriptionProjection> }>(response);
+  return handleResponse<Page<PrescriptionProjection>>(response);
 }
 
 /**
