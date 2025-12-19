@@ -7,59 +7,61 @@ import { QRScanner } from "@/components/prescription/qr-scanner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui/card";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/features/auth";
+import type { Drug } from "@/features/drugs";
 import {
-    createPrescriptionSchema,
-    DosageUnitLabels,
-    MedicineFormLabels,
-    NoteLabels,
-    TimingLabels,
-    UsageLabels,
-    useCreatePrescription,
-    useReviewPrescription,
-    useSearchPrescriptionsByDate,
-    useSearchPrescriptionsByName,
-    type CreatePrescriptionFormValues,
-    type DrugInteractionDetail,
-    type IntakeRequest,
+  createPrescriptionSchema,
+  DosageUnitLabels,
+  MedicineFormLabels,
+  NoteLabels,
+  processdrugForAutoFill,
+  TimingLabels,
+  UsageLabels,
+  useCreatePrescription,
+  useReviewPrescription,
+  useSearchPrescriptionsByDate,
+  useSearchPrescriptionsByName,
+  type CreatePrescriptionFormValues,
+  type DrugInteractionDetail,
+  type IntakeRequest
 } from "@/features/prescriptions";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-    AlertTriangle,
-    CheckCircle2,
-    Clock,
-    Eye,
-    FileText,
-    Loader2,
-    Pill,
-    Plus,
-    Search,
-    Trash2,
+  AlertTriangle,
+  CheckCircle2,
+  Clock,
+  Eye,
+  FileText,
+  Loader2,
+  Pill,
+  Plus,
+  Search,
+  Trash2,
 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -84,6 +86,7 @@ export function PrescriptionPageScreen() {
   const [successPrescriptionId, setSuccessPrescriptionId] = useState<string | null>(null);
   const [showInteractionModal, setShowInteractionModal] = useState(false);
   const [interactions, setInteractions] = useState<DrugInteractionDetail[]>([]);
+  const [activeTab, setActiveTab] = useState<"create" | "history">("create");
   
   // List of drugs added to the prescription
   const [drugList, setDrugList] = useState<DrugEntry[]>([]);
@@ -120,7 +123,7 @@ export function PrescriptionPageScreen() {
     user?.id || "",
     searchQuery || "",
     { page: 0, size: 20 },
-    isAuthenticated && !isMedRole && !!searchQuery
+    isAuthenticated && !!searchQuery
   );
 
   // Default view: fetch by date query
@@ -132,7 +135,7 @@ export function PrescriptionPageScreen() {
     pastDate.toISOString().split('T')[0],
     futureDate.toISOString().split('T')[0],
     { page: 0, size: 20 },
-    isAuthenticated && !isMedRole && !searchQuery
+    isAuthenticated && !searchQuery
   );
 
   const prescriptions = searchQuery 
@@ -336,21 +339,45 @@ export function PrescriptionPageScreen() {
                 ? "Tạo và quản lý đơn thuốc cho bệnh nhân với kiểm tra tương tác thuốc tự động."
                 : "Xem và theo dõi các đơn thuốc được kê cho bạn."}
             </p>
-            {/* QR Scanner Button */}
-            <div className="pt-2">
-              <QRScanner 
-                buttonLabel="Quét mã QR đơn thuốc"
-                className="bg-white/90 hover:bg-white dark:bg-white/20 dark:hover:bg-white/30"
-              />
-            </div>
+            {/* QR Scanner Button - only show for non-MED users */}
+            {!isMedRole && (
+              <div className="pt-2">
+                <QRScanner 
+                  buttonLabel="Quét mã QR đơn thuốc"
+                  className="bg-white/90 hover:bg-white dark:bg-white/20 dark:hover:bg-white/30"
+                />
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
 
       {/* Content based on role */}
       {isMedRole ? (
-        // MED Role: Show create prescription form
+        // MED Role: Show tabs for create and history
         <section className="container mt-12 space-y-8">
+          {/* Tab Navigation */}
+          <div className="flex items-center gap-2 border-b border-border/50 pb-4">
+            <Button
+              variant={activeTab === "create" ? "default" : "ghost"}
+              onClick={() => setActiveTab("create")}
+              className="rounded-full"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Kê đơn mới
+            </Button>
+            <Button
+              variant={activeTab === "history" ? "default" : "ghost"}
+              onClick={() => setActiveTab("history")}
+              className="rounded-full"
+            >
+              <Clock className="mr-2 h-4 w-4" />
+              Lịch sử kê đơn
+            </Button>
+          </div>
+
+          {/* Tab Content */}
+          {activeTab === "create" ? (
           <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
             {/* Left Column: Form */}
             <div className="space-y-6">
@@ -367,34 +394,19 @@ export function PrescriptionPageScreen() {
                 <CardContent>
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                      <div className="grid gap-4 md:grid-cols-2">
-                        <FormField
-                          control={form.control}
-                          name="name"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Tên đơn thuốc</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="VD: Đơn thuốc cảm cúm" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name="userId"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>ID Bệnh nhân</FormLabel>
-                              <FormControl>
-                                <Input {...field} placeholder="ID bệnh nhân" />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
+                      <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Tên đơn thuốc</FormLabel>
+                            <FormControl>
+                              <Input {...field} placeholder="VD: Đơn thuốc cảm cúm" />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
                       <div className="grid gap-4 md:grid-cols-2">
                         <FormField
@@ -474,6 +486,22 @@ export function PrescriptionPageScreen() {
                           drugName: drug.drugName,
                         });
                       }}
+                      onDrugDetailsLoaded={(drugDetails: Drug) => {
+                        // Auto-fill form fields from drug details
+                        const autoFillData = processdrugForAutoFill(
+                          drugDetails.name,
+                          drugDetails.metadata as Record<string, unknown>
+                        );
+                        
+                        setCurrentDrug(prev => ({
+                          ...prev,
+                          // Only update if we got valid data
+                          quantitative: autoFillData.quantitative ?? prev.quantitative,
+                          unit: autoFillData.unit ?? prev.unit,
+                          medicineForm: autoFillData.medicineForm ?? prev.medicineForm,
+                          usage: autoFillData.usage ?? prev.usage,
+                        }));
+                      }}
                       placeholder="Tìm kiếm thuốc theo tên..."
                     />
                   </div>
@@ -485,8 +513,16 @@ export function PrescriptionPageScreen() {
                       <Input
                         type="number"
                         min={1}
-                        value={currentDrug.total}
-                        onChange={(e) => setCurrentDrug({ ...currentDrug, total: parseInt(e.target.value) || 1 })}
+                        value={currentDrug.total || ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCurrentDrug({ ...currentDrug, total: val === "" ? 0 : parseInt(val) });
+                        }}
+                        onBlur={(e) => {
+                          if (!currentDrug.total || currentDrug.total < 1) {
+                            setCurrentDrug({ ...currentDrug, total: 1 });
+                          }
+                        }}
                       />
                     </div>
                     <div>
@@ -494,8 +530,16 @@ export function PrescriptionPageScreen() {
                       <Input
                         type="number"
                         min={1}
-                        value={currentDrug.quantitative}
-                        onChange={(e) => setCurrentDrug({ ...currentDrug, quantitative: parseInt(e.target.value) || 1 })}
+                        value={currentDrug.quantitative || ""}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setCurrentDrug({ ...currentDrug, quantitative: val === "" ? 0 : parseInt(val) });
+                        }}
+                        onBlur={(e) => {
+                          if (!currentDrug.quantitative || currentDrug.quantitative < 1) {
+                            setCurrentDrug({ ...currentDrug, quantitative: 1 });
+                          }
+                        }}
                       />
                     </div>
                     <div>
@@ -573,7 +617,7 @@ export function PrescriptionPageScreen() {
                     </div>
                     {/* Quantity per timing */}
                     {currentDrug.timingList.length > 0 && (
-                      <div className="grid gap-2 mt-2 p-3 rounded-lg bg-muted/50">
+                      <div className="grid gap-2 mt-2 p-3 rounded-lg bg-muted/30 dark:bg-slate-900/50">
                         <p className="text-xs text-muted-foreground mb-1">Số lượng mỗi lần uống:</p>
                         {currentDrug.timingList.map((timing) => (
                           <div key={timing.timing} className="flex items-center gap-2">
@@ -581,18 +625,30 @@ export function PrescriptionPageScreen() {
                             <Input
                               type="number"
                               min={1}
-                              value={timing.quantity}
+                              value={timing.quantity || ""}
                               onChange={(e) => {
+                                const val = e.target.value;
                                 setCurrentDrug({
                                   ...currentDrug,
                                   timingList: currentDrug.timingList.map(t =>
                                     t.timing === timing.timing
-                                      ? { ...t, quantity: parseInt(e.target.value) || 1 }
+                                      ? { ...t, quantity: val === "" ? 0 : parseInt(val) }
+                                      : t
+                                  ),
+                                });
+                              }}
+                              onBlur={() => {
+                                setCurrentDrug({
+                                  ...currentDrug,
+                                  timingList: currentDrug.timingList.map(t =>
+                                    t.timing === timing.timing && (!t.quantity || t.quantity < 1)
+                                      ? { ...t, quantity: 1 }
                                       : t
                                   ),
                                 });
                               }}
                               className="w-20 h-8"
+                              wrapperClassName="w-20 !h-8 !px-2"
                             />
                             <span className="text-sm text-muted-foreground">
                               {MedicineFormLabels[currentDrug.medicineForm as keyof typeof MedicineFormLabels] || 'viên'}
@@ -791,6 +847,53 @@ export function PrescriptionPageScreen() {
               )}
             </div>
           </div>
+          ) : (
+          /* History Tab Content */
+          <div>
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-2xl font-heading font-semibold text-secondary dark:text-white">
+                Danh sách đơn thuốc đã kê
+              </h2>
+              <div className="relative max-w-sm">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Tìm kiếm đơn thuốc..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 rounded-full"
+                />
+              </div>
+            </div>
+
+            {prescriptionsLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : prescriptions.length > 0 ? (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {prescriptions.map((prescription, index) => (
+                  <PrescriptionListCard
+                    key={prescription.id}
+                    prescription={prescription}
+                    index={index}
+                  />
+                ))}
+              </div>
+            ) : (
+              <Card className="mx-auto max-w-lg border-none bg-white/95 shadow-card dark:bg-secondary/70">
+                <CardContent className="py-12 text-center">
+                  <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold text-secondary dark:text-white">
+                    Chưa có đơn thuốc
+                  </h3>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Bạn chưa kê đơn thuốc nào.
+                  </p>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+          )}
         </section>
       ) : (
         // USER Role: Show prescription list

@@ -139,7 +139,7 @@ export interface IntakeRequest {
 export interface CreatePrescriptionRequest {
   name: string;
   description: string;
-  userId: string;
+  userId?: string; // Optional - patient ID
   startDate: string; // ISO date format: YYYY-MM-DD
   message: string;
   diagnosisNote: string;
@@ -257,7 +257,7 @@ export const intakeRequestSchema = z.object({
 export const createPrescriptionSchema = z.object({
   name: z.string().min(2, "Tên đơn thuốc phải có ít nhất 2 ký tự"),
   description: z.string().optional().default(""),
-  userId: z.string().min(1, "ID bệnh nhân là bắt buộc"),
+  userId: z.string().optional().default(""), // Optional - patient ID
   startDate: z.string().min(1, "Ngày bắt đầu là bắt buộc"),
   message: z.string().optional().default(""),
   diagnosisNote: z.string().optional().default(""),
