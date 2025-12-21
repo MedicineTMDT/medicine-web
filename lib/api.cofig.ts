@@ -55,6 +55,7 @@ export const API_ENDPOINTS = {
     SEARCH_BY_DATE: "/api/v1/prescriptions/search/date",
     REVIEW: "/api/v1/prescriptions/review",
     EDIT_INTAKE: "/api/v1/prescriptions/edit",
+    ACCEPT: "/api/v1/prescriptions", // /{id}/accept
   },
 } as const;
 

@@ -1,30 +1,32 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
-import { Lock, Eye, EyeOff, Loader2, Check, ArrowLeft, Shield } from "lucide-react";
+import { useTranslation } from "@/components/i18n/translation-provider";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  useChangePassword,
-  changePasswordSchema,
-  type ChangePasswordFormValues,
+    changePasswordSchema,
+    useChangePassword,
+    type ChangePasswordFormValues,
 } from "@/features/user";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
+import { ArrowLeft, Check, Eye, EyeOff, Loader2, Lock, Shield } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export function SecurityPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { mutate: changePassword, isPending, error } = useChangePassword();
   const [isSuccess, setIsSuccess] = useState(false);
   const [showCurrent, setShowCurrent] = useState(false);
@@ -68,13 +70,13 @@ export function SecurityPage() {
           className="mb-2"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Account
+          {t("account.editProfile.backToAccount")}
         </Button>
         <h1 className="text-2xl font-bold text-secondary dark:text-white">
-          Security Settings
+          {t("account.security.title")}
         </h1>
         <p className="text-muted-foreground">
-          Manage your password and security preferences
+          {t("account.security.description")}
         </p>
       </motion.div>
 
@@ -91,24 +93,24 @@ export function SecurityPage() {
           </div>
           <div>
             <h3 className="font-semibold text-secondary dark:text-white">
-              Change Password
+              {t("account.security.changePassword")}
             </h3>
             <p className="text-sm text-muted-foreground">
-              Update your password to keep your account secure
+              {t("account.security.changePassword.description")}
             </p>
           </div>
         </div>
 
         {error && (
           <div className="mb-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-            {error.message || "Failed to change password."}
+            {error.message || t("account.security.error")}
           </div>
         )}
 
         {isSuccess && (
           <div className="mb-6 flex items-center gap-2 rounded-lg border border-green-500/50 bg-green-50 p-4 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">
             <Check className="h-5 w-5" />
-            Password changed successfully!
+            {t("account.security.success")}
           </div>
         )}
 
@@ -119,12 +121,12 @@ export function SecurityPage() {
               name="currentPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Current Password</FormLabel>
+                  <FormLabel>{t("account.security.currentPassword")}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type={showCurrent ? "text" : "password"}
-                      placeholder="Enter your current password"
+                      placeholder={t("account.security.currentPassword.placeholder")}
                       leadingIcon={<Lock className="h-4 w-4" aria-hidden />}
                       trailingIcon={
                         <button
@@ -152,12 +154,12 @@ export function SecurityPage() {
               name="newPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Password</FormLabel>
+                  <FormLabel>{t("account.security.newPassword")}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type={showNew ? "text" : "password"}
-                      placeholder="Enter your new password"
+                      placeholder={t("account.security.newPassword.placeholder")}
                       leadingIcon={<Lock className="h-4 w-4" aria-hidden />}
                       trailingIcon={
                         <button
@@ -176,7 +178,7 @@ export function SecurityPage() {
                     />
                   </FormControl>
                   <FormDescription>
-                    Password must be 6-20 characters long.
+                    {t("account.security.newPassword.description")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -188,12 +190,12 @@ export function SecurityPage() {
               name="confirmPassword"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm New Password</FormLabel>
+                  <FormLabel>{t("account.security.confirmPassword")}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       type={showConfirm ? "text" : "password"}
-                      placeholder="Re-enter your new password"
+                      placeholder={t("account.security.confirmPassword.placeholder")}
                       leadingIcon={<Lock className="h-4 w-4" aria-hidden />}
                       trailingIcon={
                         <button
@@ -221,10 +223,10 @@ export function SecurityPage() {
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Updating...
+                    {t("account.security.updating")}
                   </>
                 ) : (
-                  "Update Password"
+                  t("account.security.updatePassword")
                 )}
               </Button>
               <Button
@@ -233,7 +235,7 @@ export function SecurityPage() {
                 onClick={() => form.reset()}
                 disabled={isPending}
               >
-                Reset
+                {t("account.security.reset")}
               </Button>
             </div>
           </form>
@@ -242,4 +244,5 @@ export function SecurityPage() {
     </div>
   );
 }
+
 

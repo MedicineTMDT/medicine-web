@@ -1,16 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  copyPrescription,
-  createPrescription,
-  getPrescriptionById,
-  reviewPrescription,
-  searchPrescriptionsByDate,
-  searchPrescriptionsByName,
-  updateIntakeStatus,
+    acceptPrescription,
+    copyPrescription,
+    createPrescription,
+    getPrescriptionById,
+    reviewPrescription,
+    searchPrescriptionsByDate,
+    searchPrescriptionsByName,
+    updateIntakeStatus
 } from "../data-access/prescriptions.api";
 import type {
-  CreatePrescriptionRequest,
-  Pageable,
+    CreatePrescriptionRequest,
+    Pageable,
 } from "../types";
 
 // ============================================
@@ -48,15 +49,14 @@ export function usePrescriptionById(id: string, enabled = true) {
  * Search prescriptions by name
  */
 export function useSearchPrescriptionsByName(
-  userId: string,
   name: string,
   pageable: Pageable,
   enabled = true
 ) {
   return useQuery({
-    queryKey: prescriptionKeys.list({ userId, name, ...pageable }),
-    queryFn: () => searchPrescriptionsByName(userId, name, pageable),
-    enabled: enabled && !!userId,
+    queryKey: prescriptionKeys.list({ name, ...pageable }),
+    queryFn: () => searchPrescriptionsByName(name, pageable),
+    enabled: enabled,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 }
@@ -65,16 +65,15 @@ export function useSearchPrescriptionsByName(
  * Search prescriptions by date range
  */
 export function useSearchPrescriptionsByDate(
-  userId: string,
   start: string,
   end: string,
   pageable: Pageable,
   enabled = true
 ) {
   return useQuery({
-    queryKey: prescriptionKeys.list({ userId, start, end, ...pageable }),
-    queryFn: () => searchPrescriptionsByDate(userId, start, end, pageable),
-    enabled: enabled && !!userId,
+    queryKey: prescriptionKeys.list({ start, end, ...pageable }),
+    queryFn: () => searchPrescriptionsByDate(start, end, pageable),
+    enabled: enabled,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 }
@@ -133,6 +132,20 @@ export function useUpdateIntakeStatus() {
     onSuccess: (_, id) => {
       // Invalidate the specific prescription detail
       queryClient.invalidateQueries({ queryKey: prescriptionKeys.details() });
+    },
+  });
+}
+
+/**
+ * Accept prescription mutation (Patient only - via email link)
+ */
+export function useAcceptPrescription() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => acceptPrescription(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: prescriptionKeys.all });
     },
   });
 }

@@ -16,6 +16,7 @@ import {
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -120,7 +121,6 @@ export function PrescriptionPageScreen() {
     data: nameSearchResults,
     isLoading: nameSearchLoading,
   } = useSearchPrescriptionsByName(
-    user?.id || "",
     searchQuery || "",
     { page: 0, size: 20 },
     isAuthenticated && !!searchQuery
@@ -131,7 +131,6 @@ export function PrescriptionPageScreen() {
     data: dateSearchResults,
     isLoading: dateSearchLoading,
   } = useSearchPrescriptionsByDate(
-    user?.id || "",
     pastDate.toISOString().split('T')[0],
     futureDate.toISOString().split('T')[0],
     { page: 0, size: 20 },
@@ -155,6 +154,7 @@ export function PrescriptionPageScreen() {
       name: "",
       description: "",
       userId: "",
+      patientEmailAddress: "",
       startDate: new Date().toISOString().split("T")[0],
       message: "",
       diagnosisNote: "",
@@ -450,6 +450,27 @@ export function PrescriptionPageScreen() {
                                 rows={2}
                               />
                             </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="patientEmailAddress"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email bệnh nhân (không bắt buộc)</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                type="email"
+                                placeholder="patient@example.com"
+                              />
+                            </FormControl>
+                            <FormDescription className="text-xs">
+                              Nếu có email, hệ thống sẽ gửi thông báo để bệnh nhân xác nhận đơn thuốc.
+                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}

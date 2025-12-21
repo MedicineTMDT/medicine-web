@@ -140,6 +140,7 @@ export interface CreatePrescriptionRequest {
   name: string;
   description: string;
   userId?: string; // Optional - patient ID
+  patientEmailAddress?: string; // Optional - patient email for notification
   startDate: string; // ISO date format: YYYY-MM-DD
   message: string;
   diagnosisNote: string;
@@ -258,6 +259,7 @@ export const createPrescriptionSchema = z.object({
   name: z.string().min(2, "Tên đơn thuốc phải có ít nhất 2 ký tự"),
   description: z.string().optional().default(""),
   userId: z.string().optional().default(""), // Optional - patient ID
+  patientEmailAddress: z.string().email("Email không hợp lệ").optional().or(z.literal("")), // Optional - patient email
   startDate: z.string().min(1, "Ngày bắt đầu là bắt buộc"),
   message: z.string().optional().default(""),
   diagnosisNote: z.string().optional().default(""),

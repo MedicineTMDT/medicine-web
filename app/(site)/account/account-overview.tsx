@@ -1,41 +1,42 @@
 "use client";
 
-import Link from "next/link";
+import { useTranslation } from "@/components/i18n/translation-provider";
+import { useAuth } from "@/features/auth";
 import { motion } from "framer-motion";
 import {
-  Mail,
-  User,
-  Shield,
-  ChevronRight,
-  Settings,
-  Image,
-  Calendar,
+    ChevronRight,
+    Image,
+    Mail,
+    Settings,
+    Shield,
+    User,
 } from "lucide-react";
-import { useAuth } from "@/features/auth";
-
-const quickActions = [
-  {
-    label: "Edit Profile",
-    description: "Update your name and username",
-    href: "/account/profile",
-    icon: Settings,
-  },
-  {
-    label: "Change Password",
-    description: "Update your security credentials",
-    href: "/account/security",
-    icon: Shield,
-  },
-  {
-    label: "Update Avatar",
-    description: "Change your profile picture",
-    href: "/account/avatar",
-    icon: Image,
-  },
-];
+import Link from "next/link";
 
 export function AccountOverview() {
   const { user } = useAuth();
+  const { t } = useTranslation();
+
+  const quickActions = [
+    {
+      label: t("account.overview.editProfile"),
+      description: t("account.overview.editProfile.description"),
+      href: "/account/profile",
+      icon: Settings,
+    },
+    {
+      label: t("account.overview.changePassword"),
+      description: t("account.overview.changePassword.description"),
+      href: "/account/security",
+      icon: Shield,
+    },
+    {
+      label: t("account.overview.updateAvatar"),
+      description: t("account.overview.updateAvatar.description"),
+      href: "/account/avatar",
+      icon: Image,
+    },
+  ];
 
   if (!user) return null;
 
@@ -54,10 +55,10 @@ export function AccountOverview() {
         transition={{ duration: 0.3 }}
       >
         <h1 className="text-2xl font-bold text-secondary dark:text-white">
-          Account Overview
+          {t("account.overview.title")}
         </h1>
         <p className="text-muted-foreground">
-          View your account information and manage settings
+          {t("account.overview.description")}
         </p>
       </motion.div>
 
@@ -127,7 +128,7 @@ export function AccountOverview() {
         transition={{ duration: 0.3, delay: 0.2 }}
       >
         <h3 className="mb-4 text-lg font-semibold text-secondary dark:text-white">
-          Quick Actions
+          {t("account.overview.quickActions")}
         </h3>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {quickActions.map((action) => {
@@ -164,35 +165,35 @@ export function AccountOverview() {
         transition={{ duration: 0.3, delay: 0.3 }}
       >
         <h3 className="mb-4 text-lg font-semibold text-secondary dark:text-white">
-          Account Details
+          {t("account.overview.accountDetails")}
         </h3>
         <dl className="grid gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-sm text-muted-foreground">Username</dt>
+            <dt className="text-sm text-muted-foreground">{t("account.overview.username")}</dt>
             <dd className="font-medium text-secondary dark:text-white">
               @{user.username}
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">Email</dt>
+            <dt className="text-sm text-muted-foreground">{t("account.overview.email")}</dt>
             <dd className="font-medium text-secondary dark:text-white">
               {user.email}
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">First Name</dt>
+            <dt className="text-sm text-muted-foreground">{t("account.overview.firstName")}</dt>
             <dd className="font-medium text-secondary dark:text-white">
               {user.firstName}
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">Last Name</dt>
+            <dt className="text-sm text-muted-foreground">{t("account.overview.lastName")}</dt>
             <dd className="font-medium text-secondary dark:text-white">
               {user.lastName}
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">Role</dt>
+            <dt className="text-sm text-muted-foreground">{t("account.overview.role")}</dt>
             <dd>
               <span
                 className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${
@@ -204,7 +205,7 @@ export function AccountOverview() {
             </dd>
           </div>
           <div>
-            <dt className="text-sm text-muted-foreground">Account ID</dt>
+            <dt className="text-sm text-muted-foreground">{t("account.overview.accountId")}</dt>
             <dd className="font-mono text-sm text-secondary dark:text-white">
               {user.id}
             </dd>
@@ -214,4 +215,5 @@ export function AccountOverview() {
     </div>
   );
 }
+
 

@@ -1,12 +1,12 @@
 "use client";
 
+import { useTranslation } from "@/components/i18n/translation-provider";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Loader2, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useTranslation } from "@/components/i18n/translation-provider";
 
 export type DrugInfoSuggestion = {
   id: string;

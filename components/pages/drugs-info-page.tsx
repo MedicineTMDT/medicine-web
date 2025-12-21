@@ -6,15 +6,15 @@ import { DrugInfoSearchBar, type DrugInfoSuggestion } from "@/components/drugs-i
 import { useTranslation } from "@/components/i18n/translation-provider";
 import { Button } from "@/components/ui/button";
 import {
-    useCategories,
-    useCategoryDetails,
-    useCategoryDetailSearch,
-    useDrugs,
-    useDrugsByCategory,
-    useDrugSearch,
-    useDrugSuggestions,
-    type CategoryResponse,
-    type Pageable
+  useCategories,
+  useCategoryDetails,
+  useCategoryDetailSearch,
+  useDrugs,
+  useDrugsByCategory,
+  useDrugSearch,
+  useDrugSuggestions,
+  type CategoryResponse,
+  type Pageable
 } from "@/features/drugs";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
@@ -207,9 +207,9 @@ export function DrugsInfoPageScreen() {
       placeholder: t("drugsInfo.searchDrugsPlaceholder", { fallback: "Tìm kiếm thuốc..." }),
     },
     categories: {
-      label: t("drugsInfo.modeCategories", { fallback: "Danh mục" }),
+      label: t("drugsInfo.modeCategories", { fallback: "Nhóm bệnh lý" }),
       icon: BookOpen,
-      placeholder: t("drugsInfo.searchCategoriesPlaceholder", { fallback: "Tìm kiếm danh mục..." }),
+      placeholder: t("drugsInfo.searchCategoriesPlaceholder", { fallback: "Tìm kiếm nhóm bệnh lý..." }),
     },
   };
 
@@ -242,7 +242,7 @@ export function DrugsInfoPageScreen() {
             initial={{ opacity: 0, y: 36 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, delay: 0.08 }}
-            className="mx-auto mt-10 w-full max-w-3xl"
+            className="relative z-20 mx-auto mt-10 w-full max-w-3xl"
           >
             {/* Search bar with mode dropdown and category filter */}
             <div className="flex gap-2 rounded-3xl border border-[var(--glass-border)] bg-white/60 p-2 shadow-lg backdrop-blur dark:border-white/10 dark:bg-white/5">
@@ -322,7 +322,7 @@ export function DrugsInfoPageScreen() {
         </div>
       </section>
 
-      <section className="container mt-10 space-y-6">
+      <section className="container relative z-0 mt-10 space-y-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="text-3xl font-heading font-semibold text-secondary dark:text-white">
@@ -548,7 +548,7 @@ function CategoryFilterDropdown({
       >
         <Filter className="h-4 w-4 text-primary" />
         <span className="hidden sm:inline max-w-[120px] truncate">
-          {selectedCategory ? selectedCategory.name : "Danh mục"}
+          {selectedCategory ? selectedCategory.name : "Nhóm bệnh lý"}
         </span>
         {selectedCategoryId !== undefined && (
           <button
@@ -580,7 +580,7 @@ function CategoryFilterDropdown({
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 onClick={(e) => e.stopPropagation()}
-                placeholder="Tìm danh mục..."
+                placeholder="Tìm nhóm bệnh lý..."
                 className="w-full rounded-lg border border-border/30 bg-gray-50 py-2 pl-10 pr-4 text-sm text-secondary placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 dark:border-white/10 dark:bg-white/5 dark:text-white"
               />
             </div>
@@ -599,7 +599,7 @@ function CategoryFilterDropdown({
                   : "text-secondary hover:bg-gray-100 dark:text-white dark:hover:bg-white/10"
               )}
             >
-              <span className="font-medium">Tất cả danh mục</span>
+              <span className="font-medium">Tất cả nhóm bệnh lý</span>
             </button>
 
             <div className="my-2 border-t border-border/20 dark:border-white/10" />

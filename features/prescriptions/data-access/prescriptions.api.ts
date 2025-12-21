@@ -119,12 +119,10 @@ export async function copyPrescription(
  * Search prescriptions by name
  */
 export async function searchPrescriptionsByName(
-  userId: string,
   name: string,
   pageable: Pageable
 ): Promise<Page<PrescriptionProjection>> {
   const params = buildPageableParams(pageable);
-  params.set("userId", userId);
   params.set("name", name);
 
   const response = await fetch(
@@ -142,13 +140,11 @@ export async function searchPrescriptionsByName(
  * Search prescriptions by date range
  */
 export async function searchPrescriptionsByDate(
-  userId: string,
   start: string,
   end: string,
   pageable: Pageable
 ): Promise<Page<PrescriptionProjection>> {
   const params = buildPageableParams(pageable);
-  params.set("userId", userId);
   params.set("start", start);
   params.set("end", end);
 
@@ -198,4 +194,19 @@ export async function updateIntakeStatus(
   );
 
   return handleResponse<{ result: Intake }>(response);
+}
+
+/**
+ * Accept a prescription (Patient only - via email link)
+ */
+export async function acceptPrescription(id: string): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.ACCEPT}/${id}/accept`,
+    {
+      method: "PUT",
+      headers: getAuthHeaders(),
+    }
+  );
+
+  await handleResponse<void>(response);
 }

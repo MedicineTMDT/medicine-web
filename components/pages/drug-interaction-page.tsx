@@ -183,7 +183,7 @@ export function DrugInteractionPageScreen() {
                   "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition",
                   searchMode === "drug"
                     ? "bg-primary text-white shadow-lg"
-                    : "bg-white/20 text-white/80 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20"
+                    : "border border-secondary/20 bg-secondary/10 text-secondary/80 hover:bg-secondary/20 dark:border-white/20 dark:bg-white/10 dark:text-white/80 dark:hover:bg-white/20"
                 )}
               >
                 <Pill className="h-4 w-4" aria-hidden />
@@ -196,7 +196,7 @@ export function DrugInteractionPageScreen() {
                   "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition",
                   searchMode === "ingredient"
                     ? "bg-primary text-white shadow-lg"
-                    : "bg-white/20 text-white/80 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20"
+                    : "border border-secondary/20 bg-secondary/10 text-secondary/80 hover:bg-secondary/20 dark:border-white/20 dark:bg-white/10 dark:text-white/80 dark:hover:bg-white/20"
                 )}
               >
                 <FlaskConical className="h-4 w-4" aria-hidden />
