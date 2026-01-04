@@ -23,19 +23,17 @@ const TOKEN_KEY = "auth_token";
 export const tokenStorage = {
   getToken: (): string | null => {
     if (typeof window === "undefined") return null;
-    return sessionStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(TOKEN_KEY);
   },
 
   setToken: (token: string): void => {
     if (typeof window === "undefined") return;
-    sessionStorage.setItem(TOKEN_KEY, token);
-    sessionStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(TOKEN_KEY, token);
   },
 
   clearToken: (): void => {
     if (typeof window === "undefined") return;
-    sessionStorage.removeItem(TOKEN_KEY);
-    sessionStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(TOKEN_KEY);
   },
 };
 
@@ -290,22 +288,41 @@ export async function getUserByUsername(username: string): Promise<UserApiRespon
 }
 
 /**
+ * Check if a string looks like a UUID
+ */
+function isUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
+
+/**
  * Fetch the current user's info based on the stored token.
- * Decodes the JWT to get the username from sub claim, then fetches user details.
+ * Decodes the JWT to get user identifier from sub claim, then fetches user details.
  */
 export async function getMyInfo(): Promise<UserApiResponse> {
   const token = tokenStorage.getToken();
   if (!token) {
+    console.error("[getMyInfo] No token found in storage");
     throw { code: 401, message: "No token found" } as ApiError;
   }
 
+  console.log("[getMyInfo] Token found, decoding...");
   const payload = decodeJwtPayload(token);
+  console.log("[getMyInfo] JWT Payload:", payload);
+  
   if (!payload?.sub) {
+    console.error("[getMyInfo] No sub claim in token");
     throw { code: 401, message: "Invalid token format" } as ApiError;
   }
 
-  // The sub claim contains the username
-  return getUserByUsername(payload.sub);
+  // Check if sub is a UUID (user ID) or a username
+  if (isUUID(payload.sub)) {
+    console.log("[getMyInfo] Sub is a UUID, fetching user by ID:", payload.sub);
+    return getUserById(payload.sub);
+  } else {
+    console.log("[getMyInfo] Sub is a username, fetching user by username:", payload.sub);
+    return getUserByUsername(payload.sub);
+  }
 }
 
 

@@ -180,10 +180,10 @@ export function DrugInteractionPageScreen() {
                 type="button"
                 onClick={() => setSearchMode("drug")}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition",
+                  "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition border",
                   searchMode === "drug"
-                    ? "bg-primary text-white shadow-lg"
-                    : "bg-white/20 text-white/80 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20"
+                    ? "bg-primary text-white shadow-lg border-primary"
+                    : "bg-white/80 text-secondary/70 border-secondary/20 hover:bg-white hover:text-secondary dark:bg-white/10 dark:text-white/80 dark:border-white/20 dark:hover:bg-white/20"
                 )}
               >
                 <Pill className="h-4 w-4" aria-hidden />
@@ -193,10 +193,10 @@ export function DrugInteractionPageScreen() {
                 type="button"
                 onClick={() => setSearchMode("ingredient")}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition",
+                  "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition border",
                   searchMode === "ingredient"
-                    ? "bg-primary text-white shadow-lg"
-                    : "bg-white/20 text-white/80 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20"
+                    ? "bg-primary text-white shadow-lg border-primary"
+                    : "bg-white/80 text-secondary/70 border-secondary/20 hover:bg-white hover:text-secondary dark:bg-white/10 dark:text-white/80 dark:border-white/20 dark:hover:bg-white/20"
                 )}
               >
                 <FlaskConical className="h-4 w-4" aria-hidden />
