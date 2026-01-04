@@ -1,17 +1,17 @@
 "use client";
 
+import { useTranslation } from "@/components/i18n/translation-provider";
+import { LanguageToggle } from "@/components/language-toggle";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/features/auth";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { LogOut, Menu, User, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
-import { useTranslation } from "@/components/i18n/translation-provider";
-import { LanguageToggle } from "@/components/language-toggle";
-import { useAuth } from "@/features/auth";
 
 const NAV_LINKS = [
   { nameKey: "nav.home", href: "/" },
@@ -37,7 +37,7 @@ export function Navbar() {
         language === "vi" ? "max-w-7xl" : "max-w-6xl"
       )}
     >
-      <div className="relative rounded-[calc(var(--radius)_+_0.5rem)] border border-white/50 bg-white/90 shadow-[0_24px_80px_-40px_rgba(12,39,60,0.55)] backdrop-blur-md transition-colors dark:border-white/10 dark:bg-secondary/80">
+      <div className="relative rounded-[calc(var(--radius)_+_0.5rem)] border border-border bg-white/90 shadow-[0_24px_80px_-40px_rgba(12,39,60,0.55)] backdrop-blur-md transition-colors dark:border-white/10 dark:bg-secondary/80">
         <nav className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4">
           <Logo />
 
@@ -110,7 +110,6 @@ export function Navbar() {
 
           <div className="flex items-center gap-2 md:hidden">
             <ThemeToggle />
-            <LanguageToggle />
             <Button
               variant="ghost"
               size="icon"
@@ -144,7 +143,7 @@ export function Navbar() {
                         key={link.nameKey}
                         href={link.href}
                         className={cn(
-                          "rounded-2xl border border-transparent px-4 py-3 text-sm font-semibold text-secondary transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary",
+                          "rounded-2xl border border-transparent px-4 py-3 text-sm font-semibold text-secondary dark:text-white transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary",
                           isActive &&
                             "border-primary/30 bg-primary/10 text-primary"
                         )}
@@ -153,6 +152,10 @@ export function Navbar() {
                       </Link>
                     );
                   })}
+                </div>
+                <div className="flex items-center justify-between px-2 py-4">
+                  <span className="text-sm font-medium text-muted-foreground">{t("language.label")}</span>
+                  <LanguageToggle />
                 </div>
                 <div className="flex gap-3">
                   {isAuthenticated ? (

@@ -1,11 +1,11 @@
-import type { Metadata } from "next";
-import { Inter, Poppins } from "next/font/google";
-import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
-import { cn } from "@/lib/utils";
 import { TranslationProvider } from "@/components/i18n/translation-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
+import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "@/features/auth";
+import { cn } from "@/lib/utils";
+import type { Metadata } from "next";
+import { Be_Vietnam_Pro, Inter } from "next/font/google";
+import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -13,8 +13,8 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
-const poppins = Poppins({
-  subsets: ["latin"],
+const beVietnamPro = Be_Vietnam_Pro({
+  subsets: ["latin", "vietnamese"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-heading",
   display: "swap",
@@ -74,7 +74,7 @@ export default function RootLayout({
         className={cn(
           "min-h-screen bg-background text-foreground antialiased",
           inter.variable,
-          poppins.variable
+          beVietnamPro.variable
         )}
       >
         <QueryProvider>
@@ -82,7 +82,7 @@ export default function RootLayout({
         <TranslationProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="light"
             enableSystem
             disableTransitionOnChange
           >

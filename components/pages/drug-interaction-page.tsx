@@ -1,11 +1,20 @@
 "use client";
 
 import { IngredientSearch } from "@/components/drug-interaction/ingredient-search";
+import { IngredientSearch } from "@/components/drug-interaction/ingredient-search";
 import { InteractionCard } from "@/components/drug-interaction/interaction-card";
 import { MultiDrugSearch } from "@/components/drug-interaction/multi-drug-search";
 import { useTranslation } from "@/components/i18n/translation-provider";
+import { useTranslation } from "@/components/i18n/translation-provider";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import {
+    normalizeSeverity,
+    useSearchInteractions,
+    type DrugInteraction,
+    type MergedIngredientResponse
+} from "@/features/drug-interactions";
+import { getDrugIngredients, useDrugSuggestions } from "@/features/drugs";
 import {
     normalizeSeverity,
     useSearchInteractions,
@@ -19,9 +28,16 @@ import { CheckCircle2, FlaskConical, Loader2, Pill, ShieldAlert } from "lucide-r
 import { useCallback, useMemo, useState } from "react";
 
 type SearchMode = "drug" | "ingredient";
+import { motion } from "framer-motion";
+import { CheckCircle2, FlaskConical, Loader2, Pill, ShieldAlert } from "lucide-react";
+import { useCallback, useMemo, useState } from "react";
+
+type SearchMode = "drug" | "ingredient";
 
 type Summary = {
   total: number;
+  contraindicated: number;
+  conditional: number;
   contraindicated: number;
   conditional: number;
 };
@@ -39,7 +55,21 @@ export function DrugInteractionPageScreen() {
   
   // Results state
   const [results, setResults] = useState<DrugInteraction[]>([]);
+  // Search mode state
+  const [searchMode, setSearchMode] = useState<SearchMode>("drug");
+  
+  // Drug mode state
+  const [drugQuery, setDrugQuery] = useState("");
+  const [selectedDrugs, setSelectedDrugs] = useState<{ id: string; label: string; meta?: string }[]>([]);
+  
+  // Ingredient mode state
+  const [selectedIngredients, setSelectedIngredients] = useState<MergedIngredientResponse[]>([]);
+  
+  // Results state
+  const [results, setResults] = useState<DrugInteraction[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
+  
   const [isExtracting, setIsExtracting] = useState(false);
   
   const { t } = useTranslation();
@@ -61,11 +91,34 @@ export function DrugInteractionPageScreen() {
         meta: drug.slug,
       }));
   }, [drugSuggestions, selectedDrugs]);
+  
+  // Drug suggestions query
+  const { data: drugSuggestions, isLoading: isDrugLoading } = useDrugSuggestions(drugQuery);
+  
+  // Search interactions mutation
+  const searchMutation = useSearchInteractions();
+  
+  // Format drug suggestions for MultiDrugSearch
+  const formattedDrugSuggestions = useMemo(() => {
+    if (!drugSuggestions?.result) return [];
+    return drugSuggestions.result
+      .filter((drug) => !selectedDrugs.some((s) => s.id === String(drug.id)))
+      .map((drug) => ({
+        id: String(drug.id),
+        label: drug.name,
+        meta: drug.slug,
+      }));
+  }, [drugSuggestions, selectedDrugs]);
 
+  // Calculate summary
   // Calculate summary
   const summary: Summary = useMemo(() => {
     const base = { total: results.length, contraindicated: 0, conditional: 0 };
+    const base = { total: results.length, contraindicated: 0, conditional: 0 };
     results.forEach((r) => {
+      const severity = normalizeSeverity(r.mucDoNghiemTrong);
+      if (severity === "contraindicated") base.contraindicated += 1;
+      else if (severity === "conditional") base.conditional += 1;
       const severity = normalizeSeverity(r.mucDoNghiemTrong);
       if (severity === "contraindicated") base.contraindicated += 1;
       else if (severity === "conditional") base.conditional += 1;
@@ -77,8 +130,14 @@ export function DrugInteractionPageScreen() {
   const handleAddDrug = (item: { id: string; label: string; meta?: string }) => {
     if (selectedDrugs.length >= 10) return;
     setSelectedDrugs((prev) => [...prev, item]);
+  // Drug mode handlers
+  const handleAddDrug = (item: { id: string; label: string; meta?: string }) => {
+    if (selectedDrugs.length >= 10) return;
+    setSelectedDrugs((prev) => [...prev, item]);
   };
 
+  const handleRemoveDrug = (id: string) => {
+    setSelectedDrugs((prev) => prev.filter((item) => item.id !== id));
   const handleRemoveDrug = (id: string) => {
     setSelectedDrugs((prev) => prev.filter((item) => item.id !== id));
   };
@@ -95,7 +154,68 @@ export function DrugInteractionPageScreen() {
 
   // Run interaction check
   const runCheck = useCallback(async () => {
+  // Ingredient mode handlers
+  const handleAddIngredient = (ingredient: MergedIngredientResponse) => {
+    if (selectedIngredients.length >= 10) return;
+    setSelectedIngredients((prev) => [...prev, ingredient]);
+  };
+
+  const handleRemoveIngredient = (id: number) => {
+    setSelectedIngredients((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  // Run interaction check
+  const runCheck = useCallback(async () => {
     setHasSearched(true);
+    
+    let ingredientNames: string[] = [];
+    
+    if (searchMode === "drug") {
+      // Extract ingredients from selected drugs
+      setIsExtracting(true);
+      try {
+        const ingredientPromises = selectedDrugs.map((drug) =>
+          getDrugIngredients(Number(drug.id))
+        );
+        const ingredientResults = await Promise.all(ingredientPromises);
+        
+        // Collect all unique ingredient names
+        const allIngredients = new Set<string>();
+        ingredientResults.forEach((result) => {
+          if (result.result) {
+            result.result.forEach((ing) => allIngredients.add(ing));
+          }
+        });
+        ingredientNames = Array.from(allIngredients);
+      } catch (error) {
+        console.error("Error extracting ingredients:", error);
+      } finally {
+        setIsExtracting(false);
+      }
+    } else {
+      // Use selected ingredients directly
+      ingredientNames = selectedIngredients.map((ing) => ing.name);
+    }
+    
+    if (ingredientNames.length === 0) {
+      setResults([]);
+      return;
+    }
+    
+    // Search for interactions
+    try {
+      const response = await searchMutation.mutateAsync(ingredientNames);
+      setResults(response.result || []);
+    } catch (error) {
+      console.error("Error searching interactions:", error);
+      setResults([]);
+    }
+  }, [searchMode, selectedDrugs, selectedIngredients, searchMutation]);
+
+  const isLoading = searchMutation.isPending || isExtracting;
+  const canCheck = searchMode === "drug" 
+    ? selectedDrugs.length >= 1 && selectedDrugs.length <= 10
+    : selectedIngredients.length >= 1 && selectedIngredients.length <= 10;
     
     let ingredientNames: string[] = [];
     
@@ -223,9 +343,32 @@ export function DrugInteractionPageScreen() {
                   disabled={isLoading}
                 />
               )}
+              {searchMode === "drug" ? (
+                <MultiDrugSearch
+                  suggestions={formattedDrugSuggestions}
+                  loading={isDrugLoading}
+                  onQueryChange={setDrugQuery}
+                  onAdd={handleAddDrug}
+                  onRemove={handleRemoveDrug}
+                  selected={selectedDrugs}
+                />
+              ) : (
+                <IngredientSearch
+                  onSelect={handleAddIngredient}
+                  onRemove={handleRemoveIngredient}
+                  selected={selectedIngredients}
+                  disabled={isLoading}
+                />
+              )}
             </div>
             
+            
             <div className="flex flex-col items-center gap-3 text-center text-sm text-secondary/80 sm:flex-row sm:justify-between sm:text-left dark:text-white/80">
+              <p>
+                {searchMode === "drug"
+                  ? t("drugInteraction.selectPrompt", { values: { count: selectedDrugs.length } })
+                  : `Đã chọn ${selectedIngredients.length} hoạt chất`}
+              </p>
               <p>
                 {searchMode === "drug"
                   ? t("drugInteraction.selectPrompt", { values: { count: selectedDrugs.length } })
@@ -235,8 +378,11 @@ export function DrugInteractionPageScreen() {
                 size="lg"
                 className="w-full rounded-full sm:w-auto"
                 disabled={!canCheck || isLoading}
+                disabled={!canCheck || isLoading}
                 onClick={runCheck}
               >
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
+                {isExtracting ? "Đang trích xuất hoạt chất..." : t("drugInteraction.checkButton")}
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
                 {isExtracting ? "Đang trích xuất hoạt chất..." : t("drugInteraction.checkButton")}
               </Button>
@@ -258,6 +404,8 @@ export function DrugInteractionPageScreen() {
           <div className="flex flex-wrap gap-2 text-xs font-semibold text-secondary/80 dark:text-white/70">
             <SeverityBadge label="Chống chỉ định" count={summary.contraindicated} tone="contraindicated" />
             <SeverityBadge label="CCĐ có điều kiện" count={summary.conditional} tone="conditional" />
+            <SeverityBadge label="Chống chỉ định" count={summary.contraindicated} tone="contraindicated" />
+            <SeverityBadge label="CCĐ có điều kiện" count={summary.conditional} tone="conditional" />
           </div>
           {hasSearched ? (
             <div className="sticky top-4 flex items-center gap-2 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-4 py-2 text-sm font-semibold text-secondary shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-white">
@@ -272,10 +420,17 @@ export function DrugInteractionPageScreen() {
             {searchMode === "drug" 
               ? t("drugInteraction.addDrugs")
               : "Thêm hoạt chất và nhấn kiểm tra để xem tương tác"}
+            {searchMode === "drug" 
+              ? t("drugInteraction.addDrugs")
+              : "Thêm hoạt chất và nhấn kiểm tra để xem tương tác"}
           </div>
+        ) : isLoading ? (
         ) : isLoading ? (
           <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-10 text-center dark:border-white/10 dark:bg-white/5">
             <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />
+            <p className="text-sm text-muted-foreground">
+              {isExtracting ? "Đang trích xuất hoạt chất từ thuốc..." : t("drugInteraction.checking")}
+            </p>
             <p className="text-sm text-muted-foreground">
               {isExtracting ? "Đang trích xuất hoạt chất từ thuốc..." : t("drugInteraction.checking")}
             </p>
@@ -293,7 +448,15 @@ export function DrugInteractionPageScreen() {
                 interaction={interaction}
               />
             ))}
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {results.map((interaction) => (
+              <InteractionCard
+                key={interaction.id}
+                interaction={interaction}
+              />
+            ))}
           </div>
+        )}
         )}
       </section>
     </div>
@@ -308,13 +471,19 @@ function SeverityBadge({
   label: string;
   count: number;
   tone: "contraindicated" | "conditional";
+  tone: "contraindicated" | "conditional";
 }) {
+  const styleMap: Record<typeof tone, string> = {
+    contraindicated: "bg-purple-500/10 text-purple-800 ring-purple-500/30 dark:text-purple-200",
+    conditional: "bg-orange-500/10 text-orange-800 ring-orange-500/30 dark:text-orange-200",
+  };
   const styleMap: Record<typeof tone, string> = {
     contraindicated: "bg-purple-500/10 text-purple-800 ring-purple-500/30 dark:text-purple-200",
     conditional: "bg-orange-500/10 text-orange-800 ring-orange-500/30 dark:text-orange-200",
   };
 
   return (
+    <span className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 ring-1", styleMap[tone])}>
     <span className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 ring-1", styleMap[tone])}>
       {label}: {count}
     </span>

@@ -77,7 +77,7 @@ export default function DrugInfoDetailPage() {
       return (
         <ul key={index} className="ml-4 list-disc space-y-1">
           {item.map((subItem, subIndex) => (
-            <li key={subIndex} className="text-secondary/80 dark:text-muted-foreground">
+            <li key={subIndex} className="text-secondary/80 dark:text-primary">
               {subItem}
             </li>
           ))}
@@ -85,7 +85,7 @@ export default function DrugInfoDetailPage() {
       );
     }
     return (
-      <p key={index} className="text-secondary/80 dark:text-muted-foreground">
+      <p key={index} className="text-secondary/80 dark:text-primary">
         {item}
       </p>
     );
@@ -170,7 +170,7 @@ export default function DrugInfoDetailPage() {
 
       <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
         {/* Sidebar - Table of Contents & Metadata */}
-        <div className="lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:pr-2">
+        <div className="lg:sticky lg:top-4 lg:pr-2">
           <div className="space-y-6">
             {/* Table of Contents */}
             {tableOfContent.length > 0 && (
@@ -178,7 +178,7 @@ export default function DrugInfoDetailPage() {
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base text-secondary dark:text-white">Mục lục</CardTitle>
                 </CardHeader>
-                <CardContent className="max-h-[300px] overflow-y-auto">
+                <CardContent>
                   <nav className="space-y-1">
                     {tableOfContent.map((item, index) => (
                       <a
@@ -190,7 +190,7 @@ export default function DrugInfoDetailPage() {
                           item.level === 2 ? "ml-4 text-xs" : "font-medium",
                           activeSection === `section-${index}`
                             ? "bg-primary/10 text-primary"
-                            : "text-secondary/70 dark:text-muted-foreground"
+                            : "text-secondary/70 dark:text-white"
                         )}
                       >
                         {item.title}
@@ -210,7 +210,7 @@ export default function DrugInfoDetailPage() {
                 <CardContent className="space-y-3">
                   {Object.entries(metadata).map(([key, value]) => (
                     <div key={key} className="text-sm">
-                      <dt className="font-medium text-secondary/60 dark:text-muted-foreground">{key}</dt>
+                      <dt className="font-medium text-secondary/60 dark:text-primary">{key}</dt>
                       <dd className="mt-0.5 text-secondary dark:text-white">
                         {Array.isArray(value) ? value.join(", ") : value}
                       </dd>

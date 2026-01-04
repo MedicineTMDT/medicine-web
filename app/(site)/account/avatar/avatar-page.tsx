@@ -1,17 +1,19 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Camera, Loader2, Check, X, ArrowLeft, Upload, Image } from "lucide-react";
+import { useTranslation } from "@/components/i18n/translation-provider";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth";
 import { useUpdateAvatar, useUser } from "@/features/user";
 import { useQueryClient } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { ArrowLeft, Camera, Check, Image, Loader2, Upload, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useRef, useState } from "react";
 
 export function AvatarPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const { mutate: updateAvatar, isPending, error } = useUpdateAvatar();
   const [isSuccess, setIsSuccess] = useState(false);
@@ -33,13 +35,13 @@ export function AvatarPage() {
   const processFile = (file: File) => {
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
+      alert(t("account.avatar.invalidType"));
       return;
     }
 
     // Validate file size (5MB max)
     if (file.size > 5 * 1024 * 1024) {
-      alert("File size must be less than 5MB");
+      alert(t("account.avatar.fileTooLarge"));
       return;
     }
 
@@ -119,13 +121,13 @@ export function AvatarPage() {
           className="mb-2"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Account
+          {t("account.editProfile.backToAccount")}
         </Button>
         <h1 className="text-2xl font-bold text-secondary dark:text-white">
-          Profile Picture
+          {t("account.avatar.title")}
         </h1>
         <p className="text-muted-foreground">
-          Upload a new avatar to personalize your profile
+          {t("account.avatar.description")}
         </p>
       </motion.div>
 
@@ -137,7 +139,7 @@ export function AvatarPage() {
         transition={{ duration: 0.3, delay: 0.1 }}
       >
         <h3 className="mb-4 font-semibold text-secondary dark:text-white">
-          Current Avatar
+          {t("account.avatar.currentAvatar")}
         </h3>
         <div className="flex items-center gap-6">
           <div className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-primary/20 to-primary/5">
@@ -177,24 +179,24 @@ export function AvatarPage() {
           </div>
           <div>
             <h3 className="font-semibold text-secondary dark:text-white">
-              Upload New Avatar
+              {t("account.avatar.uploadNew")}
             </h3>
             <p className="text-sm text-muted-foreground">
-              Supported formats: JPG, PNG, GIF (max 5MB)
+              {t("account.avatar.supportedFormats")}
             </p>
           </div>
         </div>
 
         {error && (
           <div className="mb-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-            {error.message || "Failed to upload avatar."}
+            {error.message || t("account.avatar.error")}
           </div>
         )}
 
         {isSuccess && (
           <div className="mb-6 flex items-center gap-2 rounded-lg border border-green-500/50 bg-green-50 p-4 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">
             <Check className="h-5 w-5" />
-            Avatar updated successfully!
+            {t("account.avatar.success")}
           </div>
         )}
 
@@ -224,10 +226,10 @@ export function AvatarPage() {
               </div>
               <div>
                 <p className="font-medium text-secondary dark:text-white">
-                  Preview
+                  {t("account.avatar.preview")}
                 </p>
                 <p className="text-sm text-muted-foreground">
-                  This is how your new avatar will look
+                  {t("account.avatar.previewDescription")}
                 </p>
               </div>
             </div>
@@ -237,12 +239,12 @@ export function AvatarPage() {
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Uploading...
+                    {t("account.avatar.uploading")}
                   </>
                 ) : (
                   <>
                     <Upload className="mr-2 h-4 w-4" />
-                    Upload Avatar
+                    {t("account.avatar.uploadAvatar")}
                   </>
                 )}
               </Button>
@@ -251,7 +253,7 @@ export function AvatarPage() {
                 onClick={handleCancel}
                 disabled={isPending}
               >
-                Cancel
+                {t("account.avatar.cancel")}
               </Button>
             </div>
           </div>
@@ -272,10 +274,10 @@ export function AvatarPage() {
               <Camera className="h-8 w-8 text-primary" />
             </div>
             <p className="font-medium text-secondary dark:text-white">
-              {dragActive ? "Drop your image here" : "Click or drag to upload"}
+              {dragActive ? t("account.avatar.dropHere") : t("account.avatar.dragDrop")}
             </p>
             <p className="mt-1 text-sm text-muted-foreground">
-              JPG, PNG or GIF up to 5MB
+              {t("account.avatar.fileSizeLimit")}
             </p>
           </div>
         )}
@@ -283,4 +285,5 @@ export function AvatarPage() {
     </div>
   );
 }
+
 

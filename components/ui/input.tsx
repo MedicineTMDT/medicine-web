@@ -18,20 +18,20 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     return (
       <div
         className={cn(
-          "relative flex items-center rounded-[calc(var(--radius)_-_0.5rem)] border border-input/80 bg-white px-4 shadow-sm ring-offset-background transition focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 dark:border-white/20 dark:bg-slate-800",
+          "relative flex items-center rounded-md border border-input bg-background px-3 ring-offset-background transition focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
           wrapperClassName,
-          disabled && "opacity-60"
+          disabled && "opacity-60 cursor-not-allowed"
         )}
       >
         {leadingIcon ? (
-          <span className="mr-3 inline-flex h-10 w-10 items-center justify-center text-primary">
+          <span className="mr-2 inline-flex items-center justify-center text-primary">
             {leadingIcon}
           </span>
         ) : null}
         <input
           type={type}
           className={cn(
-            "flex h-12 w-full bg-transparent text-base text-secondary placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed dark:text-white",
+            "flex h-10 w-full bg-transparent text-sm text-secondary placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed dark:text-white",
             className
           )}
           ref={ref}
@@ -39,7 +39,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {...props}
         />
         {trailingIcon ? (
-          <span className="ml-3 inline-flex h-10 w-10 items-center justify-center text-muted-foreground">
+          <span className="ml-2 inline-flex items-center justify-center text-muted-foreground">
             {trailingIcon}
           </span>
         ) : null}
@@ -50,3 +50,4 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 Input.displayName = "Input";
 
 export { Input };
+
