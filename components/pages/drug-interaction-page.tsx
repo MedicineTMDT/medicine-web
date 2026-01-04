@@ -448,7 +448,15 @@ export function DrugInteractionPageScreen() {
                 interaction={interaction}
               />
             ))}
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            {results.map((interaction) => (
+              <InteractionCard
+                key={interaction.id}
+                interaction={interaction}
+              />
+            ))}
           </div>
+        )}
         )}
       </section>
     </div>
@@ -463,13 +471,19 @@ function SeverityBadge({
   label: string;
   count: number;
   tone: "contraindicated" | "conditional";
+  tone: "contraindicated" | "conditional";
 }) {
+  const styleMap: Record<typeof tone, string> = {
+    contraindicated: "bg-purple-500/10 text-purple-800 ring-purple-500/30 dark:text-purple-200",
+    conditional: "bg-orange-500/10 text-orange-800 ring-orange-500/30 dark:text-orange-200",
+  };
   const styleMap: Record<typeof tone, string> = {
     contraindicated: "bg-purple-500/10 text-purple-800 ring-purple-500/30 dark:text-purple-200",
     conditional: "bg-orange-500/10 text-orange-800 ring-orange-500/30 dark:text-orange-200",
   };
 
   return (
+    <span className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 ring-1", styleMap[tone])}>
     <span className={cn("inline-flex items-center gap-2 rounded-full px-3 py-1 ring-1", styleMap[tone])}>
       {label}: {count}
     </span>
