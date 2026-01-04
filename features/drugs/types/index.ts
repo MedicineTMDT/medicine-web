@@ -62,6 +62,26 @@ export interface CategorySimpleResponse {
 }
 
 // ============================================
+// CategoryDetail Types
+// ============================================
+
+export interface CategoryDetail {
+  id: number;
+  name: string;
+  content: string;
+  created: string;
+  update: string;
+}
+
+export interface CategoryDetailResponse {
+  id: number;
+  name: string;
+  content: string;
+  created: string;
+  update: string;
+}
+
+// ============================================
 // API Response Types
 // ============================================
 
@@ -73,3 +93,7 @@ export type DrugIngredientsApiResponse = ApiResponse<string[]>;
 export type CategoryListApiResponse = ApiResponse<PageableResponse<CategoryResponse>>;
 export type CategorySearchApiResponse = ApiResponse<PageableResponse<CategorySimpleResponse>>;
 
+// CategoryDetail API Response Types
+export type CategoryDetailApiResponse = ApiResponse<CategoryDetail>;
+export type CategoryDetailListApiResponse = ApiResponse<PageableResponse<CategoryDetailResponse>>;
+export type CategoryDetailByCategoryApiResponse = ApiResponse<PageableResponse<CategorySimpleResponse>>;

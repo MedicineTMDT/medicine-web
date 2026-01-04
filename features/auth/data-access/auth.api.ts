@@ -1,17 +1,17 @@
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api.cofig";
 import type {
-  LoginPayload,
-  LoginApiResponse,
-  RegisterPayload,
-  RegisterApiResponse,
-  LogoutPayload,
-  LogoutApiResponse,
-  IntrospectPayload,
-  IntrospectApiResponse,
-  UserApiResponse,
-  VerifyEmailPayload,
-  VerifyEmailApiResponse,
-  ApiError,
+    ApiError,
+    IntrospectApiResponse,
+    IntrospectPayload,
+    LoginApiResponse,
+    LoginPayload,
+    LogoutApiResponse,
+    LogoutPayload,
+    RegisterApiResponse,
+    RegisterPayload,
+    UserApiResponse,
+    VerifyEmailApiResponse,
+    VerifyEmailPayload,
 } from "../types";
 
 // ============================================
@@ -23,17 +23,17 @@ const TOKEN_KEY = "auth_token";
 export const tokenStorage = {
   getToken: (): string | null => {
     if (typeof window === "undefined") return null;
-    return localStorage.getItem(TOKEN_KEY);
+    return sessionStorage.getItem(TOKEN_KEY);
   },
 
   setToken: (token: string): void => {
     if (typeof window === "undefined") return;
-    localStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(TOKEN_KEY, token);
   },
 
   clearToken: (): void => {
     if (typeof window === "undefined") return;
-    localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
   },
 };
 
@@ -178,4 +178,132 @@ export async function verifyEmail(
 
   return handleResponse<VerifyEmailApiResponse>(response);
 }
+
+// ============================================
+// JWT Helper Functions
+// ============================================
+
+interface JwtPayload {
+  sub: string; // User ID or email
+  exp?: number;
+  iat?: number;
+  // Common claims that might be in the token
+  userId?: string;
+  id?: string;
+  email?: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  given_name?: string;
+  family_name?: string;
+  role?: string;
+  scope?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Decode JWT token payload without verification.
+ * Note: This doesn't verify the signature, just extracts the payload.
+ */
+export function decodeJwtPayload(token: string): JwtPayload | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+
+    const payload = parts[1];
+    // Handle URL-safe base64
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+
+    return JSON.parse(jsonPayload);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Get user ID from JWT payload, checking multiple possible claim names.
+ */
+function getUserIdFromPayload(payload: JwtPayload): string | null {
+  // Check various possible claim names for user ID
+  // Order: explicit userId/id claims first, then sub if it looks like an ID
+  if (payload.userId) return payload.userId;
+  if (payload.id) return payload.id;
+  
+  // Check if sub is a UUID (typical user ID format) vs email
+  const sub = payload.sub;
+  if (sub && !sub.includes("@")) {
+    // sub doesn't look like an email, assume it's a user ID
+    return sub;
+  }
+  
+  return null;
+}
+
+/**
+ * Extract user info directly from JWT claims (for OAuth flows).
+ */
+export function getUserInfoFromToken(): { 
+  email?: string;
+  username?: string;
+  firstName?: string;
+  lastName?: string;
+  role?: string;
+  userId?: string;
+} | null {
+  const token = tokenStorage.getToken();
+  if (!token) return null;
+
+  const payload = decodeJwtPayload(token);
+  if (!payload) return null;
+
+  // Debug: log the full payload to see what's available
+  console.log("JWT Payload:", payload);
+
+  return {
+    email: payload.email || (payload.sub?.includes("@") ? payload.sub : undefined),
+    username: payload.username,
+    firstName: payload.firstName || payload.given_name,
+    lastName: payload.lastName || payload.family_name,
+    role: payload.role,
+    userId: getUserIdFromPayload(payload) || undefined,
+  };
+}
+
+/**
+ * Fetch user by username.
+ */
+export async function getUserByUsername(username: string): Promise<UserApiResponse> {
+  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USERS.GET_BY_USERNAME}/${username}`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+
+  return handleResponse<UserApiResponse>(response);
+}
+
+/**
+ * Fetch the current user's info based on the stored token.
+ * Decodes the JWT to get the username from sub claim, then fetches user details.
+ */
+export async function getMyInfo(): Promise<UserApiResponse> {
+  const token = tokenStorage.getToken();
+  if (!token) {
+    throw { code: 401, message: "No token found" } as ApiError;
+  }
+
+  const payload = decodeJwtPayload(token);
+  if (!payload?.sub) {
+    throw { code: 401, message: "Invalid token format" } as ApiError;
+  }
+
+  // The sub claim contains the username
+  return getUserByUsername(payload.sub);
+}
+
 

@@ -13,6 +13,8 @@ export const API_ENDPOINTS = {
   },
   USERS: {
     GET_BY_ID: "/api/v1/users",
+    GET_BY_USERNAME: "/api/v1/users/username",
+    MY_INFO: "/api/v1/users/my-info",
     EDIT: "/api/v1/users/edit",
     CHANGE_PASSWORD: "/api/v1/users/change-password",
     UPDATE_AVATAR: "/api/v1/users/update-avatar-img",
@@ -30,6 +32,19 @@ export const API_ENDPOINTS = {
     GET_ALL: "/api/v1/categories",
     GET_BY_ID: "/api/v1/categories",
     SEARCH: "/api/v1/categories/search",
+  },
+  CATEGORY_DETAIL: {
+    GET_ALL: "/api/v1/category-detail",
+    GET_BY_ID: "/api/v1/category-detail",
+    SEARCH: "/api/v1/category-detail/search",
+    BY_CATEGORY: "/api/v1/category-detail/by-category",
+  },
+  DRUG_INTERACTIONS: {
+    GET_BY_ID: "/api/v1/drug-interactions",
+    SEARCH_BY_INGREDIENTS: "/api/v1/drug-interactions/search-by-ingredients",
+  },
+  MERGED_INGREDIENT: {
+    SUGGEST: "/api/v1/merged-ingredient/suggest",
   },
 } as const;
 

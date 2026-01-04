@@ -1,20 +1,49 @@
 // Types
 export type {
-    CategoryListApiResponse, CategoryResponse, CategorySearchApiResponse, CategorySimpleResponse, Drug, DrugDetailApiResponse, DrugIngredientsApiResponse, DrugListApiResponse, DrugSimpleResponse, DrugTop10ApiResponse, Pageable,
+    CategoryDetail,
+    CategoryDetailApiResponse,
+    CategoryDetailByCategoryApiResponse,
+    CategoryDetailListApiResponse,
+    CategoryDetailResponse,
+    CategoryListApiResponse,
+    CategoryResponse,
+    CategorySearchApiResponse,
+    CategorySimpleResponse,
+    Drug,
+    DrugDetailApiResponse,
+    DrugIngredientsApiResponse,
+    DrugListApiResponse,
+    DrugSimpleResponse,
+    DrugTop10ApiResponse,
+    Pageable,
     PageableResponse
 } from "./types";
 
 // API
 export {
-    getAllCategories, getAllDrugs,
-    getDrugById, getDrugIngredients,
-    getDrugsByCategory, getTop10Drugs, searchDrugs
+    getAllCategories,
+    getAllCategoryDetails,
+    getAllDrugs,
+    getCategoryDetailById,
+    getCategoryDetailsByCategory,
+    getDrugById,
+    getDrugIngredients,
+    getDrugsByCategory,
+    getTop10Drugs,
+    searchCategoryDetails,
+    searchDrugs
 } from "./data-access/drugs.api";
 
 // Queries
 export {
-    categoryKeys, drugKeys, useCategories, useDrug,
+    categoryDetailKeys,
+    categoryKeys,
+    drugKeys,
+    useCategories,
+    useCategoryDetail, useCategoryDetailSearch, useCategoryDetails, useCategoryDetailsByCategory, useDrug,
     useDrugSearch,
-    useDrugSuggestions, useDrugs, useDrugsByCategory
+    useDrugSuggestions,
+    useDrugs,
+    useDrugsByCategory
 } from "./queries/drugs.queries";
 

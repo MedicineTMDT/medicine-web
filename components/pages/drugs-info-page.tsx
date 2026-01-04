@@ -6,12 +6,12 @@ import { DrugInfoSearchBar, type DrugInfoSuggestion } from "@/components/drugs-i
 import { useTranslation } from "@/components/i18n/translation-provider";
 import { Button } from "@/components/ui/button";
 import {
-  useCategories,
-  useDrugs,
-  useDrugsByCategory,
-  useDrugSearch,
-  useDrugSuggestions,
-  type Pageable
+    useCategories,
+    useDrugs,
+    useDrugsByCategory,
+    useDrugSearch,
+    useDrugSuggestions,
+    type Pageable
 } from "@/features/drugs";
 import { motion } from "framer-motion";
 import { BookOpen, ChevronLeft, ChevronRight, Loader2, Search } from "lucide-react";
@@ -31,10 +31,10 @@ export function DrugsInfoPageScreen() {
     [page]
   );
 
-  // Fetch categories for filter
+  // Fetch categories for filter (fetch all categories for dropdown)
   const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useCategories({
     page: 0,
-    size: 50,
+    size: 1000, // Fetch all categories for filter dropdown
   });
 
   // Fetch suggestions for autocomplete (top 10)
