@@ -1,45 +1,19 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { useTranslation } from "@/components/i18n/translation-provider";
+import { useAuth } from "@/features/auth";
+import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
-  User,
-  Shield,
-  Image,
-  Settings,
-  ChevronRight,
+    ChevronRight,
+    Image,
+    Settings,
+    Shield,
+    User,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/features/auth";
-
-const accountNavItems = [
-  {
-    label: "Overview",
-    href: "/account",
-    icon: User,
-    description: "View your account information",
-  },
-  {
-    label: "Edit Profile",
-    href: "/account/profile",
-    icon: Settings,
-    description: "Update your personal information",
-  },
-  {
-    label: "Security",
-    href: "/account/security",
-    icon: Shield,
-    description: "Change password and security settings",
-  },
-  {
-    label: "Avatar",
-    href: "/account/avatar",
-    icon: Image,
-    description: "Update your profile picture",
-  },
-];
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function AccountLayout({
   children,
@@ -49,7 +23,35 @@ export default function AccountLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, isLoading } = useAuth();
+  const { t } = useTranslation();
   const [isMounted, setIsMounted] = useState(false);
+
+  const accountNavItems = [
+    {
+      label: t("account.nav.overview"),
+      href: "/account",
+      icon: User,
+      description: t("account.nav.overview.description"),
+    },
+    {
+      label: t("account.nav.editProfile"),
+      href: "/account/profile",
+      icon: Settings,
+      description: t("account.nav.editProfile.description"),
+    },
+    {
+      label: t("account.nav.security"),
+      href: "/account/security",
+      icon: Shield,
+      description: t("account.nav.security.description"),
+    },
+    {
+      label: t("account.nav.avatar"),
+      href: "/account/avatar",
+      icon: Image,
+      description: t("account.nav.avatar.description"),
+    },
+  ];
 
   // Wait for client-side mount to avoid hydration mismatch
   useEffect(() => {
@@ -91,7 +93,7 @@ export default function AccountLayout({
           className="space-y-2"
         >
           <h2 className="mb-4 px-3 text-lg font-semibold text-secondary dark:text-white">
-            Account Settings
+            {t("account.settings")}
           </h2>
           <nav className="space-y-1">
             {accountNavItems.map((item) => {

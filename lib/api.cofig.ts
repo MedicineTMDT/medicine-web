@@ -46,5 +46,16 @@ export const API_ENDPOINTS = {
   MERGED_INGREDIENT: {
     SUGGEST: "/api/v1/merged-ingredient/suggest",
   },
+  PRESCRIPTIONS: {
+    BASE: "/api/v1/prescriptions",
+    CREATE: "/api/v1/prescriptions",
+    GET_BY_ID: "/api/v1/prescriptions",
+    COPY: "/api/v1/prescriptions",
+    SEARCH_BY_NAME: "/api/v1/prescriptions/search/name",
+    SEARCH_BY_DATE: "/api/v1/prescriptions/search/date",
+    REVIEW: "/api/v1/prescriptions/review",
+    EDIT_INTAKE: "/api/v1/prescriptions/edit",
+    ACCEPT: "/api/v1/prescriptions", // /{id}/accept
+  },
 } as const;
 

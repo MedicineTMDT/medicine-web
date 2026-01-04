@@ -1,28 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { motion } from "framer-motion";
-import { User, Loader2, Check, ArrowLeft } from "lucide-react";
+import { useTranslation } from "@/components/i18n/translation-provider";
 import { Button } from "@/components/ui/button";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/features/auth";
-import { useEditUser, editUserSchema, type EditUserFormValues } from "@/features/user";
+import { editUserSchema, useEditUser, type EditUserFormValues } from "@/features/user";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { motion } from "framer-motion";
+import { ArrowLeft, Check, Loader2, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
 
 export function EditProfilePage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { mutate: editUser, isPending, error } = useEditUser();
   const [isSuccess, setIsSuccess] = useState(false);
 
@@ -75,13 +77,13 @@ export function EditProfilePage() {
           className="mb-2"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Account
+          {t("account.editProfile.backToAccount")}
         </Button>
         <h1 className="text-2xl font-bold text-secondary dark:text-white">
-          Edit Profile
+          {t("account.editProfile.title")}
         </h1>
         <p className="text-muted-foreground">
-          Update your personal information
+          {t("account.editProfile.description")}
         </p>
       </motion.div>
 
@@ -94,14 +96,14 @@ export function EditProfilePage() {
       >
         {error && (
           <div className="mb-6 rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive">
-            {error.message || "Failed to update profile."}
+            {error.message || t("account.editProfile.error")}
           </div>
         )}
 
         {isSuccess && (
           <div className="mb-6 flex items-center gap-2 rounded-lg border border-green-500/50 bg-green-50 p-4 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-400">
             <Check className="h-5 w-5" />
-            Profile updated successfully! Redirecting...
+            {t("account.editProfile.success")}
           </div>
         )}
 
@@ -112,17 +114,17 @@ export function EditProfilePage() {
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>{t("account.editProfile.username")}</FormLabel>
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="johndoe"
+                      placeholder={t("account.editProfile.username.placeholder")}
                       leadingIcon={<User className="h-4 w-4" aria-hidden />}
                       disabled={isPending}
                     />
                   </FormControl>
                   <FormDescription>
-                    Your unique username. Must be 5-20 characters.
+                    {t("account.editProfile.username.description")}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -135,16 +137,16 @@ export function EditProfilePage() {
                 name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>First Name</FormLabel>
+                    <FormLabel>{t("account.editProfile.firstName")}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="John"
+                        placeholder={t("account.editProfile.firstName.placeholder")}
                         disabled={isPending}
                       />
                     </FormControl>
                     <FormDescription>
-                      Letters only, no spaces or numbers.
+                      {t("account.editProfile.firstName.description")}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -156,15 +158,15 @@ export function EditProfilePage() {
                 name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Last Name</FormLabel>
+                    <FormLabel>{t("account.editProfile.lastName")}</FormLabel>
                     <FormControl>
                       <Input
                         {...field}
-                        placeholder="Doe"
+                        placeholder={t("account.editProfile.lastName.placeholder")}
                         disabled={isPending}
                       />
                     </FormControl>
-                    <FormDescription>Your family name.</FormDescription>
+                    <FormDescription>{t("account.editProfile.lastName.description")}</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -174,13 +176,13 @@ export function EditProfilePage() {
             {/* Email (read-only) */}
             <div>
               <label className="text-sm font-medium text-secondary dark:text-white">
-                Email
+                {t("account.editProfile.email")}
               </label>
               <div className="mt-2 rounded-lg border border-border/50 bg-muted/50 px-4 py-3 text-sm text-muted-foreground">
                 {user.email}
               </div>
               <p className="mt-1.5 text-xs text-muted-foreground">
-                Email cannot be changed.
+                {t("account.editProfile.email.readOnly")}
               </p>
             </div>
 
@@ -189,10 +191,10 @@ export function EditProfilePage() {
                 {isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    {t("account.editProfile.saving")}
                   </>
                 ) : (
-                  "Save Changes"
+                  t("account.editProfile.saveChanges")
                 )}
               </Button>
               <Button
@@ -201,7 +203,7 @@ export function EditProfilePage() {
                 onClick={() => router.push("/account")}
                 disabled={isPending}
               >
-                Cancel
+                {t("account.editProfile.cancel")}
               </Button>
             </div>
           </form>
@@ -210,4 +212,5 @@ export function EditProfilePage() {
     </div>
   );
 }
+
 

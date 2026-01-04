@@ -106,6 +106,7 @@ export interface AuthenticationResponse {
   username: string;
   firstName: string;
   lastName: string;
+  avatarImg?: string;
   role: UserRole;
   token: string;
   authenticated: boolean;

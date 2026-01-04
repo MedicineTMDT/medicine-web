@@ -1,17 +1,17 @@
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api.cofig";
 import type {
-    ApiError,
-    IntrospectApiResponse,
-    IntrospectPayload,
-    LoginApiResponse,
-    LoginPayload,
-    LogoutApiResponse,
-    LogoutPayload,
-    RegisterApiResponse,
-    RegisterPayload,
-    UserApiResponse,
-    VerifyEmailApiResponse,
-    VerifyEmailPayload,
+  ApiError,
+  IntrospectApiResponse,
+  IntrospectPayload,
+  LoginApiResponse,
+  LoginPayload,
+  LogoutApiResponse,
+  LogoutPayload,
+  RegisterApiResponse,
+  RegisterPayload,
+  UserApiResponse,
+  VerifyEmailApiResponse,
+  VerifyEmailPayload
 } from "../types";
 
 // ============================================
@@ -29,10 +29,12 @@ export const tokenStorage = {
   setToken: (token: string): void => {
     if (typeof window === "undefined") return;
     sessionStorage.setItem(TOKEN_KEY, token);
+    sessionStorage.setItem(TOKEN_KEY, token);
   },
 
   clearToken: (): void => {
     if (typeof window === "undefined") return;
+    sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(TOKEN_KEY);
   },
 };
