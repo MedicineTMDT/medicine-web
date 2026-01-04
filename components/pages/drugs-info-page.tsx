@@ -15,12 +15,6 @@ import {
   useDrugSuggestions,
   type CategoryResponse,
   type Pageable
-    useCategories,
-    useDrugs,
-    useDrugsByCategory,
-    useDrugSearch,
-    useDrugSuggestions,
-    type Pageable
 } from "@/features/drugs";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
