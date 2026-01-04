@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { Pill } from "lucide-react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
 
 type LogoProps = {
   className?: string;
@@ -13,27 +13,40 @@ type LogoProps = {
 export function Logo({ className, compact = false }: LogoProps) {
   return (
     <motion.div
-      className={cn("flex items-center gap-2 font-heading text-xl", className)}
+      className={cn("flex items-center font-heading", className)}
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
     >
       <Link
         href="/"
-        className="group flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 shadow-sm ring-1 ring-border/40 transition hover:bg-white"
+        className="group flex items-center gap-2 rounded-2xl border border-border/30 bg-white/90 px-3 py-1.5 shadow-sm backdrop-blur-sm transition-all duration-200 hover:border-primary/30 hover:bg-white hover:shadow-md dark:border-white/10 dark:bg-secondary/60 dark:hover:border-primary/40 dark:hover:bg-secondary/80"
       >
-        <span className="relative inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <Pill className="h-5 w-5" aria-hidden />
-        </span>
+        {/* Logo icon with subtle animation */}
+        <motion.div
+          className="flex items-center justify-center"
+          whileHover={{ rotate: [0, -5, 5, 0] }}
+          transition={{ duration: 0.4 }}
+        >
+          <Image
+            src="/MedLogo.svg"
+            alt="MedLogo"
+            width={26}
+            height={26}
+            className="h-6.5 w-6.5"
+          />
+        </motion.div>
+        
+        {/* Text content */}
         {!compact && (
-          <span className="flex flex-col leading-tight">
-            <span className="text-base font-semibold text-secondary">
+          <div className="flex flex-col leading-none">
+            <span className="text-sm font-bold tracking-tight text-secondary dark:text-white">
               AnalyticsPill
             </span>
-            <span className="text-xs font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            <span className="text-[9px] font-semibold uppercase tracking-[0.2em] text-primary/70 dark:text-accent/70">
               Knowledge
             </span>
-          </span>
+          </div>
         )}
       </Link>
     </motion.div>

@@ -1,161 +1,286 @@
-import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Pill, ShieldCheck } from "lucide-react";
-import { DrugDetailTabs } from "@/components/drugs-info/drug-detail-tabs";
-import { DrugInfoCard } from "@/components/drugs-info/drug-card";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { drugInfoList, type DrugInfo } from "@/lib/mockData";
+"use client";
 
-type DrugDetailPageProps = {
-  params: { id: string };
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useDrug } from "@/features/drugs";
+import { cn } from "@/lib/utils";
+import { ArrowLeft, ExternalLink, FileText, Loader2, Pill } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import { useState } from "react";
+
+// Types for the info structure
+type ContentSection = {
+  slug?: string;
+  level: number;
+  heading: string;
+  content: (string | string[])[];
 };
 
-const lookup: Record<string, DrugInfo> = Object.fromEntries(drugInfoList.map((d) => [d.id, d]));
+type DrugInfoData = {
+  contents?: ContentSection[];
+  table_of_content?: { level: number; title: string }[];
+};
 
-export function generateStaticParams() {
-  return drugInfoList.map((drug) => ({ id: drug.id }));
-}
+type MetadataType = Record<string, string | string[]>;
 
-export function generateMetadata({ params }: DrugDetailPageProps): Metadata {
-  const drug = lookup[params.id];
-  if (!drug) return {};
-  return {
-    title: `${drug.name} details`,
-    description: drug.description,
-  };
-}
+export default function DrugInfoDetailPage() {
+  const params = useParams();
+  const drugId = params.id ? Number(params.id) : undefined;
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+  
+  const { data, isLoading, error } = useDrug(drugId);
+  const drug = data?.result;
 
-export default function DrugInfoDetailPage({ params }: DrugDetailPageProps) {
-  const drug = lookup[params.id];
-  if (!drug) {
-    notFound();
+  if (isLoading) {
+    return (
+      <div className="container flex items-center justify-center py-24">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Đang tải thông tin thuốc...</p>
+        </div>
+      </div>
+    );
   }
 
-  const related = (drug.relatedIds ?? [])
-    .map((id) => lookup[id])
-    .filter(Boolean)
-    .slice(0, 4) as DrugInfo[];
+  if (error || !drug) {
+    return (
+      <div className="container py-24">
+        <div className="rounded-2xl border border-dashed border-border/50 bg-white/50 p-12 text-center dark:bg-secondary/50">
+          <Pill className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h2 className="mt-4 text-xl font-semibold text-secondary dark:text-white">
+            Không tìm thấy thuốc
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Thuốc yêu cầu không tồn tại trong hệ thống.
+          </p>
+          <Link
+            href="/drugs-info"
+            className="mt-4 inline-flex items-center gap-2 text-primary hover:underline"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Quay lại danh sách thuốc
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const metadata = drug.metadata as MetadataType | undefined;
+  const info = drug.info as DrugInfoData | undefined;
+  const contents = info?.contents ?? [];
+  const tableOfContent = info?.table_of_content ?? [];
+
+  // Helper to render content items (can be strings or arrays of strings)
+  const renderContentItem = (item: string | string[], index: number) => {
+    if (Array.isArray(item)) {
+      return (
+        <ul key={index} className="ml-4 list-disc space-y-1">
+          {item.map((subItem, subIndex) => (
+            <li key={subIndex} className="text-secondary/80 dark:text-primary">
+              {subItem}
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    return (
+      <p key={index} className="text-secondary/80 dark:text-primary">
+        {item}
+      </p>
+    );
+  };
 
   return (
-    <div className="container pb-24 pt-10 space-y-10">
+    <div className="container space-y-8 pb-24 pt-10">
+      {/* Breadcrumb */}
       <div className="flex items-center gap-3 text-sm text-muted-foreground">
-        <Link href="/drugs-info" className="inline-flex items-center gap-2 font-semibold text-primary">
+        <Link href="/drugs-info" className="inline-flex items-center gap-2 font-semibold text-primary hover:underline">
           <ArrowLeft className="h-4 w-4" aria-hidden />
-          Back to Drug Info
+          Quay lại
         </Link>
         <span aria-hidden>•</span>
-        <span>{drug.category}</span>
+        <span className="truncate">{drug.name}</span>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
-        <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
-          <CardHeader className="space-y-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-                <Pill className="h-6 w-6" aria-hidden />
-              </span>
-              <div>
-                <CardTitle className="text-3xl text-secondary dark:text-white">{drug.name}</CardTitle>
-                <CardDescription className="text-secondary/80 dark:text-muted-foreground">
-                  {drug.genericName ?? drug.name}
-                </CardDescription>
+      {/* Header Card */}
+      <Card className="overflow-hidden border-none bg-gradient-to-br from-primary/5 via-white to-white shadow-lg ring-1 ring-border/40 dark:ring-white/20 dark:from-primary/10 dark:via-secondary dark:to-secondary">
+        <CardHeader className="space-y-4 pb-6">
+          <div className="flex flex-col gap-6 md:flex-row md:items-start">
+            {/* Drug Image */}
+            {drug.image && drug.image.length > 0 && (
+              <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-2xl bg-white shadow-md ring-1 ring-border/20">
+                <Image
+                  src={drug.image[0]}
+                  alt={drug.name}
+                  fill
+                  className="object-contain p-2"
+                  sizes="128px"
+                />
               </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-primary">
-                {drug.category}
-              </span>
-              {drug.fdaApproved ? (
-                <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-500/30 dark:text-emerald-200">
-                  <ShieldCheck className="h-4 w-4" aria-hidden />
-                  FDA Approved
+            )}
+            
+            {/* Drug Info */}
+            <div className="flex-1 space-y-3">
+              <div className="flex items-start gap-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Pill className="h-5 w-5" aria-hidden />
                 </span>
-              ) : null}
-              {drug.quickFacts.map((fact) => (
-                <span
-                  key={fact}
-                  className="rounded-full bg-[var(--muted)]/60 px-3 py-1 text-[11px] font-semibold text-secondary dark:bg-white/10 dark:text-white/80"
-                >
-                  {fact}
-                </span>
-              ))}
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-6 text-sm text-secondary/85 dark:text-muted-foreground">
-            <p>{drug.description}</p>
-            <Separator />
-            <div className="space-y-3">
-              <h3 className="text-base font-semibold text-secondary dark:text-white">Compounds</h3>
-              <div className="flex flex-wrap gap-2">
-                {drug.compounds.map((compound) => (
-                  <span
-                    key={compound}
-                    className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
-                  >
-                    {compound}
-                  </span>
-                ))}
+                <div>
+                  <CardTitle className="text-2xl text-secondary dark:text-white md:text-3xl">
+                    {drug.name}
+                  </CardTitle>
+                  <CardDescription className="mt-1 text-secondary/70 dark:text-muted-foreground">
+                    {drug.slug}
+                  </CardDescription>
+                </div>
               </div>
-            </div>
-            <div className="space-y-3">
-              <h3 className="text-base font-semibold text-secondary dark:text-white">Tabs</h3>
-              <DrugDetailTabs
-                content={{
-                  overview: drug.overview,
-                  dosage: drug.dosage,
-                  sideEffects: drug.sideEffects,
-                  interactions: drug.interactions,
-                  warnings: drug.warnings,
-                }}
-              />
-            </div>
-          </CardContent>
-        </Card>
 
-        <div className="space-y-6">
-          <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
-            <CardHeader>
-              <CardTitle className="text-xl text-secondary dark:text-white">Quick facts</CardTitle>
-              <CardDescription className="text-secondary/80 dark:text-muted-foreground">
-                Safety highlights to review with patients.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3 text-sm text-secondary/80 dark:text-muted-foreground">
-              <ul className="space-y-2">
-                {drug.warnings.slice(0, 4).map((warning) => (
-                  <li
-                    key={warning}
-                    className="flex items-start gap-2 rounded-xl bg-amber-500/10 px-3 py-2 text-amber-800 dark:bg-amber-500/20 dark:text-amber-100"
-                  >
-                    <CheckCircle2 className="mt-0.5 h-4 w-4" aria-hidden />
-                    <span>{warning}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
-            <CardHeader>
-              <CardTitle className="text-xl text-secondary dark:text-white">Related drugs</CardTitle>
-              <CardDescription className="text-secondary/80 dark:text-muted-foreground">
-                Explore similar or complementary therapies.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {related.length ? (
-                <div className="grid gap-4">
-                  {related.map((item, index) => (
-                    <DrugInfoCard key={item.id} drug={item} href={`/drugs-info/${item.id}`} index={index} />
+              {/* Ingredients */}
+              {drug.ingredient && drug.ingredient.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {drug.ingredient.map((ing) => (
+                    <span
+                      key={ing}
+                      className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary"
+                    >
+                      {ing}
+                    </span>
                   ))}
                 </div>
-              ) : (
-                <p className="text-sm text-muted-foreground">No related drugs listed.</p>
               )}
-            </CardContent>
-          </Card>
+
+              {/* Document Link */}
+              {drug.document && (
+                <a
+                  href={drug.document}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <FileText className="h-4 w-4" />
+                  Xem hướng dẫn sử dụng (PDF)
+                  <ExternalLink className="h-3 w-3" />
+                </a>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+      </Card>
+
+      <div className="grid gap-8 lg:grid-cols-[280px_1fr]">
+        {/* Sidebar - Table of Contents & Metadata */}
+        <div className="lg:sticky lg:top-4 lg:pr-2">
+          <div className="space-y-6">
+            {/* Table of Contents */}
+            {tableOfContent.length > 0 && (
+              <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/40 dark:ring-white/20 backdrop-blur-sm dark:bg-secondary/70">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base text-secondary dark:text-white">Mục lục</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <nav className="space-y-1">
+                    {tableOfContent.map((item, index) => (
+                      <a
+                        key={index}
+                        href={`#section-${index}`}
+                        onClick={() => setActiveSection(`section-${index}`)}
+                        className={cn(
+                          "block rounded-lg px-3 py-2 text-sm transition hover:bg-primary/5",
+                          item.level === 2 ? "ml-4 text-xs" : "font-medium",
+                          activeSection === `section-${index}`
+                            ? "bg-primary/10 text-primary"
+                            : "text-secondary/70 dark:text-white"
+                        )}
+                      >
+                        {item.title}
+                      </a>
+                    ))}
+                  </nav>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Metadata */}
+            {metadata && Object.keys(metadata).length > 0 && (
+              <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/40 dark:ring-white/20 backdrop-blur-sm dark:bg-secondary/70">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base text-secondary dark:text-white">Thông tin sản phẩm</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  {Object.entries(metadata).map(([key, value]) => (
+                    <div key={key} className="text-sm">
+                      <dt className="font-medium text-secondary/60 dark:text-primary">{key}</dt>
+                      <dd className="mt-0.5 text-secondary dark:text-white">
+                        {Array.isArray(value) ? value.join(", ") : value}
+                      </dd>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Images Gallery */}
+            {drug.image && drug.image.length > 1 && (
+              <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/40 dark:ring-white/20 backdrop-blur-sm dark:bg-secondary/70">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base text-secondary dark:text-white">Hình ảnh</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-3 gap-2">
+                    {drug.image.map((img, index) => (
+                      <div key={index} className="relative aspect-square overflow-hidden rounded-lg bg-white ring-1 ring-border/20">
+                        <Image
+                          src={img}
+                          alt={`${drug.name} - ${index + 1}`}
+                          fill
+                          className="object-contain p-1"
+                          sizes="100px"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="space-y-6">
+          {contents.map((section, index) => (
+            <Card
+              key={index}
+              id={`section-${index}`}
+              className="scroll-mt-4 border-none bg-white/95 shadow-card ring-1 ring-border/40 dark:ring-white/20 backdrop-blur-sm dark:bg-secondary/70"
+            >
+              <CardHeader className="pb-3">
+                <CardTitle
+                  className={cn(
+                    "text-secondary dark:text-white",
+                    section.level === 1 ? "text-xl" : "text-lg"
+                  )}
+                >
+                  {section.heading}
+                </CardTitle>
+              </CardHeader>
+              {section.content.length > 0 && (
+                <CardContent className="space-y-3 text-sm">
+                  {section.content.map((item, itemIndex) => renderContentItem(item, itemIndex))}
+                </CardContent>
+              )}
+            </Card>
+          ))}
+
+          {contents.length === 0 && (
+            <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/40 dark:ring-white/20 backdrop-blur-sm dark:bg-secondary/70">
+              <CardContent className="py-12 text-center">
+                <p className="text-muted-foreground">
+                  Chưa có thông tin chi tiết cho thuốc này.
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import { SignInForm } from "@/features/sign-in";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Sign in",
@@ -7,9 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function SignInPage() {
-  return (
-    <div className="flex w-full justify-center">
-      <SignInForm />
-    </div>
-  );
+  return <SignInForm />;
 }

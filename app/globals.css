@@ -22,15 +22,15 @@
   --accent-foreground: #031423;
   --destructive: #ef4444;
   --destructive-foreground: #f5f8fa;
-  --border: rgba(8, 32, 51, 0.14);
-  --input: rgba(8, 32, 51, 0.18);
+  --border: rgba(2, 135, 190, 0.35);
+  --input: rgba(2, 135, 190, 0.30);
   --ring: rgba(2, 135, 190, 0.38);
   --radius: 1.5rem;
 
   /* 🩵 Light mode glass adjustments (only change for light mode) */
-  --glass-bg: rgba(8, 32, 51, 0.06);
-  --glass-border: rgba(8, 32, 51, 0.12);
-  --glass-hover: rgba(8, 32, 51, 0.1);
+  --glass-bg: rgba(2, 135, 190, 0.06);
+  --glass-border: rgba(2, 135, 190, 0.30);
+  --glass-hover: rgba(2, 135, 190, 0.12);
 }
 
 /* ================================
@@ -100,5 +100,162 @@
   h5,
   h6 {
     @apply font-heading text-foreground;
+  }
+}
+
+/* ================================
+   Content Renderer Styles
+   ================================ */
+.content-renderer {
+  @apply text-secondary dark:text-white/90 leading-relaxed;
+
+  /* Headings */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading text-secondary dark:text-white mt-8 mb-4;
+  }
+
+  h1 {
+    @apply text-2xl md:text-3xl font-bold;
+  }
+
+  h2 {
+    @apply text-xl md:text-2xl font-bold border-b pb-2;
+    border-color: rgba(8, 32, 51, 0.12);
+  }
+
+  h3 {
+    @apply text-lg md:text-xl font-semibold;
+  }
+
+  h4 {
+    @apply text-base md:text-lg font-semibold;
+  }
+
+  /* Paragraphs */
+  p {
+    @apply my-4 text-secondary/80 dark:text-white/80 leading-relaxed;
+  }
+
+  /* Links */
+  a {
+    @apply text-primary font-medium hover:underline transition-colors;
+  }
+
+  /* Lists */
+  ul,
+  ol {
+    @apply my-4 pl-6 space-y-2;
+  }
+
+  ul {
+    @apply list-disc;
+  }
+
+  ol {
+    @apply list-decimal;
+  }
+
+  li {
+    @apply text-secondary/80 dark:text-white/80;
+  }
+
+  /* Images */
+  img {
+    @apply rounded-xl shadow-md mx-auto my-6 max-w-full h-auto;
+  }
+
+  figure.content-image {
+    @apply my-6 text-center;
+  }
+
+  figcaption {
+    @apply mt-2 text-sm text-muted-foreground dark:text-white/60 italic;
+  }
+
+  /* Blockquotes */
+  blockquote {
+    @apply my-6 pl-4 py-3 pr-4 border-l-4 border-primary bg-primary/5 rounded-r-lg italic;
+  }
+
+  blockquote p {
+    @apply my-0;
+  }
+
+  /* Tables */
+  table {
+    @apply w-full my-6 border-collapse;
+  }
+
+  th,
+  td {
+    @apply px-4 py-3 border text-left;
+    border-color: rgba(8, 32, 51, 0.12);
+  }
+
+  th {
+    @apply bg-primary/5 font-semibold text-secondary dark:text-white;
+  }
+
+  tr:nth-child(even) td {
+    @apply bg-muted/30;
+  }
+
+  /* Code */
+  code {
+    @apply bg-muted/50 text-primary px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+
+  pre {
+    @apply my-6 p-4 bg-secondary/5 dark:bg-white/5 rounded-xl overflow-x-auto;
+  }
+
+  pre code {
+    @apply bg-transparent p-0;
+  }
+
+  /* Strong & Emphasis */
+  strong,
+  b {
+    @apply font-semibold text-secondary dark:text-white;
+  }
+
+  em,
+  i {
+    @apply italic;
+  }
+
+  /* Horizontal Rule */
+  hr {
+    @apply my-8;
+    border-color: rgba(8, 32, 51, 0.12);
+  }
+
+  /* Time elements (from API) */
+  time {
+    @apply text-muted-foreground text-sm;
+  }
+
+  /* First child spacing fix */
+  > *:first-child {
+    @apply mt-0;
+  }
+
+  > *:last-child {
+    @apply mb-0;
+  }
+
+  /* Hide feedback prompts from source */
+  [onclick] {
+    @apply hidden;
+  }
+
+  /* Nested divs reset */
+  > div {
+    @apply !float-none !bg-transparent !border-none !m-0 !p-0;
   }
 }
