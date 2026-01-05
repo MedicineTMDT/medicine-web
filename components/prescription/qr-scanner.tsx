@@ -2,15 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { Camera, Loader2, ScanLine, X } from "lucide-react";
+import { Camera, ImagePlus, Loader2, ScanLine, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -29,8 +29,10 @@ export function QRScanner({
   const [open, setOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
   const [isStarting, setIsStarting] = useState(false);
+  const [isProcessingImage, setIsProcessingImage] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const scannerRef = useRef<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const scannerId = "html5-qr-scanner";
 
   const handleScanSuccess = useCallback(
@@ -125,7 +127,44 @@ export function QRScanner({
     }
     setOpen(isOpen);
     setError(null);
+    setIsProcessingImage(false);
   };
+
+  // Handle image file upload for QR scanning
+  const handleFileUpload = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+
+      setError(null);
+      setIsProcessingImage(true);
+
+      try {
+        // Dynamic import
+        const { Html5Qrcode } = await import("html5-qrcode");
+
+        // Create a temporary instance to scan file
+        const html5QrCode = new Html5Qrcode("qr-file-reader", { verbose: false });
+        
+        // Scan the file
+        const result = await html5QrCode.scanFileV2(file, false);
+        html5QrCode.clear();
+        
+        // Success - handle the decoded text
+        handleScanSuccess(result.decodedText);
+      } catch (err: any) {
+        console.error("Image scan error:", err);
+        setError("Không tìm thấy mã QR trong ảnh. Vui lòng thử ảnh khác.");
+      } finally {
+        setIsProcessingImage(false);
+        // Reset file input
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
+    },
+    [handleScanSuccess]
+  );
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -164,12 +203,31 @@ export function QRScanner({
             />
             
             {/* Start button overlay */}
-            {!isScanning && !isStarting && !error && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gray-900">
-                <Camera className="h-12 w-12 text-white/50" />
-                <Button onClick={startScanner} variant="secondary" size="sm">
-                  Bật camera
-                </Button>
+            {!isScanning && !isStarting && !isProcessingImage && !error && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-gray-900">
+                <Camera className="h-10 w-10 text-white/50" />
+                <div className="flex flex-col gap-2">
+                  <Button onClick={startScanner} variant="secondary" size="sm">
+                    Bật camera
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="gap-2 text-white border-white/30 hover:bg-white/20"
+                  >
+                    <ImagePlus className="h-4 w-4" />
+                    Tải ảnh lên
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Image processing loader */}
+            {isProcessingImage && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-900">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm text-white/70">Đang xử lý ảnh...</p>
               </div>
             )}
 
@@ -194,20 +252,44 @@ export function QRScanner({
             )}
           </div>
 
+          {/* Hidden file input for image upload */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          
+          {/* Hidden div for QR file reader (required by Html5Qrcode) */}
+          <div id="qr-file-reader" className="hidden" />
+
           {/* Error message */}
           {error && (
             <div className="text-center">
               <p className="text-sm text-destructive mb-2">{error}</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setError(null);
-                  startScanner();
-                }}
-              >
-                Thử lại
-              </Button>
+              <div className="flex gap-2 justify-center">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setError(null);
+                    startScanner();
+                  }}
+                >
+                  Thử camera
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setError(null);
+                    fileInputRef.current?.click();
+                  }}
+                >
+                  Tải ảnh khác
+                </Button>
+              </div>
             </div>
           )}
 

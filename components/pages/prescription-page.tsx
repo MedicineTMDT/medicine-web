@@ -2,7 +2,7 @@
 
 import { DrugSearchSelect } from "@/components/prescription/drug-search-select";
 import { PrescriptionListCard } from "@/components/prescription/prescription-list-card";
-import { PrescriptionQRCodeInline } from "@/components/prescription/prescription-qr-code";
+import { PrescriptionQRCodeWithDownload } from "@/components/prescription/prescription-qr-code";
 import { QRScanner } from "@/components/prescription/qr-scanner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -738,12 +738,12 @@ export function PrescriptionPageScreen() {
                     <p className="text-center text-lg font-medium text-secondary dark:text-white">
                       Đơn thuốc đã được tạo thành công!
                     </p>
-                    <PrescriptionQRCodeInline
+                    <PrescriptionQRCodeWithDownload
                       prescriptionId={successPrescriptionId}
                       size="lg"
                     />
                     <p className="text-center text-sm text-muted-foreground">
-                      Quét mã QR để xem chi tiết đơn thuốc
+                      Quét mã QR hoặc tải xuống để chia sẻ đơn thuốc
                     </p>
                     <div className="flex gap-3">
                       <Button
