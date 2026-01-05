@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { Download, QrCode, Share2 } from "lucide-react";
@@ -176,6 +176,96 @@ export function PrescriptionQRCodeInline({
         bgColor="#ffffff"
         fgColor="#0a2542"
       />
+    </div>
+  );
+}
+
+/**
+ * Inline QR code with download and share buttons
+ * Used in the success screen after creating a prescription
+ */
+export function PrescriptionQRCodeWithDownload({
+  prescriptionId,
+  prescriptionName,
+  size = "lg",
+  className,
+}: PrescriptionQRCodeProps) {
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const prescriptionUrl = `${baseUrl}/prescription/claim/${prescriptionId}`;
+
+  const handleDownload = () => {
+    const svg = document.getElementById(`qr-download-${prescriptionId}`);
+    if (!svg) return;
+
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    const img = new Image();
+
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx?.drawImage(img, 0, 0);
+      const pngFile = canvas.toDataURL("image/png");
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `prescription-${prescriptionId}.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+    };
+
+    img.src = "data:image/svg+xml;base64," + btoa(svgData);
+  };
+
+  const handleShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: prescriptionName || `Đơn thuốc ${prescriptionId}`,
+          text: "Xem chi tiết đơn thuốc",
+          url: prescriptionUrl,
+        });
+      } catch (err) {
+        console.error("Error sharing:", err);
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(prescriptionUrl);
+    }
+  };
+
+  return (
+    <div className={cn("flex flex-col items-center gap-4", className)}>
+      <div className="rounded-2xl border border-[var(--glass-border)] bg-white p-4 dark:border-white/10">
+        <QRCodeSVG
+          id={`qr-download-${prescriptionId}`}
+          value={prescriptionUrl}
+          size={sizeMap[size]}
+          level="H"
+          includeMargin
+          bgColor="#ffffff"
+          fgColor="#0a2542"
+        />
+      </div>
+      <div className="flex gap-3">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleDownload}
+          className="gap-2 rounded-full"
+        >
+          <Download className="h-4 w-4" />
+          Tải xuống
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleShare}
+          className="gap-2 rounded-full"
+        >
+          <Share2 className="h-4 w-4" />
+          Chia sẻ
+        </Button>
+      </div>
     </div>
   );
 }
