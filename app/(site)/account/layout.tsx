@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import {
     ChevronRight,
     Image,
+    MessageSquareText,
     Settings,
     Shield,
     User,
@@ -50,6 +51,12 @@ export default function AccountLayout({
       href: "/account/avatar",
       icon: Image,
       description: t("account.nav.avatar.description"),
+    },
+    {
+      label: "Yêu cầu của tôi",
+      href: "/account/requests",
+      icon: MessageSquareText,
+      description: "Xem và theo dõi yêu cầu chỉnh sửa dữ liệu",
     },
   ];
 
