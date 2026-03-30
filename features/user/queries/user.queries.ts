@@ -8,7 +8,7 @@ import {
   updateAvatar,
   forgotPassword,
 } from "../data-access/user.api";
-import { tokenStorage } from "@/features/auth";
+import { tokenStorage } from "@/lib/token-storage";
 import type {
   GetUserApiResponse,
   EditUserPayload,

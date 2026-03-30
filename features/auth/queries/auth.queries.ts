@@ -8,8 +8,8 @@ import {
   introspect,
   getUserById,
   verifyEmail,
-  tokenStorage,
 } from "../data-access/auth.api";
+import { tokenStorage } from "@/lib/token-storage";
 import type {
   LoginPayload,
   LoginApiResponse,
@@ -45,7 +45,6 @@ export function useIntrospect() {
     queryKey: authKeys.introspect(),
     queryFn: () => introspect({ token: token! }),
     retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: !!token,
   });
 }
@@ -55,7 +54,6 @@ export function useUser(id: string | undefined) {
     queryKey: authKeys.user(id!),
     queryFn: () => getUserById(id!),
     retry: false,
-    staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: !!id && !!tokenStorage.getToken(),
   });
 }

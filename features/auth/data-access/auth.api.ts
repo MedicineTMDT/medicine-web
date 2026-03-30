@@ -15,27 +15,10 @@ import type {
 } from "../types";
 
 // ============================================
-// Token Storage
-// ============================================
+import { tokenStorage } from "@/lib/token-storage";
+export { tokenStorage };
 
-const TOKEN_KEY = "auth_token";
-
-export const tokenStorage = {
-  getToken: (): string | null => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem(TOKEN_KEY);
-  },
-
-  setToken: (token: string): void => {
-    if (typeof window === "undefined") return;
-    localStorage.setItem(TOKEN_KEY, token);
-  },
-
-  clearToken: (): void => {
-    if (typeof window === "undefined") return;
-    localStorage.removeItem(TOKEN_KEY);
-  },
-};
+import { fetchWithAuth } from "@/lib/fetch-with-auth";
 
 // ============================================
 // HTTP Client Helper
@@ -119,7 +102,7 @@ export async function register(
 }
 
 export async function logout(payload: LogoutPayload): Promise<LogoutApiResponse> {
-  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.AUTH.LOGOUT}`, {
+  const response = await fetchWithAuth(`${API_BASE_URL}${API_ENDPOINTS.AUTH.LOGOUT}`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),
@@ -149,7 +132,7 @@ export async function introspect(
 }
 
 export async function getUserById(id: string): Promise<UserApiResponse> {
-  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USERS.GET_BY_ID}/${id}`, {
+  const response = await fetchWithAuth(`${API_BASE_URL}${API_ENDPOINTS.USERS.GET_BY_ID}/${id}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });
@@ -279,7 +262,7 @@ export function getUserInfoFromToken(): {
  * Fetch user by username.
  */
 export async function getUserByUsername(username: string): Promise<UserApiResponse> {
-  const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.USERS.GET_BY_USERNAME}/${username}`, {
+  const response = await fetchWithAuth(`${API_BASE_URL}${API_ENDPOINTS.USERS.GET_BY_USERNAME}/${username}`, {
     method: "GET",
     headers: getAuthHeaders(),
   });

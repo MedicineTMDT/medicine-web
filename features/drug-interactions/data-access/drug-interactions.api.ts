@@ -1,6 +1,7 @@
-import { tokenStorage } from "@/features/auth";
+import { tokenStorage } from "@/lib/token-storage";
 import type { ApiError } from "@/features/auth/types";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api.cofig";
+import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import type {
     DrugInteractionApiResponse,
     DrugInteractionListApiResponse,
@@ -55,7 +56,7 @@ function getAuthHeaders(): HeadersInit {
 export async function getDrugInteractionById(
   id: number
 ): Promise<DrugInteractionApiResponse> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.DRUG_INTERACTIONS.GET_BY_ID}/${id}`,
     {
       method: "GET",
@@ -106,7 +107,7 @@ export async function suggestIngredients(
 ): Promise<MergedIngredientListApiResponse> {
   const params = new URLSearchParams({ name });
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.MERGED_INGREDIENT.SUGGEST}?${params}`,
     {
       method: "GET",

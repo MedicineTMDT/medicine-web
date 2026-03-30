@@ -1,5 +1,6 @@
-import { tokenStorage } from "@/features/auth";
+import { tokenStorage } from "@/lib/token-storage";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api.cofig";
+import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import type { CreateRequestPayload, RequestPageResponse, RequestResponse } from "../types";
 
 // ============================================
@@ -25,7 +26,7 @@ function getAuthHeaders(): HeadersInit {
 export async function createRequest(
   payload: CreateRequestPayload
 ): Promise<RequestResponse> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.REQUESTS.CREATE}`,
     {
       method: "POST",
@@ -58,7 +59,7 @@ export async function getUserRequests(
     sort: "id,DESC",
   });
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.REQUESTS.GET_BY_USER}/${userId}?${params}`,
     {
       method: "GET",

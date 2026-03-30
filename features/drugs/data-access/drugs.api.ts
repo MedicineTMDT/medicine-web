@@ -1,6 +1,7 @@
-import { tokenStorage } from "@/features/auth";
+import { tokenStorage } from "@/lib/token-storage";
 import type { ApiError } from "@/features/auth/types";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api.cofig";
+import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import type {
     CategoryDetailApiResponse,
     CategoryDetailByCategoryApiResponse,
@@ -70,7 +71,7 @@ export async function getAllDrugs(
 ): Promise<DrugListApiResponse> {
   const params = buildPageableParams(pageable);
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.GET_ALL}?${params}`,
     {
       method: "GET",
@@ -82,7 +83,7 @@ export async function getAllDrugs(
 }
 
 export async function getDrugById(id: number): Promise<DrugDetailApiResponse> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.GET_BY_ID}/${id}`,
     {
       method: "GET",
@@ -100,7 +101,7 @@ export async function searchDrugs(
   const params = buildPageableParams(pageable);
   params.set("name", name);
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.SEARCH}?${params}`,
     {
       method: "GET",
@@ -114,7 +115,7 @@ export async function searchDrugs(
 export async function getTop10Drugs(name: string): Promise<DrugTop10ApiResponse> {
   const params = new URLSearchParams({ name });
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.TOP10}?${params}`,
     {
       method: "GET",
@@ -128,7 +129,7 @@ export async function getTop10Drugs(name: string): Promise<DrugTop10ApiResponse>
 export async function getDrugIngredients(
   id: number
 ): Promise<DrugIngredientsApiResponse> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.INGREDIENTS}/${id}/ingredients`,
     {
       method: "GET",
@@ -145,7 +146,7 @@ export async function getDrugsByCategory(
 ): Promise<DrugListApiResponse> {
   const params = buildPageableParams(pageable);
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.DRUGS.BY_CATEGORY}/${categoryId}?${params}`,
     {
       method: "GET",
@@ -165,7 +166,7 @@ export async function getAllCategories(
 ): Promise<CategoryListApiResponse> {
   const params = buildPageableParams(pageable);
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.CATEGORIES.GET_ALL}?${params}`,
     {
       method: "GET",
@@ -186,7 +187,7 @@ export async function getAllCategories(
 export async function getCategoryDetailById(
   id: number
 ): Promise<CategoryDetailApiResponse> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.CATEGORY_DETAIL.GET_BY_ID}/${id}`,
     {
       method: "GET",
@@ -205,7 +206,7 @@ export async function getAllCategoryDetails(
 ): Promise<CategoryDetailListApiResponse> {
   const params = buildPageableParams(pageable);
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.CATEGORY_DETAIL.GET_ALL}?${params}`,
     {
       method: "GET",
@@ -225,7 +226,7 @@ export async function getCategoryDetailsByCategory(
 ): Promise<CategoryDetailByCategoryApiResponse> {
   const params = buildPageableParams(pageable);
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.CATEGORY_DETAIL.BY_CATEGORY}/${categoryId}?${params}`,
     {
       method: "GET",
@@ -246,7 +247,7 @@ export async function searchCategoryDetails(
   const params = buildPageableParams(pageable);
   params.set("name", name);
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.CATEGORY_DETAIL.SEARCH}?${params}`,
     {
       method: "GET",

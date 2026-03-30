@@ -18,6 +18,7 @@ const NAV_LINKS = [
   { nameKey: "nav.drugInfo", href: "/drugs-info" },
   { nameKey: "nav.drugInteraction", href: "/drug-interaction" },
   { nameKey: "nav.prescription", href: "/prescription" },
+  { nameKey: "nav.chatbot", href: "/chatbot" },
 ];
 
 export function Navbar() {
