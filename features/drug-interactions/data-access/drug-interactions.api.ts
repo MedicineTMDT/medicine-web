@@ -115,5 +115,5 @@ export async function suggestIngredients(
     }
   );
 
-  return response.json();
+  return handleResponse<MergedIngredientListApiResponse>(response);
 }

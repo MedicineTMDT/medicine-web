@@ -1,10 +1,11 @@
 "use client";
 
 import React from "react";
-import { User, ShieldCheck, AlertCircle } from "lucide-react";
+import { User, ShieldCheck, AlertCircle, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Message } from "@/lib/types/chatbot";
 import SourcesAccordion from "./SourcesAccordion";
+import MarkdownRenderer from "./MarkdownRenderer";
 import { motion } from "framer-motion";
 
 interface MessageBubbleProps {
@@ -40,8 +41,8 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
 
       {/* Bubble Content */}
       <div className={cn(
-        "flex flex-col max-w-[85%] md:max-w-[70%]",
-        isUser ? "items-end" : "items-start"
+        "flex flex-col",
+        isUser ? "max-w-[85%] md:max-w-[70%] items-end" : "max-w-[95%] md:max-w-[85%] items-start"
       )}>
         <div className={cn(
           "px-4 py-3.5 rounded-[1.5rem] shadow-sm relative",
@@ -51,21 +52,33 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         )}>
           {/* Main Message Text */}
           <div className={cn(
-            "text-sm md:text-base leading-relaxed whitespace-pre-wrap",
+            "text-sm md:text-base leading-relaxed",
+            isUser && "whitespace-pre-wrap",
             message.isError && "text-destructive font-medium"
           )}>
             {message.isError && <AlertCircle className="w-4 h-4 inline-block mr-2 mb-0.5" />}
             
             {message.isStreaming && !message.content ? (
-              <div className="flex items-center gap-1.5 h-6">
-                {[0, 1, 2].map((i) => (
-                  <span
-                    key={i}
-                    className="w-2.5 h-2.5 rounded-full bg-current opacity-60 animate-bounce"
-                    style={{ animationDelay: `${i * 0.15}s` }}
-                  />
-                ))}
+              <div className="flex flex-col gap-2">
+                {message.toolStatus ? (
+                  <div className="flex items-center gap-2 text-primary animate-pulse py-1">
+                    <Search className="w-4 h-4" />
+                    <span className="text-sm font-medium italic italic">{message.toolStatus}</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5 h-6">
+                    {[0, 1, 2].map((i) => (
+                      <span
+                        key={i}
+                        className="w-2.5 h-2.5 rounded-full bg-current opacity-60 animate-bounce"
+                        style={{ animationDelay: `${i * 0.15}s` }}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
+            ) : isBot ? (
+              <MarkdownRenderer content={message.content} />
             ) : (
               message.content
             )}

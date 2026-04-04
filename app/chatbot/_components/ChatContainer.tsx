@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useReducer, useCallback, useRef, useEffect } from "react";
-import { RefreshCw, Copy, Trash2, StopCircle } from "lucide-react";
+import { RefreshCw, Copy, Trash2, StopCircle, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Message, DocumentMetadata } from "@/lib/types/chatbot";
 import { streamChat, fetchMessages, deleteConversation } from "@/lib/api/chatbot";
 import MessageList from "./MessageList";
@@ -17,6 +17,7 @@ type Action =
   | { type: "SET_MESSAGES"; payload: Message[] }
   | { type: "SET_LOADING"; payload: boolean }
   | { type: "APPEND_STREAM_TOKEN"; payload: { id: string; token: string } }
+  | { type: "SET_TOOL_STATUS"; payload: { id: string; status: string } }
   | { type: "FINALIZE_BOT_MESSAGE"; payload: { id: string; sources?: DocumentMetadata[]; warning?: string; isError?: boolean } }
   | { type: "CLEAR_CHAT" };
 
@@ -45,7 +46,16 @@ function chatReducer(state: State, action: Action): State {
         ...state,
         messages: state.messages.map((m) =>
           m.id === action.payload.id
-            ? { ...m, content: m.content + action.payload.token }
+            ? { ...m, content: m.content + action.payload.token, toolStatus: undefined }
+            : m
+        ),
+      };
+    case "SET_TOOL_STATUS":
+      return {
+        ...state,
+        messages: state.messages.map((m) =>
+          m.id === action.payload.id
+            ? { ...m, toolStatus: action.payload.status }
             : m
         ),
       };
@@ -79,13 +89,17 @@ interface ChatContainerProps {
   userId?: string;
   onConversationCreated?: (id: string) => void;
   onDeleted?: () => void;
+  isSidebarOpen?: boolean;
+  onToggleSidebar?: () => void;
 }
 
 const ChatContainer: React.FC<ChatContainerProps> = ({ 
   conversationId, 
   userId,
   onConversationCreated,
-  onDeleted 
+  onDeleted,
+  isSidebarOpen,
+  onToggleSidebar
 }) => {
   const [state, dispatch] = useReducer(chatReducer, initialState);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -176,6 +190,8 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
               newlyCreatedConvIdRef.current = chunk.conversation_id;
               onConversationCreated?.(chunk.conversation_id);
             }
+          } else if (chunk.type === "tool_start" && chunk.answer) {
+            dispatch({ type: "SET_TOOL_STATUS", payload: { id: botMsgId, status: chunk.answer } });
           } else if (chunk.type === "stream" && chunk.answer) {
             dispatch({ type: "APPEND_STREAM_TOKEN", payload: { id: botMsgId, token: chunk.answer } });
           } else if (chunk.type === "end") {
@@ -228,14 +244,25 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-[600px] md:h-full bg-background relative">
+    <div className="flex flex-col h-full bg-background relative">
       {/* Header Actions */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-card/30 backdrop-blur-md sticky top-0 z-10">
-        <div className="flex items-center gap-3">
-          <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <h1 className="text-sm font-bold tracking-tight text-secondary dark:text-white uppercase transition-all">
-            Hệ thống Tư vấn Phác đồ Điều trị
-          </h1>
+      <div className="flex items-center justify-between px-6 py-4 border-b border-border/50 bg-card/30 backdrop-blur-md sticky top-0 z-10 transition-all">
+        <div className="flex items-center gap-4">
+          {onToggleSidebar && (
+            <button 
+              onClick={onToggleSidebar}
+              className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground hidden lg:flex"
+              title={isSidebarOpen ? "Đóng thanh bên" : "Mở thanh bên"}
+            >
+              {isSidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}
+            </button>
+          )}
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <h1 className="text-sm font-bold tracking-tight text-secondary dark:text-white uppercase transition-all">
+              Hệ thống Tư vấn Phác đồ Điều trị
+            </h1>
+          </div>
         </div>
         
         <div className="flex items-center gap-2">
@@ -268,16 +295,14 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
-        <div className="absolute inset-0 flex flex-col">
-          <MessageList messages={state.messages} isLoading={state.isLoading} />
-        </div>
+        <MessageList messages={state.messages} isLoading={state.isLoading} />
       </div>
 
-      {/* Input Area */}
-      <div className="px-4 md:px-6 py-6 border-t border-border/50 bg-card/20 backdrop-blur-xl">
+      {/* Input Area — Floating style */}
+      <div className="shrink-0 w-full relative z-10">
         <div className="max-w-4xl mx-auto">
           <ChatInput onSend={handleSendMessage} isLoading={state.isLoading} />
-          <p className="text-[10px] text-center text-muted-foreground mt-3 font-medium opacity-60">
+          <p className="text-[10px] md:text-xs text-center text-muted-foreground/60 my-3 px-4 font-medium">
             Dữ liệu được trích xuất từ các tài liệu chuẩn của Bộ Y tế. Hãy sử dụng có trách nhiệm.
           </p>
         </div>

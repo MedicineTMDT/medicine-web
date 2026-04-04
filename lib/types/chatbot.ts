@@ -4,7 +4,7 @@ export interface DocumentMetadata {
   page_content: string;
 }
 
-export type StreamChunkType = "start" | "stream" | "end" | "error";
+export type StreamChunkType = "start" | "stream" | "tool_start" | "end" | "error";
 
 export interface ChatStreamChunk {
   type: StreamChunkType;
@@ -40,4 +40,5 @@ export interface Message {
   timestamp: Date;
   isError?: boolean;
   isStreaming?: boolean;
+  toolStatus?: string;
 }
