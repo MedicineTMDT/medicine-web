@@ -61,9 +61,30 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
             {message.isStreaming && !message.content ? (
               <div className="flex flex-col gap-2">
                 {message.toolStatus ? (
-                  <div className="flex items-center gap-2 text-primary animate-pulse py-1">
-                    <Search className="w-4 h-4" />
-                    <span className="text-sm font-medium italic italic">{message.toolStatus}</span>
+                  <div className="flex flex-col gap-2 py-2 px-3 bg-primary/5 rounded-xl border border-primary/10 mb-2 max-w-sm">
+                    <div className="flex items-center gap-2.5 text-primary">
+                      <div className="relative flex items-center justify-center">
+                        <Search className="w-4 h-4 relative z-10" />
+                        <motion.div 
+                          className="absolute inset-0 bg-primary/20 rounded-full"
+                          animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+                          transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                        />
+                      </div>
+                      <span className="text-sm font-semibold tracking-tight leading-none">Hành động của AI</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground/80 overflow-hidden">
+                      <span className="text-xs font-medium italic truncate">{message.toolStatus}</span>
+                      <div className="flex gap-1">
+                        {[0, 1, 2].map((i) => (
+                          <div 
+                            key={i} 
+                            className="w-1 h-1 rounded-full bg-primary/40 animate-pulse" 
+                            style={{ animationDelay: `${i * 0.2}s` }}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   </div>
                 ) : (
                   <div className="flex items-center gap-1.5 h-6">

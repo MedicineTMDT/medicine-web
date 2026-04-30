@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ChevronDown, FileText, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+
 import { DocumentMetadata } from "@/lib/types/chatbot";
 
 interface SourcesAccordionProps {
@@ -68,7 +69,19 @@ const SourcesAccordion: React.FC<SourcesAccordionProps> = ({ sources }) => {
                       Trang {source.page_number}
                     </span>
                   </div>
-                  <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0 cursor-help" />
+                  {source.source_link ? (
+                    <a 
+                      href={source.source_link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="p-1.5 bg-primary/10 hover:bg-primary/20 rounded-md transition-colors group"
+                      title="Xem phác đồ gốc"
+                    >
+                      <ExternalLink className="w-3 h-3 text-primary transition-transform group-hover:scale-110" />
+                    </a>
+                  ) : (
+                    <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0 cursor-help" />
+                  )}
                 </div>
                 
                 <div className="text-[11px] text-muted-foreground/90 leading-relaxed italic bg-card/40 rounded-lg p-2 border border-border/20 whitespace-pre-wrap">

@@ -2,6 +2,7 @@ export interface DocumentMetadata {
   filename: string;
   page_number: number;
   page_content: string;
+  source_link?: string;
 }
 
 export type StreamChunkType = "start" | "stream" | "tool_start" | "end" | "error";

@@ -5,6 +5,7 @@ import {
     createPrescription,
     getPrescriptionById,
     reviewPrescription,
+    scanPrescription,
     searchPrescriptionsByDate,
     searchPrescriptionsByName,
     updateIntakeStatus
@@ -81,6 +82,15 @@ export function useSearchPrescriptionsByDate(
 // ============================================
 // Mutations
 // ============================================
+
+/**
+ * Scan prescription image mutation — calls Gemini AI to extract data (MED/ADMIN only)
+ */
+export function useScanPrescription() {
+  return useMutation({
+    mutationFn: (image: File) => scanPrescription(image),
+  });
+}
 
 /**
  * Create prescription mutation (MED/ADMIN only)

@@ -23,13 +23,16 @@ export async function streamChat({
   onError,
   onDone,
 }: StreamChatOptions): Promise<void> {
+  if (!conversationId) {
+    throw new Error("Conversation ID is required for streaming chat messages.");
+  }
+
   try {
-    const res = await fetch(`${BASE}/chat/`, {
+    const res = await fetch(`${BASE}/conversations/${conversationId}/messages`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         question,
-        conversation_id: conversationId ?? null,
         user_id: userId ?? null,
       }),
       signal,
@@ -108,4 +111,14 @@ export async function fetchMessages(conversationId: string): Promise<Conversatio
 export async function deleteConversation(conversationId: string): Promise<void> {
   const res = await fetch(`${BASE}/conversations/${conversationId}`, { method: "DELETE" });
   if (!res.ok) throw new Error("Không thể xóa hội thoại");
+}
+
+export async function generateChatTitle(conversationId: string, question: string): Promise<string> {
+  const res = await fetch(`${BASE}/conversations/${conversationId}/title`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ question }),
+  });
+  if (!res.ok) throw new Error("Không thể tạo tiêu đề hội thoại");
+  return res.json();
 }

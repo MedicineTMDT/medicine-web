@@ -52,6 +52,7 @@ export const API_ENDPOINTS = {
   },
   PRESCRIPTIONS: {
     BASE: "/api/v1/prescriptions",
+    SCAN: "/api/v1/prescriptions/scan",
     CREATE: "/api/v1/prescriptions",
     GET_BY_ID: "/api/v1/prescriptions",
     COPY: "/api/v1/prescriptions",

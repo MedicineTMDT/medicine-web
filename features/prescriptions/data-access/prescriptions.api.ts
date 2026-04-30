@@ -65,6 +65,49 @@ function getAuthHeaders(): HeadersInit {
 // ============================================
 
 /**
+ * Scan a prescription image with AI and extract structured data (MED/ADMIN only)
+ * Uses multipart/form-data — do NOT set Content-Type header manually.
+ * The backend returns a raw CreatePrescriptionRequest (no APIResponse wrapper).
+ */
+export async function scanPrescription(
+  image: File
+): Promise<CreatePrescriptionRequest> {
+  const token = tokenStorage.getToken();
+  const formData = new FormData();
+  formData.append("image", image);
+
+  const response = await fetchWithAuth(
+    `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.SCAN}`,
+    {
+      method: "POST",
+      headers: {
+        // Intentionally NOT setting Content-Type — browser sets multipart boundary automatically
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData,
+    }
+  );
+
+  if (!response.ok) {
+    let errorMsg = "Không thể phân tích ảnh đơn thuốc";
+    try {
+      const err = await response.json();
+      errorMsg = err.message ?? errorMsg;
+    } catch (_) {}
+    throw new Error(errorMsg);
+  }
+
+  const data = await response.json();
+
+  // Backend returns raw object or null on unreadable image
+  if (!data) {
+    throw new Error("AI không thể đọc được đơn thuốc. Vui lòng thử lại với ảnh rõ hơn.");
+  }
+
+  return data as CreatePrescriptionRequest;
+}
+
+/**
  * Create a new prescription (MED/ADMIN only)
  */
 export async function createPrescription(

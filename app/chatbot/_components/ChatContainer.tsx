@@ -3,7 +3,7 @@
 import React, { useReducer, useCallback, useRef, useEffect } from "react";
 import { RefreshCw, Copy, Trash2, StopCircle, PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { Message, DocumentMetadata } from "@/lib/types/chatbot";
-import { streamChat, fetchMessages, deleteConversation } from "@/lib/api/chatbot";
+import { streamChat, fetchMessages, deleteConversation, createConversation, generateChatTitle } from "@/lib/api/chatbot";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
 
@@ -178,19 +178,35 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
       payload: { id: botMsgId, role: "bot", content: "", timestamp: new Date(), isStreaming: true },
     });
 
+    let currentId = conversationId;
+    
     try {
+      // 1. If it's a new conversation, we must create it first
+      if (!currentId) {
+        const newConv = await createConversation(userId);
+        currentId = newConv.id;
+        newlyCreatedConvIdRef.current = currentId;
+        onConversationCreated?.(currentId);
+        
+        // 2. Generate title in parallel 
+        generateChatTitle(currentId, text)
+          .then(() => {
+            // Trigger a second refresh once the title is actually updated in DB
+            onConversationCreated?.(currentId!);
+          })
+          .catch(err => {
+            console.error("Failed to generate title:", err);
+          });
+      }
+
+      // 3. Start streaming
       await streamChat({
         question: text,
         userId: userId,
-        conversationId: conversationId ?? undefined,
+        conversationId: currentId,
         signal: controller.signal,
         onChunk: (chunk) => {
-          if (chunk.type === "start" && chunk.conversation_id) {
-            if (!conversationId) {
-              newlyCreatedConvIdRef.current = chunk.conversation_id;
-              onConversationCreated?.(chunk.conversation_id);
-            }
-          } else if (chunk.type === "tool_start" && chunk.answer) {
+          if (chunk.type === "tool_start" && chunk.answer) {
             dispatch({ type: "SET_TOOL_STATUS", payload: { id: botMsgId, status: chunk.answer } });
           } else if (chunk.type === "stream" && chunk.answer) {
             dispatch({ type: "APPEND_STREAM_TOKEN", payload: { id: botMsgId, token: chunk.answer } });
@@ -208,7 +224,9 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
         },
       });
     } catch (error) {
-      // Handled by streamChat callbacks
+      console.error("Chat error:", error);
+      dispatch({ type: "FINALIZE_BOT_MESSAGE", payload: { id: botMsgId, isError: true } });
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   }, [state.isLoading, conversationId, onConversationCreated]);
 
