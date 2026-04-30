@@ -3,7 +3,8 @@
 import { DrugSearchSelect } from "@/components/prescription/drug-search-select";
 import { PrescriptionListCard } from "@/components/prescription/prescription-list-card";
 import { PrescriptionQRCodeWithDownload } from "@/components/prescription/prescription-qr-code";
-import { QRScanner } from "@/components/prescription/qr-scanner";
+import { PrescriptionScanPreview } from "@/components/prescription/prescription-scan-preview";
+import { PrescriptionScanUpload } from "@/components/prescription/prescription-scan-upload";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -44,9 +45,11 @@ import {
   UsageLabels,
   useCreatePrescription,
   useReviewPrescription,
+  useScanPrescription,
   useSearchPrescriptionsByDate,
   useSearchPrescriptionsByName,
   type CreatePrescriptionFormValues,
+  type CreatePrescriptionRequest,
   type DrugInteractionDetail,
   type IntakeRequest
 } from "@/features/prescriptions";
@@ -54,13 +57,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertTriangle,
+  Camera,
   CheckCircle2,
   Clock,
+  Edit2,
   Eye,
   FileText,
   Loader2,
+  Pencil,
   Pill,
   Plus,
+  ScanLine,
   Search,
   Trash2,
 } from "lucide-react";
@@ -81,6 +88,9 @@ interface DrugEntry {
   noteList: string[];
 }
 
+// Step type for create flow
+type CreateStep = "method-select" | "scan" | "scan-preview" | "manual";
+
 export function PrescriptionPageScreen() {
   const { user, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -88,6 +98,16 @@ export function PrescriptionPageScreen() {
   const [showInteractionModal, setShowInteractionModal] = useState(false);
   const [interactions, setInteractions] = useState<DrugInteractionDetail[]>([]);
   const [activeTab, setActiveTab] = useState<"create" | "history">("create");
+  const [patientTab, setPatientTab] = useState<"scan" | "history">("scan");
+  const [patientScanStep, setPatientScanStep] = useState<"upload" | "preview">("upload");
+  const [patientScannedData, setPatientScannedData] = useState<CreatePrescriptionRequest | null>(null);
+  const [patientScanError, setPatientScanError] = useState<string | null>(null);
+  const [patientSuccessPrescriptionId, setPatientSuccessPrescriptionId] = useState<string | null>(null);
+
+  // Create flow step state
+  const [createStep, setCreateStep] = useState<CreateStep>("method-select");
+  const [scannedData, setScannedData] = useState<CreatePrescriptionRequest | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
   
   // List of drugs added to the prescription
   const [drugList, setDrugList] = useState<DrugEntry[]>([]);
@@ -146,6 +166,55 @@ export function PrescriptionPageScreen() {
   // Mutations
   const createMutation = useCreatePrescription();
   const reviewMutation = useReviewPrescription();
+
+  // --- Scan handlers ---
+  const handleScanComplete = (result: CreatePrescriptionRequest) => {
+    setScanError(null);
+    setScannedData(result);
+    setCreateStep("scan-preview");
+  };
+
+  const handleScanError = (error: string) => {
+    setScanError(error);
+  };
+
+  const handleRescan = () => {
+    setScannedData(null);
+    setScanError(null);
+    setCreateStep("scan");
+  };
+
+  const handleScanConfirm = async (editedData: CreatePrescriptionRequest) => {
+    try {
+      const result = await createMutation.mutateAsync(editedData);
+      const prescription = (result as any).result || result;
+      if ((prescription as any)?.id) {
+        setSuccessPrescriptionId((prescription as any).id);
+        setCreateStep("method-select");
+        setScannedData(null);
+      }
+    } catch (err) {
+      console.error("Error creating prescription from scan:", err);
+    }
+  };
+
+  const resetCreateFlow = () => {
+    setCreateStep("method-select");
+    setScannedData(null);
+    setScanError(null);
+    setDrugList([]);
+    form.reset({
+      name: "",
+      description: "",
+      userId: "",
+      patientEmailAddress: "",
+      startDate: new Date().toISOString().split("T")[0],
+      message: "",
+      diagnosisNote: "",
+      info: {},
+      intakes: [],
+    });
+  };
 
   // Prescription form (patient info only)
   const form = useForm<CreatePrescriptionFormValues>({
@@ -337,17 +406,8 @@ export function PrescriptionPageScreen() {
             <p className="text-sm text-secondary/80 dark:text-white/80 md:text-base">
               {isMedRole
                 ? "Tạo và quản lý đơn thuốc cho bệnh nhân với kiểm tra tương tác thuốc tự động."
-                : "Xem và theo dõi các đơn thuốc được kê cho bạn."}
+                : "Chụp ảnh, tải lên hoặc quét mã QR để lưu đơn thuốc của bạn."}
             </p>
-            {/* QR Scanner Button - only show for non-MED users */}
-            {!isMedRole && (
-              <div className="pt-2">
-                <QRScanner 
-                  buttonLabel="Quét mã QR đơn thuốc"
-                  className="bg-white/90 hover:bg-white dark:bg-white/20 dark:hover:bg-white/30"
-                />
-              </div>
-            )}
           </motion.div>
         </div>
       </section>
@@ -378,6 +438,190 @@ export function PrescriptionPageScreen() {
 
           {/* Tab Content */}
           {activeTab === "create" ? (
+          <div>
+            {/* -- Success State -- */}
+            {successPrescriptionId ? (
+              <Card className="border-none bg-white/90 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/60">
+                <CardContent className="flex flex-col items-center gap-6 py-8">
+                  <CheckCircle2 className="h-16 w-16 text-emerald-500" />
+                  <p className="text-center text-lg font-medium text-secondary dark:text-white">
+                    Đơn thuốc đã được tạo thành công!
+                  </p>
+                  <PrescriptionQRCodeWithDownload
+                    prescriptionId={successPrescriptionId}
+                    size="lg"
+                  />
+                  <p className="text-center text-sm text-muted-foreground">
+                    Quét mã QR hoặc tải xuống để chia sẻ đơn thuốc
+                  </p>
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      className="rounded-full"
+                      onClick={() => {
+                        setSuccessPrescriptionId(null);
+                        resetCreateFlow();
+                      }}
+                    >
+                      Tạo đơn mới
+                    </Button>
+                    <Button asChild className="rounded-full">
+                      <a href={`/prescription/${successPrescriptionId}`}>Xem chi tiết</a>
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ) : (
+            <AnimatePresence mode="wait">
+              {/* ======= STEP: method-select ======= */}
+              {createStep === "method-select" && (
+                <motion.div
+                  key="method-select"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.25 }}
+                  className="grid gap-6 md:grid-cols-2"
+                >
+                  {/* Scan Card */}
+                  <button
+                    type="button"
+                    onClick={() => { setScanError(null); setCreateStep("scan"); }}
+                    className="group relative flex flex-col items-center gap-5 rounded-2xl border-2 border-dashed border-primary/40 bg-primary/5 p-10 text-center transition-all hover:border-primary hover:bg-primary/10 dark:border-primary/30 dark:bg-primary/10 dark:hover:border-primary dark:hover:bg-primary/15"
+                  >
+                    <div className="rounded-full bg-primary/15 p-5 transition-transform group-hover:scale-105">
+                      <ScanLine className="h-10 w-10 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-secondary dark:text-white">
+                        Quét đơn thuốc
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Chụp ảnh đơn thuốc — AI sẽ tự động trích xuất thông tin
+                      </p>
+                    </div>
+                    <Badge variant="secondary" className="text-xs">
+                      Nhanh hơn · Dùng AI
+                    </Badge>
+                  </button>
+
+                  {/* Manual Card */}
+                  <button
+                    type="button"
+                    onClick={() => setCreateStep("manual")}
+                    className="group relative flex flex-col items-center gap-5 rounded-2xl border-2 border-dashed border-border/50 bg-muted/20 p-10 text-center transition-all hover:border-foreground/40 hover:bg-muted/40 dark:border-white/15 dark:bg-white/5 dark:hover:border-white/30"
+                  >
+                    <div className="rounded-full bg-muted p-5 transition-transform group-hover:scale-105">
+                      <Pencil className="h-10 w-10 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-semibold text-secondary dark:text-white">
+                        Nhập thủ công
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        Tìm thuốc và nhập thông tin liều dùng từng bước
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="text-xs">
+                      Kiểm soát đầy đủ
+                    </Badge>
+                  </button>
+                </motion.div>
+              )}
+
+              {/* ======= STEP: scan (upload) ======= */}
+              {createStep === "scan" && (
+                <motion.div
+                  key="scan"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-4"
+                >
+                  <div className="flex items-center gap-3">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="rounded-full"
+                      onClick={() => setCreateStep("method-select")}
+                    >
+                      ← Quay lại
+                    </Button>
+                    <h3 className="text-lg font-semibold text-secondary dark:text-white">
+                      Quét ảnh đơn thuốc
+                    </h3>
+                  </div>
+
+                  {scanError && (
+                    <div className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3">
+                      <AlertTriangle className="h-5 w-5 shrink-0 text-destructive" />
+                      <p className="text-sm text-destructive">{scanError}</p>
+                    </div>
+                  )}
+
+                  <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg text-secondary dark:text-white">
+                        <Camera className="h-5 w-5" />
+                        Tải ảnh đơn thuốc
+                      </CardTitle>
+                      <CardDescription>
+                        Hỗ trợ ảnh chụp rõ nét · AI sẽ tự đọc và điền thông tin
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <PrescriptionScanUpload
+                        onScanComplete={handleScanComplete}
+                        onError={handleScanError}
+                      />
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              )}
+
+              {/* ======= STEP: scan-preview ======= */}
+              {createStep === "scan-preview" && scannedData && (
+                <motion.div
+                  key="scan-preview"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <PrescriptionScanPreview
+                    scannedData={scannedData}
+                    onConfirm={handleScanConfirm}
+                    onRescan={handleRescan}
+                    isSubmitting={createMutation.isPending}
+                  />
+                </motion.div>
+              )}
+
+              {/* ======= STEP: manual ======= */}
+              {createStep === "manual" && (
+                <motion.div
+                  key="manual"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.25 }}
+                  className="space-y-1"
+                >
+                  <div className="flex items-center gap-3 mb-6">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="rounded-full"
+                      onClick={() => setCreateStep("method-select")}
+                    >
+                      ← Quay lại
+                    </Button>
+                    <h3 className="text-lg font-semibold text-secondary dark:text-white">
+                      Nhập thủ công
+                    </h3>
+                  </div>
+
           <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
             {/* Left Column: Form */}
             <div className="space-y-6">
@@ -730,41 +974,10 @@ export function PrescriptionPageScreen() {
 
             {/* Right Column: Preview */}
             <div className="space-y-6">
-              {/* Success Card */}
-              {successPrescriptionId ? (
+              {/* Drug List Preview */}
+              <>
+                {/* Drug List Preview */}
                 <Card className="border-none bg-white/90 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/60">
-                  <CardContent className="flex flex-col items-center gap-6 py-8">
-                    <CheckCircle2 className="h-16 w-16 text-emerald-500" />
-                    <p className="text-center text-lg font-medium text-secondary dark:text-white">
-                      Đơn thuốc đã được tạo thành công!
-                    </p>
-                    <PrescriptionQRCodeWithDownload
-                      prescriptionId={successPrescriptionId}
-                      size="lg"
-                    />
-                    <p className="text-center text-sm text-muted-foreground">
-                      Quét mã QR hoặc tải xuống để chia sẻ đơn thuốc
-                    </p>
-                    <div className="flex gap-3">
-                      <Button
-                        variant="outline"
-                        className="rounded-full"
-                        onClick={() => setSuccessPrescriptionId(null)}
-                      >
-                        Tạo đơn mới
-                      </Button>
-                      <Button asChild className="rounded-full">
-                        <a href={`/prescription/${successPrescriptionId}`}>
-                          Xem chi tiết
-                        </a>
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ) : (
-                <>
-                  {/* Drug List Preview */}
-                  <Card className="border-none bg-white/90 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/60">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2 text-xl text-secondary dark:text-white">
                         <Eye className="h-5 w-5" />
@@ -865,8 +1078,12 @@ export function PrescriptionPageScreen() {
                     </CardContent>
                   </Card>
                 </>
-              )}
             </div>
+          </div>
+          </motion.div>
+          )}
+            </AnimatePresence>
+            )}
           </div>
           ) : (
           /* History Tab Content */
@@ -917,46 +1134,185 @@ export function PrescriptionPageScreen() {
           )}
         </section>
       ) : (
-        // USER Role: Show prescription list
-        <section className="container mt-12">
-          <div className="mb-8 flex items-center gap-4">
-            <div className="relative flex-1 max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Tìm kiếm đơn thuốc..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 rounded-full"
-              />
-            </div>
+        // USER Role: Tabs — Scan image | My prescriptions
+        <section className="container mt-12 space-y-8">
+          {/* Tab Navigation */}
+          <div className="flex items-center gap-2 border-b border-border/50 pb-4">
+            <Button
+              variant={patientTab === "scan" ? "default" : "ghost"}
+              onClick={() => setPatientTab("scan")}
+              className="rounded-full"
+            >
+              <ScanLine className="mr-2 h-4 w-4" />
+              Quét đơn thuốc
+            </Button>
+            <Button
+              variant={patientTab === "history" ? "default" : "ghost"}
+              onClick={() => setPatientTab("history")}
+              className="rounded-full"
+            >
+              <Clock className="mr-2 h-4 w-4" />
+              Đơn thuốc của tôi
+            </Button>
           </div>
 
-          {prescriptionsLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            </div>
-          ) : prescriptions.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2">
-              {prescriptions.map((prescription, index) => (
-                <PrescriptionListCard
-                  key={prescription.id}
-                  prescription={prescription}
-                  index={index}
-                />
-              ))}
+          {patientTab === "scan" ? (
+            <div>
+              {/* ---- Success state ---- */}
+              {patientSuccessPrescriptionId ? (
+                <Card className="border-none bg-white/90 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/60">
+                  <CardContent className="flex flex-col items-center gap-6 py-8">
+                    <CheckCircle2 className="h-16 w-16 text-emerald-500" />
+                    <p className="text-center text-lg font-medium text-secondary dark:text-white">
+                      Đơn thuốc đã được lưu thành công!
+                    </p>
+                    <PrescriptionQRCodeWithDownload
+                      prescriptionId={patientSuccessPrescriptionId}
+                      size="lg"
+                    />
+                    <p className="text-center text-sm text-muted-foreground">
+                      Quét mã QR hoặc tải xuống để chia sẻ đơn thuốc
+                    </p>
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        className="rounded-full"
+                        onClick={() => {
+                          setPatientSuccessPrescriptionId(null);
+                          setPatientScanStep("upload");
+                          setPatientScannedData(null);
+                          setPatientScanError(null);
+                        }}
+                      >
+                        Quét đơn khác
+                      </Button>
+                      <Button asChild className="rounded-full">
+                        <a href={`/prescription/${patientSuccessPrescriptionId}`}>Xem chi tiết</a>
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <AnimatePresence mode="wait">
+                  {/* ---- STEP: upload ---- */}
+                  {patientScanStep === "upload" && (
+                    <motion.div
+                      key="patient-upload"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.25 }}
+                      className="space-y-4"
+                    >
+                      {patientScanError && (
+                        <div className="flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-3">
+                          <AlertTriangle className="h-5 w-5 shrink-0 text-destructive" />
+                          <p className="text-sm text-destructive">{patientScanError}</p>
+                        </div>
+                      )}
+                      <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2 text-lg text-secondary dark:text-white">
+                            <Camera className="h-5 w-5" />
+                            Tải ảnh đơn thuốc
+                          </CardTitle>
+                          <CardDescription>
+                            Hỗ trợ ảnh chụp rõ nét · AI sẽ tự đọc và điền thông tin
+                          </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <PrescriptionScanUpload
+                            onScanComplete={(result) => {
+                              setPatientScanError(null);
+                              setPatientScannedData(result);
+                              setPatientScanStep("preview");
+                            }}
+                            onError={(err) => setPatientScanError(err)}
+                          />
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  )}
+
+                  {/* ---- STEP: preview ---- */}
+                  {patientScanStep === "preview" && patientScannedData && (
+                    <motion.div
+                      key="patient-preview"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <PrescriptionScanPreview
+                        scannedData={patientScannedData}
+                        onConfirm={async (editedData) => {
+                          try {
+                            const result = await createMutation.mutateAsync(editedData);
+                            const prescription = (result as any).result || result;
+                            if ((prescription as any)?.id) {
+                              setPatientSuccessPrescriptionId((prescription as any).id);
+                              setPatientScanStep("upload");
+                              setPatientScannedData(null);
+                            }
+                          } catch (err) {
+                            console.error("Error creating prescription from scan:", err);
+                          }
+                        }}
+                        onRescan={() => {
+                          setPatientScannedData(null);
+                          setPatientScanError(null);
+                          setPatientScanStep("upload");
+                        }}
+                        isSubmitting={createMutation.isPending}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              )}
             </div>
           ) : (
-            <Card className="mx-auto max-w-lg border-none bg-white/95 shadow-card dark:bg-secondary/70">
-              <CardContent className="py-12 text-center">
-                <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
-                <h3 className="text-lg font-semibold text-secondary dark:text-white">
-                  Chưa có đơn thuốc
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Bạn chưa có đơn thuốc nào.
-                </p>
-              </CardContent>
-            </Card>
+            /* History tab */
+            <div>
+              <div className="mb-6 flex items-center gap-4">
+                <div className="relative flex-1 max-w-md">
+                  <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder="Tìm kiếm đơn thuốc..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 rounded-full"
+                  />
+                </div>
+              </div>
+
+              {prescriptionsLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                </div>
+              ) : prescriptions.length > 0 ? (
+                <div className="grid gap-6 md:grid-cols-2">
+                  {prescriptions.map((prescription, index) => (
+                    <PrescriptionListCard
+                      key={prescription.id}
+                      prescription={prescription}
+                      index={index}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card className="mx-auto max-w-lg border-none bg-white/95 shadow-card dark:bg-secondary/70">
+                  <CardContent className="py-12 text-center">
+                    <FileText className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+                    <h3 className="text-lg font-semibold text-secondary dark:text-white">
+                      Chưa có đơn thuốc
+                    </h3>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Bạn chưa có đơn thuốc nào.
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
           )}
         </section>
       )}

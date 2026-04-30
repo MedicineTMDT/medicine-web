@@ -1,6 +1,7 @@
 "use client";
 
-import { getMyInfo, getUserInfoFromToken, tokenStorage } from "@/features/auth";
+import { getMyInfo, getUserInfoFromToken } from "@/features/auth";
+import { tokenStorage } from "@/lib/token-storage";
 import { motion } from "framer-motion";
 import { CheckCircle, Loader2, XCircle } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";

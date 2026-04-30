@@ -1,5 +1,6 @@
 "use client";
 
+import { DrugUpdateRequestDialog } from "@/components/drugs-info/drug-update-request-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useDrug } from "@/features/drugs";
 import { cn } from "@/lib/utils";
@@ -163,6 +164,11 @@ export default function DrugInfoDetailPage() {
                   <ExternalLink className="h-3 w-3" />
                 </a>
               )}
+
+              {/* Request to Update */}
+              <div className="pt-1">
+                <DrugUpdateRequestDialog drugName={drug.name} drugId={drugId!} />
+              </div>
             </div>
           </div>
         </CardHeader>

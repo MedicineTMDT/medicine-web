@@ -1,6 +1,7 @@
-import { tokenStorage } from "@/features/auth";
+import { tokenStorage } from "@/lib/token-storage";
 import type { ApiError } from "@/features/auth/types";
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api.cofig";
+import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import type {
     CreatePrescriptionRequest,
     Intake,
@@ -64,12 +65,55 @@ function getAuthHeaders(): HeadersInit {
 // ============================================
 
 /**
+ * Scan a prescription image with AI and extract structured data (MED/ADMIN only)
+ * Uses multipart/form-data — do NOT set Content-Type header manually.
+ * The backend returns a raw CreatePrescriptionRequest (no APIResponse wrapper).
+ */
+export async function scanPrescription(
+  image: File
+): Promise<CreatePrescriptionRequest> {
+  const token = tokenStorage.getToken();
+  const formData = new FormData();
+  formData.append("image", image);
+
+  const response = await fetchWithAuth(
+    `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.SCAN}`,
+    {
+      method: "POST",
+      headers: {
+        // Intentionally NOT setting Content-Type — browser sets multipart boundary automatically
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData,
+    }
+  );
+
+  if (!response.ok) {
+    let errorMsg = "Không thể phân tích ảnh đơn thuốc";
+    try {
+      const err = await response.json();
+      errorMsg = err.message ?? errorMsg;
+    } catch (_) {}
+    throw new Error(errorMsg);
+  }
+
+  const data = await response.json();
+
+  // Backend returns raw object or null on unreadable image
+  if (!data) {
+    throw new Error("AI không thể đọc được đơn thuốc. Vui lòng thử lại với ảnh rõ hơn.");
+  }
+
+  return data as CreatePrescriptionRequest;
+}
+
+/**
  * Create a new prescription (MED/ADMIN only)
  */
 export async function createPrescription(
   request: CreatePrescriptionRequest
 ): Promise<{ result: Prescription }> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.CREATE}`,
     {
       method: "POST",
@@ -87,7 +131,7 @@ export async function createPrescription(
 export async function getPrescriptionById(
   id: string
 ): Promise<{ result: Prescription }> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.GET_BY_ID}/${id}`,
     {
       method: "GET",
@@ -104,7 +148,7 @@ export async function getPrescriptionById(
 export async function copyPrescription(
   id: string
 ): Promise<{ result: Prescription }> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.COPY}/${id}/copy`,
     {
       method: "POST",
@@ -125,7 +169,7 @@ export async function searchPrescriptionsByName(
   const params = buildPageableParams(pageable);
   params.set("name", name);
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.SEARCH_BY_NAME}?${params}`,
     {
       method: "GET",
@@ -148,7 +192,7 @@ export async function searchPrescriptionsByDate(
   params.set("start", start);
   params.set("end", end);
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.SEARCH_BY_DATE}?${params}`,
     {
       method: "GET",
@@ -168,7 +212,7 @@ export async function reviewPrescription(
   const params = new URLSearchParams();
   drugIds.forEach((id) => params.append("listDrugIds", id.toString()));
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.REVIEW}?${params}`,
     {
       method: "GET",
@@ -185,7 +229,7 @@ export async function reviewPrescription(
 export async function updateIntakeStatus(
   id: string
 ): Promise<{ result: Intake }> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.EDIT_INTAKE}/${id}`,
     {
       method: "PUT",
@@ -200,7 +244,7 @@ export async function updateIntakeStatus(
  * Accept a prescription (Patient only - via email link)
  */
 export async function acceptPrescription(id: string): Promise<void> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.ACCEPT}/${id}/accept`,
     {
       method: "PUT",

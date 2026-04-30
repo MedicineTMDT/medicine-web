@@ -48,8 +48,9 @@ export const Note = {
   BEFORE_MEAL: "BEFORE_MEAL",
   AFTER_MEAL: "AFTER_MEAL",
   WITH_MEAL: "WITH_MEAL",
-  EMPTY_STOMACH: "EMPTY_STOMACH",
-  PRN: "PRN",
+  WITH_WATER: "WITH_WATER",
+  AVOID_ALCOHOL: "AVOID_ALCOHOL",
+  AVOID_DAIRY: "AVOID_DAIRY",
 } as const;
 
 export type Note = (typeof Note)[keyof typeof Note];
@@ -59,6 +60,7 @@ export const Timing = {
   NOON: "NOON",
   AFTERNOON: "AFTERNOON",
   EVENING: "EVENING",
+  BEDTIME: "BEDTIME",
 } as const;
 
 export type Timing = (typeof Timing)[keyof typeof Timing];
@@ -104,8 +106,9 @@ export const NoteLabels: Record<Note, string> = {
   BEFORE_MEAL: "Trước ăn",
   AFTER_MEAL: "Sau ăn",
   WITH_MEAL: "Trong bữa ăn",
-  EMPTY_STOMACH: "Lúc đói",
-  PRN: "Khi cần",
+  WITH_WATER: "Uống với nhiều nước",
+  AVOID_ALCOHOL: "Tránh rượu bia",
+  AVOID_DAIRY: "Tránh sữa",
 };
 
 export const TimingLabels: Record<Timing, string> = {
@@ -113,6 +116,7 @@ export const TimingLabels: Record<Timing, string> = {
   NOON: "Trưa",
   AFTERNOON: "Chiều",
   EVENING: "Tối",
+  BEDTIME: "Trước ngủ",
 };
 
 // ============================================
@@ -226,7 +230,7 @@ export type IntakeApiResponse = ApiResponse<Intake>;
 // ============================================
 
 export const medicationScheduleSchema = z.object({
-  timing: z.enum(["MORNING", "NOON", "AFTERNOON", "EVENING"]),
+  timing: z.enum(["MORNING", "NOON", "AFTERNOON", "EVENING", "BEDTIME"]),
   quantity: z.coerce.number().min(1, "Số lượng phải lớn hơn 0"),
 });
 
@@ -252,7 +256,7 @@ export const intakeRequestSchema = z.object({
     "VAGINAL",
   ]),
   timingList: z.array(medicationScheduleSchema).min(1, "Cần ít nhất một lịch uống"),
-  noteList: z.array(z.enum(["BEFORE_MEAL", "AFTER_MEAL", "WITH_MEAL", "EMPTY_STOMACH", "PRN"])),
+  noteList: z.array(z.enum(["BEFORE_MEAL", "AFTER_MEAL", "WITH_MEAL", "WITH_WATER", "AVOID_ALCOHOL", "AVOID_DAIRY"])),
 });
 
 export const createPrescriptionSchema = z.object({

@@ -131,7 +131,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }, [user?.id, queryClient]);
 
-  // Check if token is still valid
+  // Check if token is still valid on load
   useEffect(() => {
     if (introspectData && !introspectData.result?.valid) {
       // Token is invalid, clear auth state

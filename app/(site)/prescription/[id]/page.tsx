@@ -9,15 +9,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { usePrescriptionById } from "@/features/prescriptions";
+import { usePrescriptionById, useUpdateIntakeStatus } from "@/features/prescriptions";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
-  Calendar,
+  Calendar as CalendarIcon,
   CheckCircle2,
   Circle,
   Clock,
   FileText,
+  LayoutList,
   Loader2,
   MessageSquare,
   Pill,
@@ -25,12 +26,18 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useState } from "react";
+import { PrescriptionCalendar } from "@/components/prescription/prescription-calendar";
 
 export default function PrescriptionDetailPage() {
   const params = useParams();
   const prescriptionId = params.id as string;
 
   const { data, isLoading, error } = usePrescriptionById(prescriptionId);
+  const updateIntakeStatusMutation = useUpdateIntakeStatus();
+  
+  const [viewMode, setViewMode] = useState<"calendar" | "list">("calendar");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   
   // Handle both wrapped { result: {...} } and direct Prescription response
   const rawData = data as any;
@@ -65,18 +72,31 @@ export default function PrescriptionDetailPage() {
     );
   }
 
-  // Group intakes by date
+  // Group intakes by date using a consistent key format (DD/MM/YYYY)
   const intakesByDate = (prescription.intakes || []).reduce(
     (acc: Record<string, any[]>, intake: any) => {
-      const date = new Date(intake.time).toLocaleDateString("vi-VN");
-      if (!acc[date]) {
-        acc[date] = [];
+      const d = new Date(intake.time);
+      const day = d.getDate().toString().padStart(2, '0');
+      const month = (d.getMonth() + 1).toString().padStart(2, '0');
+      const year = d.getFullYear();
+      const dateKey = `${day}/${month}/${year}`;
+      
+      if (!acc[dateKey]) {
+        acc[dateKey] = [];
       }
-      acc[date].push(intake);
+      acc[dateKey].push(intake);
       return acc;
     },
     {} as Record<string, any[]>
   );
+
+  // Consistency: Use the same manual formatter for the selected date lookup
+  const selectedDateKey = (() => {
+    const day = selectedDate.getDate().toString().padStart(2, '0');
+    const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0');
+    const year = selectedDate.getFullYear();
+    return `${day}/${month}/${year}`;
+  })();
 
   return (
     <div className="relative pb-24">
@@ -120,7 +140,7 @@ export default function PrescriptionDetailPage() {
               <CardContent className="space-y-4">
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="flex items-center gap-3 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-3 dark:border-white/10 dark:bg-white/5">
-                    <Calendar className="h-5 w-5 text-primary" />
+                    <CalendarIcon className="h-5 w-5 text-primary" />
                     <div>
                       <p className="text-xs text-muted-foreground">
                         Ngày bắt đầu
@@ -133,7 +153,7 @@ export default function PrescriptionDetailPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-3 rounded-xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-3 dark:border-white/10 dark:bg-white/5">
-                    <Calendar className="h-5 w-5 text-primary" />
+                    <CalendarIcon className="h-5 w-5 text-primary" />
                     <div>
                       <p className="text-xs text-muted-foreground">
                         Ngày kết thúc
@@ -183,139 +203,309 @@ export default function PrescriptionDetailPage() {
 
             {/* Intake Schedule */}
             <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
                 <CardTitle className="flex items-center gap-2 text-xl text-secondary dark:text-white">
                   <Clock className="h-5 w-5" />
                   Lịch uống thuốc
                 </CardTitle>
+                <div className="flex items-center gap-1 rounded-lg border border-[var(--glass-border)] bg-muted/30 p-1 dark:border-white/10">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-8 gap-2 rounded-md px-3 text-xs transition-all",
+                      viewMode === "calendar"
+                        ? "bg-white text-secondary shadow-sm dark:bg-white/10 dark:text-white"
+                        : "text-muted-foreground hover:text-secondary dark:hover:text-white"
+                    )}
+                    onClick={() => setViewMode("calendar")}
+                  >
+                    <CalendarIcon className="h-3.5 w-3.5" />
+                    Lịch
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      "h-8 gap-2 rounded-md px-3 text-xs transition-all",
+                      viewMode === "list"
+                        ? "bg-white text-secondary shadow-sm dark:bg-white/10 dark:text-white"
+                        : "text-muted-foreground hover:text-secondary dark:hover:text-white"
+                    )}
+                    onClick={() => setViewMode("list")}
+                  >
+                    <LayoutList className="h-3.5 w-3.5" />
+                    Danh sách
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {(Object.entries(intakesByDate) as [string, any[]][]).map(([date, intakes]) => (
-                    <div key={date} className="space-y-3">
-                      <h3 className="text-sm font-semibold text-secondary dark:text-white">
-                        {date}
-                      </h3>
-                      <div className="space-y-3">
-                        {intakes
-                          .sort(
-                            (a: any, b: any) =>
-                              new Date(a.time).getTime() -
-                              new Date(b.time).getTime()
-                          )
-                          .map((intake: any) => (
-                            <div
-                              key={intake.id}
-                              className={cn(
-                                "rounded-xl border p-4 transition-colors",
-                                intake.status
-                                  ? "border-emerald-500/30 bg-emerald-500/5"
-                                  : "border-[var(--glass-border)] bg-[var(--glass-bg)] dark:border-white/10 dark:bg-white/5"
-                              )}
-                            >
-                              <div className="flex items-start justify-between mb-3">
-                                <div className="flex items-center gap-3">
-                                  {intake.status ? (
-                                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                                  ) : (
-                                    <Circle className="h-5 w-5 text-muted-foreground" />
+                  {viewMode === "calendar" ? (
+                    <div className="grid gap-6 lg:grid-cols-[280px_1fr]">
+                      <div className="space-y-4">
+                        <PrescriptionCalendar
+                          intakesByDate={intakesByDate}
+                          selectedDate={selectedDate}
+                          onSelectDate={setSelectedDate}
+                        />
+                      </div>
+                      
+                      {/* Selected Date Details */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-sm font-semibold text-secondary dark:text-white">
+                            Chi tiết ngày {selectedDateKey}
+                          </h3>
+                          {intakesByDate[selectedDateKey]?.length > 0 && (
+                            <Badge variant="outline" className="bg-primary/5 text-primary border-primary/20">
+                              {intakesByDate[selectedDateKey].length} lần uống
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        <div className="space-y-3">
+                          {intakesByDate[selectedDateKey] ? (
+                            intakesByDate[selectedDateKey]
+                              .sort(
+                                (a: any, b: any) =>
+                                  new Date(a.time).getTime() -
+                                  new Date(b.time).getTime()
+                              )
+                              .map((intake: any) => (
+                                <motion.div
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  key={intake.id}
+                                  className={cn(
+                                    "rounded-xl border p-4 transition-all duration-300",
+                                    intake.status
+                                      ? "border-emerald-500/30 bg-emerald-500/5 shadow-[0_0_15px_-5px_rgba(16,185,129,0.1)]"
+                                      : "border-[var(--glass-border)] bg-[var(--glass-bg)] dark:border-white/10 dark:bg-white/5"
                                   )}
-                                  <p className="font-semibold text-secondary dark:text-white">
-                                    {new Date(intake.time).toLocaleTimeString(
-                                      "vi-VN",
-                                      {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                      }
-                                    )}
-                                  </p>
-                                </div>
-                                {intake.status && (
-                                  <Badge
-                                    variant="outline"
-                                    className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
-                                  >
-                                    Đã uống
-                                  </Badge>
-                                )}
-                              </div>
-                              
-                              {/* Detailed drug list */}
-                              <div className="space-y-2 ml-8">
-                                {intake.info.map((drug: any, idx: number) => (
-                                  <div
-                                    key={idx}
-                                    className="rounded-lg border border-border/50 bg-white/50 p-3 dark:bg-white/5"
-                                  >
-                                    <div className="flex items-start gap-3">
-                                      <Pill className="h-5 w-5 text-primary mt-0.5" />
-                                      <div className="flex-1 space-y-1">
-                                        <p className="font-medium text-secondary dark:text-white">
-                                          {drug.drugName || `Thuốc ${idx + 1}`}
-                                        </p>
-                                        <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                                          {drug.medicineForm && (
-                                            <span className="flex items-center gap-1">
-                                              <span className="font-medium">Dạng:</span>
-                                              {drug.medicineForm === 'TABLET' && 'Viên'}
-                                              {drug.medicineForm === 'POWDER' && 'Gói'}
-                                              {drug.medicineForm === 'VIAL' && 'Ống'}
-                                              {drug.medicineForm === 'SYRUP' && 'Lọ'}
-                                              {drug.medicineForm === 'TUBE' && 'Tuýp'}
-                                              {drug.medicineForm === 'BOTTLE' && 'Chai'}
-                                            </span>
-                                          )}
-                                          {drug.usage && (
-                                            <span className="flex items-center gap-1">
-                                              <span className="font-medium">Cách dùng:</span>
-                                              {drug.usage === 'ORAL' && 'Uống'}
-                                              {drug.usage === 'SUBLINGUAL' && 'Ngậm'}
-                                              {drug.usage === 'CHEW' && 'Nhai'}
-                                              {drug.usage === 'TOPICAL' && 'Bôi'}
-                                              {drug.usage === 'EYE_DROPS' && 'Nhỏ mắt'}
-                                              {drug.usage === 'EAR_DROPS' && 'Nhỏ tai'}
-                                              {drug.usage === 'NASAL_DROPS' && 'Nhỏ mũi'}
-                                              {drug.usage === 'IM' && 'Tiêm bắp'}
-                                              {drug.usage === 'IV' && 'Tiêm tĩnh mạch'}
-                                              {drug.usage === 'SC' && 'Tiêm dưới da'}
-                                              {drug.usage === 'RECTAL' && 'Đặt hậu môn'}
-                                              {drug.usage === 'VAGINAL' && 'Đặt âm đạo'}
-                                            </span>
-                                          )}
-                                          {drug.quantitative && drug.unit && (
-                                            <span className="flex items-center gap-1">
-                                              <span className="font-medium">Liều:</span>
-                                              {drug.quantitative} {drug.unit}
-                                            </span>
-                                          )}
-                                        </div>
-                                        {drug.noteList && drug.noteList.length > 0 && (
-                                          <div className="flex flex-wrap gap-1 mt-1">
-                                            {drug.noteList.map((note: string, nIdx: number) => (
-                                              <Badge
-                                                key={nIdx}
-                                                variant="outline"
-                                                className="text-xs"
-                                              >
-                                                {note === 'BEFORE_MEAL' && 'Trước ăn'}
-                                                {note === 'AFTER_MEAL' && 'Sau ăn'}
-                                                {note === 'WITH_MEAL' && 'Trong bữa ăn'}
-                                                {note === 'EMPTY_STOMACH' && 'Lúc đói'}
-                                                {note === 'PRN' && 'Khi cần'}
-                                              </Badge>
-                                            ))}
-                                          </div>
+                                >
+                                  <div className="flex items-start justify-between mb-3">
+                                    <div className="flex items-center gap-3">
+                                      {intake.status ? (
+                                        <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                                      ) : (
+                                        <Circle className="h-5 w-5 text-muted-foreground" />
+                                      )}
+                                      <p className="font-semibold text-secondary dark:text-white">
+                                        {new Date(intake.time).toLocaleTimeString(
+                                          "vi-VN",
+                                          {
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                          }
                                         )}
-                                      </div>
+                                      </p>
                                     </div>
+                                    {intake.status ? (
+                                      <Badge
+                                        variant="outline"
+                                        className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
+                                      >
+                                        Đã uống
+                                      </Badge>
+                                    ) : (
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-7 rounded-full border-primary/30 text-xs text-primary hover:bg-primary/5"
+                                        onClick={() => updateIntakeStatusMutation.mutate(intake.id)}
+                                        disabled={updateIntakeStatusMutation.isPending}
+                                      >
+                                        {updateIntakeStatusMutation.isPending ? (
+                                          <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                        ) : (
+                                          <CheckCircle2 className="mr-1 h-3 w-3" />
+                                        )}
+                                        Đánh dấu đã uống
+                                      </Button>
+                                    )}
                                   </div>
-                                ))}
+                                  
+                                  <div className="space-y-2 ml-8">
+                                    {intake.info.map((drug: any, idx: number) => (
+                                      <div
+                                        key={idx}
+                                        className="rounded-lg border border-border/50 bg-white/50 p-3 dark:bg-white/5"
+                                      >
+                                        <div className="flex items-start gap-3">
+                                          <Pill className="h-5 w-5 text-primary mt-0.5" />
+                                          <div className="flex-1 space-y-1">
+                                            <p className="font-medium text-secondary dark:text-white">
+                                              {drug.drugName || `Thuốc ${idx + 1}`}
+                                            </p>
+                                            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                              {drug.medicineForm && (
+                                                <span className="flex items-center gap-1">
+                                                  <span className="font-medium">Dạng:</span>
+                                                  {drug.medicineForm === 'TABLET' && 'Viên'}
+                                                  {drug.medicineForm === 'POWDER' && 'Gói'}
+                                                  {drug.medicineForm === 'VIAL' && 'Ống'}
+                                                  {drug.medicineForm === 'SYRUP' && 'Lọ'}
+                                                  {drug.medicineForm === 'TUBE' && 'Tuýp'}
+                                                  {drug.medicineForm === 'BOTTLE' && 'Chai'}
+                                                </span>
+                                              )}
+                                              {drug.usage && (
+                                                <span className="flex items-center gap-1">
+                                                  <span className="font-medium">Cách dùng:</span>
+                                                  {drug.usage === 'ORAL' && 'Uống'}
+                                                  {drug.usage === 'SUBLINGUAL' && 'Ngậm'}
+                                                  {drug.usage === 'CHEW' && 'Nhai'}
+                                                  {drug.usage === 'TOPICAL' && 'Bôi'}
+                                                  {drug.usage === 'EYE_DROPS' && 'Nhỏ mắt'}
+                                                  {drug.usage === 'EAR_DROPS' && 'Nhỏ tai'}
+                                                  {drug.usage === 'NASAL_DROPS' && 'Nhỏ mũi'}
+                                                  {drug.usage === 'IM' && 'Tiêm bắp'}
+                                                  {drug.usage === 'IV' && 'Tiêm tĩnh mạch'}
+                                                  {drug.usage === 'SC' && 'Tiêm dưới da'}
+                                                  {drug.usage === 'RECTAL' && 'Đặt hậu môn'}
+                                                  {drug.usage === 'VAGINAL' && 'Đặt âm đạo'}
+                                                </span>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              ))
+                          ) : (
+                            <div className="flex flex-col items-center justify-center py-12 text-center">
+                              <div className="mb-4 rounded-full bg-muted/30 p-4">
+                                <Clock className="h-8 w-8 text-muted-foreground/50" />
                               </div>
+                              <p className="text-sm text-muted-foreground">
+                                Không có lịch uống thuốc cho ngày này
+                              </p>
                             </div>
-                          ))}
+                          )}
+                        </div>
                       </div>
                     </div>
-                  ))}
+                  ) : (
+                    (Object.entries(intakesByDate) as [string, any[]][]).map(([date, intakes]) => (
+                      <div key={date} className="space-y-3">
+                        <h3 className="text-sm font-semibold text-secondary dark:text-white">
+                          {date}
+                        </h3>
+                        <div className="space-y-3">
+                          {intakes
+                            .sort(
+                              (a: any, b: any) =>
+                                new Date(a.time).getTime() -
+                                new Date(b.time).getTime()
+                            )
+                            .map((intake: any) => (
+                              <div
+                                key={intake.id}
+                                className={cn(
+                                  "rounded-xl border p-4 transition-colors",
+                                  intake.status
+                                    ? "border-emerald-500/30 bg-emerald-500/5"
+                                    : "border-[var(--glass-border)] bg-[var(--glass-bg)] dark:border-white/10 dark:bg-white/5"
+                                )}
+                              >
+                                <div className="flex items-start justify-between mb-3">
+                                  <div className="flex items-center gap-3">
+                                    {intake.status ? (
+                                      <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                                    ) : (
+                                      <Circle className="h-5 w-5 text-muted-foreground" />
+                                    )}
+                                    <p className="font-semibold text-secondary dark:text-white">
+                                      {new Date(intake.time).toLocaleTimeString(
+                                        "vi-VN",
+                                        {
+                                          hour: "2-digit",
+                                          minute: "2-digit",
+                                        }
+                                      )}
+                                    </p>
+                                  </div>
+                                  {intake.status ? (
+                                    <Badge
+                                      variant="outline"
+                                      className="border-emerald-500/30 bg-emerald-500/10 text-emerald-600"
+                                    >
+                                      Đã uống
+                                    </Badge>
+                                  ) : (
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-7 rounded-full border-primary/30 text-xs text-primary hover:bg-primary/5"
+                                      onClick={() => updateIntakeStatusMutation.mutate(intake.id)}
+                                      disabled={updateIntakeStatusMutation.isPending}
+                                    >
+                                      {updateIntakeStatusMutation.isPending ? (
+                                        <Loader2 className="mr-1 h-3 w-3 animate-spin" />
+                                      ) : (
+                                        <CheckCircle2 className="mr-1 h-3 w-3" />
+                                      )}
+                                      Đánh dấu đã uống
+                                    </Button>
+                                  )}
+                                </div>
+                                
+                                <div className="space-y-2 ml-8">
+                                  {intake.info.map((drug: any, idx: number) => (
+                                    <div
+                                      key={idx}
+                                      className="rounded-lg border border-border/50 bg-white/50 p-3 dark:bg-white/5"
+                                    >
+                                      <div className="flex items-start gap-3">
+                                        <Pill className="h-5 w-5 text-primary mt-0.5" />
+                                        <div className="flex-1 space-y-1">
+                                          <p className="font-medium text-secondary dark:text-white">
+                                            {drug.drugName || `Thuốc ${idx + 1}`}
+                                          </p>
+                                          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                            {drug.medicineForm && (
+                                              <span className="flex items-center gap-1">
+                                                <span className="font-medium">Dạng:</span>
+                                                {drug.medicineForm === 'TABLET' && 'Viên'}
+                                                {drug.medicineForm === 'POWDER' && 'Gói'}
+                                                {drug.medicineForm === 'VIAL' && 'Ống'}
+                                                {drug.medicineForm === 'SYRUP' && 'Lọ'}
+                                                {drug.medicineForm === 'TUBE' && 'Tuýp'}
+                                                {drug.medicineForm === 'BOTTLE' && 'Chai'}
+                                              </span>
+                                            )}
+                                            {drug.usage && (
+                                              <span className="flex items-center gap-1">
+                                                <span className="font-medium">Cách dùng:</span>
+                                                {drug.usage === 'ORAL' && 'Uống'}
+                                                {drug.usage === 'SUBLINGUAL' && 'Ngậm'}
+                                                {drug.usage === 'CHEW' && 'Nhai'}
+                                                {drug.usage === 'TOPICAL' && 'Bôi'}
+                                                {drug.usage === 'EYE_DROPS' && 'Nhỏ mắt'}
+                                                {drug.usage === 'EAR_DROPS' && 'Nhỏ tai'}
+                                                {drug.usage === 'NASAL_DROPS' && 'Nhỏ mũi'}
+                                                {drug.usage === 'IM' && 'Tiêm bắp'}
+                                                {drug.usage === 'IV' && 'Tiêm tĩnh mạch'}
+                                                {drug.usage === 'SC' && 'Tiêm dưới da'}
+                                                {drug.usage === 'RECTAL' && 'Đặt hậu môn'}
+                                                {drug.usage === 'VAGINAL' && 'Đặt âm đạo'}
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>

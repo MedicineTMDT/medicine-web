@@ -1,5 +1,6 @@
 import { API_BASE_URL, API_ENDPOINTS } from "@/lib/api.cofig";
-import { tokenStorage } from "@/features/auth";
+import { tokenStorage } from "@/lib/token-storage";
+import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import type {
   EditUserPayload,
   EditUserApiResponse,
@@ -56,7 +57,7 @@ function getAuthHeaders(): HeadersInit {
 // ============================================
 
 export async function getUser(id: string): Promise<GetUserApiResponse> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.USERS.GET_BY_ID}/${id}`,
     {
       method: "GET",
@@ -82,7 +83,7 @@ export async function editUser(
 export async function changePassword(
   payload: ChangePasswordPayload
 ): Promise<ChangePasswordApiResponse> {
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.USERS.CHANGE_PASSWORD}`,
     {
       method: "PUT",
@@ -102,7 +103,7 @@ export async function updateAvatar(
   const formData = new FormData();
   formData.append("file", payload.file);
 
-  const response = await fetch(
+  const response = await fetchWithAuth(
     `${API_BASE_URL}${API_ENDPOINTS.USERS.UPDATE_AVATAR}`,
     {
       method: "PUT",
