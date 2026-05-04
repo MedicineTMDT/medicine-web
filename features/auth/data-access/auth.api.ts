@@ -128,7 +128,14 @@ export async function introspect(
     }
   );
 
-  return handleResponse<IntrospectApiResponse>(response);
+  const data = await handleResponse<IntrospectApiResponse>(response);
+
+  // Fix: If the backend refreshed the token, the frontend must save the new one!
+  if (data.result?.valid && data.result?.token) {
+    tokenStorage.setToken(data.result.token);
+  }
+
+  return data;
 }
 
 export async function getUserById(id: string): Promise<UserApiResponse> {
