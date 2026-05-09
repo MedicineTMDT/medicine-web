@@ -21,12 +21,15 @@ import {
 } from "@/components/ui/card";
 import type { CreatePrescriptionRequest, IntakeRequest } from "@/features/prescriptions";
 import {
-  DosageUnitLabels,
-  MedicineFormLabels,
-  NoteLabels,
-  TimingLabels,
-  UsageLabels,
+    DosageUnitLabels,
+    MedicineFormLabels,
+    NoteLabels,
+    TimingLabels,
+    UsageLabels,
+    useAnalyzePrescription,
 } from "@/features/prescriptions";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { motion } from "framer-motion";
 import {
   AlertTriangle,
@@ -37,10 +40,13 @@ import {
   Clock,
   Edit2,
   FileText,
+  Loader2,
   Pill,
   Plus,
   Trash2,
   User,
+  Sparkles,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -65,6 +71,9 @@ export function PrescriptionScanPreview({
   );
   const [diagnosisNote, setDiagnosisNote] = useState(scannedData.diagnosisNote ?? "");
   const [message, setMessage] = useState(scannedData.message ?? "");
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(
+    (scannedData.info?.ai_analysis as string) ?? null
+  );
   const [patientEmailAddress, setPatientEmailAddress] = useState(
     scannedData.patientEmailAddress ?? ""
   );
@@ -76,6 +85,27 @@ export function PrescriptionScanPreview({
       timingList: (intake.timingList ?? []) as any,
     }))
   );
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  const analyzeMutation = useAnalyzePrescription();
+
+  const handleAnalyze = async () => {
+    try {
+      setIsAnalyzing(true);
+      const result = await analyzeMutation.mutateAsync({
+        name,
+        description,
+        startDate,
+        diagnosisNote,
+        intakes
+      });
+      setAiAnalysis(result.answer);
+    } catch (error) {
+      console.error("Analysis failed", error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   const handleRemoveIntake = (index: number) => {
     setIntakes(intakes.filter((_, i) => i !== index));
@@ -95,6 +125,10 @@ export function PrescriptionScanPreview({
       message,
       patientEmailAddress,
       intakes,
+      info: {
+        ...scannedData.info,
+        ai_analysis: aiAnalysis,
+      },
     });
   };
 
@@ -120,7 +154,70 @@ export function PrescriptionScanPreview({
         </div>
       </div>
 
-      {/* Prescription Info */}
+      <div className={`grid gap-6 ${scannedData.image ? 'lg:grid-cols-[1fr_1.2fr]' : 'lg:grid-cols-[1fr_1.2fr]'}`}>
+        {/* Left Column: Image Preview & AI Analysis */}
+        <div className="space-y-4 lg:sticky lg:top-6 lg:self-start">
+          {scannedData.image && (
+             <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70 overflow-hidden">
+                <CardHeader className="py-4 border-b border-border/50 bg-muted/20">
+                   <CardTitle className="text-lg font-medium flex items-center gap-2 text-secondary dark:text-white">
+                      <ImageIcon className="h-5 w-5" />
+                      Ảnh đơn thuốc gốc
+                   </CardTitle>
+                </CardHeader>
+                <CardContent className="p-4 flex items-center justify-center bg-black/5 dark:bg-black/20">
+                   <img 
+                     src={scannedData.image} 
+                     alt="Prescription scan" 
+                     className="max-w-full max-h-[75vh] w-auto h-auto object-contain rounded-md shadow-sm" 
+                   />
+                </CardContent>
+             </Card>
+          )}
+
+          {/* AI Analysis Section */}
+          <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70 overflow-hidden">
+            <CardHeader className="bg-primary/5 border-b border-primary/10 dark:bg-primary/10">
+              <div className="flex items-center justify-between">
+                <CardTitle className="flex items-center gap-2 text-lg text-primary">
+                  <Sparkles className="h-5 w-5" />
+                  Tư vấn từ AI
+                </CardTitle>
+                <Button
+                  type="button"
+                  variant="default"
+                  size="sm"
+                  className="rounded-full gap-1.5 font-semibold shadow-sm"
+                  onClick={handleAnalyze}
+                  disabled={isAnalyzing || !hasIntakes}
+                >
+                  {isAnalyzing ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Bot className="h-4 w-4" />
+                  )}
+                  {aiAnalysis ? "Phân tích lại" : "Tiến hành phân tích"}
+                </Button>
+              </div>
+              <CardDescription className="text-primary/70 font-medium">
+                Sử dụng trí tuệ nhân tạo để phân tích tương tác thuốc, liều lượng và đưa ra lời khuyên sử dụng an toàn.
+              </CardDescription>
+            </CardHeader>
+            {aiAnalysis && (
+              <CardContent className="pt-6">
+                <div className="rounded-xl border border-primary/10 bg-white p-5 text-sm text-secondary dark:bg-secondary dark:text-white leading-relaxed shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-strong:text-primary">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {aiAnalysis}
+                  </ReactMarkdown>
+                </div>
+              </CardContent>
+            )}
+          </Card>
+        </div>
+
+        {/* Right Column: Scanned Info */}
+        <div className="space-y-6">
+          {/* Prescription Info */}
       <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg text-secondary dark:text-white">
@@ -167,7 +264,7 @@ export function PrescriptionScanPreview({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Lời dặn cho bệnh nhân..."
-              rows={2}
+              rows={3}
               className="mt-1"
             />
           </div>
@@ -363,6 +460,8 @@ export function PrescriptionScanPreview({
           </div>
         </CardContent>
       </Card>
+      </div>
+      </div>
 
       {/* Action Buttons */}
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">

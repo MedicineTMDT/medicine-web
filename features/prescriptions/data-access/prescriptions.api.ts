@@ -254,3 +254,47 @@ export async function acceptPrescription(id: string): Promise<void> {
 
   await handleResponse<void>(response);
 }
+
+/**
+ * Analyze prescription using the chatbot AI
+ */
+export async function analyzePrescription(
+  prescription: any
+): Promise<{ answer: string }> {
+  const token = tokenStorage.getToken();
+  const response = await fetch(API_ENDPOINTS.CHATBOT.ANALYZE, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token && { Authorization: `Bearer ${token}` }),
+    },
+    body: JSON.stringify({
+      question: JSON.stringify(prescription),
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Không thể phân tích đơn thuốc lúc này.");
+  }
+
+  return response.json();
+}
+
+/**
+ * Update the prescription's message (doctor's message or AI analysis)
+ */
+export async function updatePrescriptionMessage(
+  id: string,
+  message: string
+): Promise<{ result: Prescription }> {
+  const response = await fetchWithAuth(
+    `${API_BASE_URL}${API_ENDPOINTS.PRESCRIPTIONS.UPDATE_MESSAGE}/${id}/message`,
+    {
+      method: "PUT",
+      headers: getAuthHeaders(),
+      body: message, // Sending as raw string body since backend @RequestBody String message
+    }
+  );
+
+  return handleResponse<{ result: Prescription }>(response);
+}

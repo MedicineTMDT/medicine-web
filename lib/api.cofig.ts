@@ -61,6 +61,10 @@ export const API_ENDPOINTS = {
     REVIEW: "/api/v1/prescriptions/review",
     EDIT_INTAKE: "/api/v1/prescriptions/edit",
     ACCEPT: "/api/v1/prescriptions", // /{id}/accept
+    UPDATE_MESSAGE: "/api/v1/prescriptions", // /{id}/message
+  },
+  CHATBOT: {
+    ANALYZE: "/chatbot/analyze",
   },
 } as const;
 

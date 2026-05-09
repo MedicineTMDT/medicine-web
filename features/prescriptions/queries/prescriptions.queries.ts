@@ -8,7 +8,9 @@ import {
     scanPrescription,
     searchPrescriptionsByDate,
     searchPrescriptionsByName,
-    updateIntakeStatus
+    updateIntakeStatus,
+    analyzePrescription,
+    updatePrescriptionMessage
 } from "../data-access/prescriptions.api";
 import type {
     CreatePrescriptionRequest,
@@ -156,6 +158,30 @@ export function useAcceptPrescription() {
     mutationFn: (id: string) => acceptPrescription(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: prescriptionKeys.all });
+    },
+  });
+}
+
+/**
+ * Analyze prescription mutation
+ */
+export function useAnalyzePrescription() {
+  return useMutation({
+    mutationFn: (prescription: any) => analyzePrescription(prescription),
+  });
+}
+
+/**
+ * Update prescription message mutation
+ */
+export function useUpdatePrescriptionMessage() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, message }: { id: string; message: string }) =>
+      updatePrescriptionMessage(id, message),
+    onSuccess: (_, { id }) => {
+      queryClient.invalidateQueries({ queryKey: prescriptionKeys.detail(id) });
     },
   });
 }

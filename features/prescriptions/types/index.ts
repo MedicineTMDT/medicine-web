@@ -150,6 +150,7 @@ export interface CreatePrescriptionRequest {
   diagnosisNote: string;
   info: Record<string, unknown>;
   intakes: IntakeRequest[];
+  image?: string;
 }
 
 // ============================================
@@ -269,6 +270,7 @@ export const createPrescriptionSchema = z.object({
   diagnosisNote: z.string().optional().default(""),
   info: z.record(z.unknown()).optional().default({}),
   intakes: z.array(intakeRequestSchema).optional().default([]), // Allow empty - validated separately
+  image: z.string().optional(),
 });
 
 export type CreatePrescriptionFormValues = z.infer<typeof createPrescriptionSchema>;
