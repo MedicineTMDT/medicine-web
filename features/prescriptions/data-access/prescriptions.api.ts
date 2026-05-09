@@ -256,11 +256,13 @@ export async function acceptPrescription(id: string): Promise<void> {
 }
 
 /**
- * Analyze prescription using the chatbot AI
+ * Analyze prescription using the chatbot AI.
+ * Returns `is_useful: false` when the AI answer is generated from general knowledge
+ * rather than from the RAG knowledge base (no relevant documents found).
  */
 export async function analyzePrescription(
   prescription: any
-): Promise<{ answer: string }> {
+): Promise<{ answer: string; is_useful: boolean }> {
   const token = tokenStorage.getToken();
   const response = await fetch(API_ENDPOINTS.CHATBOT.COMPLETION, {
     method: "POST",

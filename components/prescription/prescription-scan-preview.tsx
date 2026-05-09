@@ -47,6 +47,7 @@ import {
   User,
   Sparkles,
   Image as ImageIcon,
+  Info,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -74,6 +75,7 @@ export function PrescriptionScanPreview({
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(
     (scannedData.info?.ai_analysis as string) ?? null
   );
+  const [isUseful, setIsUseful] = useState<boolean | null>(null);
   const [patientEmailAddress, setPatientEmailAddress] = useState(
     scannedData.patientEmailAddress ?? ""
   );
@@ -100,6 +102,7 @@ export function PrescriptionScanPreview({
         intakes
       });
       setAiAnalysis(result.answer);
+      setIsUseful(result.is_useful);
     } catch (error) {
       console.error("Analysis failed", error);
     } finally {
@@ -204,7 +207,15 @@ export function PrescriptionScanPreview({
               </CardDescription>
             </CardHeader>
             {aiAnalysis && (
-              <CardContent className="pt-6">
+              <CardContent className="pt-6 space-y-3">
+                {isUseful === false && (
+                  <div className="flex items-start gap-2.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3.5 py-2.5 text-xs text-amber-700 dark:text-amber-300">
+                    <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                    <span>
+                      <span className="font-semibold">Lưu ý:</span> Câu trả lời này được tạo ra từ kiến thức chung của AI, không dựa trên cơ sở dữ liệu chuyên khoa (RAG). Thông tin có thể chưa đầy đủ — hãy tham khảo ý kiến bác sĩ.
+                    </span>
+                  </div>
+                )}
                 <div className="rounded-xl border border-primary/10 bg-white p-5 text-sm text-secondary dark:bg-secondary dark:text-white leading-relaxed shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-strong:text-primary">
                   <ReactMarkdown remarkPlugins={[remarkGfm]}>
                     {aiAnalysis}
