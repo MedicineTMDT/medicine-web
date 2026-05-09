@@ -255,7 +255,19 @@
   }
 
   /* Nested divs reset */
-  > div {
-    @apply !float-none !bg-transparent !border-none !m-0 !p-0;
+  > div,
+  .cs-row10,
+  .cs_wcontent,
+  .cs_ppwcontent {
+    @apply !float-none !bg-transparent !border-none !m-0 !p-0 !w-full !max-w-none !shadow-none !static !block;
+  }
+
+  /* Specific elements to hide from external source */
+  .cs-sscomment,
+  .cs-warningct,
+  [onclick^="show_recontact"],
+  div[style*="font-size:12px"],
+  time[datetime] {
+    @apply !hidden;
   }
 }

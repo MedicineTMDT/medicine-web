@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
-import { LogOut, Menu, User, X } from "lucide-react";
+import { LogOut, Menu, ShieldCheck, Stethoscope, User, X } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
@@ -78,12 +79,37 @@ export function Navbar() {
                 <>
                   <Link
                     href="/account"
-                    className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 transition hover:bg-primary/10"
+                    className="relative group transition-transform hover:scale-105 active:scale-95"
                   >
-                    <User className="h-4 w-4 text-primary" />
-                    <span className="text-sm font-medium text-secondary dark:text-white">
-                      {user?.firstName || user?.username}
-                    </span>
+                    <div className="h-10 w-10 overflow-hidden rounded-full border-2 border-primary/20 bg-primary/5 shadow-sm transition-colors group-hover:border-primary/40">
+                      {user?.avatarImg ? (
+                        <Image
+                          src={user.avatarImg}
+                          alt={user.firstName || user.username}
+                          width={40}
+                          height={40}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-primary/70">
+                          <User className="h-5 w-5" />
+                        </div>
+                      )}
+                    </div>
+                    {user?.role && user.role !== "USER" && (
+                      <div
+                        className={cn(
+                          "absolute -bottom-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full border-2 border-white shadow-md dark:border-secondary",
+                          user.role === "ADMIN" ? "bg-red-500" : "bg-blue-500"
+                        )}
+                      >
+                        {user.role === "ADMIN" ? (
+                          <ShieldCheck className="h-2.5 w-2.5 text-white" />
+                        ) : (
+                          <Stethoscope className="h-2.5 w-2.5 text-white" />
+                        )}
+                      </div>
+                    )}
                   </Link>
                   <Button
                     variant="ghost"
@@ -163,12 +189,37 @@ export function Navbar() {
                     <>
                       <Link
                         href="/account"
-                        className="flex flex-1 items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-2 transition hover:bg-primary/10"
+                        className="relative group transition-transform active:scale-95"
                       >
-                        <User className="h-4 w-4 text-primary" />
-                        <span className="text-sm font-medium text-secondary dark:text-white">
-                          {user?.firstName || user?.username}
-                        </span>
+                        <div className="h-12 w-12 overflow-hidden rounded-full border-2 border-primary/20 bg-primary/5 shadow-sm">
+                          {user?.avatarImg ? (
+                            <Image
+                              src={user.avatarImg}
+                              alt={user.firstName || user.username}
+                              width={48}
+                              height={48}
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center text-primary/70">
+                              <User className="h-6 w-6" />
+                            </div>
+                          )}
+                        </div>
+                        {user?.role && user.role !== "USER" && (
+                          <div
+                            className={cn(
+                              "absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white shadow-md dark:border-secondary",
+                              user.role === "ADMIN" ? "bg-red-500" : "bg-blue-500"
+                            )}
+                          >
+                            {user.role === "ADMIN" ? (
+                              <ShieldCheck className="h-3 w-3 text-white" />
+                            ) : (
+                              <Stethoscope className="h-3 w-3 text-white" />
+                            )}
+                          </div>
+                        )}
                       </Link>
                       <Button
                         variant="outline"

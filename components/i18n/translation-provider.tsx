@@ -31,6 +31,9 @@ const enTranslations = {
   "nav.signIn": "Sign in",
   "nav.register": "Register",
   "nav.signOut": "Sign out",
+  "role.admin": "Admin",
+  "role.user": "User",
+  "role.med": "Medical",
 
   "actions.search": "Search",
   "actions.readMore": "Read More",
@@ -461,6 +464,9 @@ const viTranslations: { [K in TranslationKey]: string } = {
   "nav.signIn": "Đăng nhập",
   "nav.register": "Đăng ký",
   "nav.signOut": "Đăng xuất",
+  "role.admin": "Quản trị",
+  "role.user": "Thành viên",
+  "role.med": "Chuyên gia",
 
   "actions.search": "Tìm kiếm",
   "actions.readMore": "Đọc thêm",
@@ -583,9 +589,9 @@ const viTranslations: { [K in TranslationKey]: string } = {
     "Đánh giá triệu chứng dựa trên cây quyết định và gợi ý bước tiếp theo phù hợp.",
 
   "drugsInfo.badge": "Thông tin thuốc",
-  "drugsInfo.title": "Khám phá thuốc với sự tự tin",
+  "drugsInfo.title": "Tra cứu thuốc an toàn & tin cậy",
   "drugsInfo.description":
-    "Tìm thuốc nhanh với gợi ý theo thời gian thực và bộ lọc gọn nhẹ cho liều dùng hoặc lưu ý an toàn.",
+    "Tra cứu thông tin chi tiết về thuốc, hoạt chất và các nhóm bệnh lý với công cụ tìm kiếm thông minh.",
   "drugsInfo.results": "Kết quả",
   "drugsInfo.matchesFound": "Tìm thấy {{count}} kết quả",
   "drugsInfo.noMatchesTitle": "Không tìm thấy kết quả",

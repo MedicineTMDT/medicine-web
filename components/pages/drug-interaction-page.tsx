@@ -16,7 +16,7 @@ import { getDrugIngredients, useDrugSuggestions } from "@/features/drugs";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { CheckCircle2, FlaskConical, Loader2, Pill, ShieldAlert } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 type SearchMode = "drug" | "ingredient";
 
@@ -42,6 +42,7 @@ export function DrugInteractionPageScreen() {
   const [hasSearched, setHasSearched] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
   
+  const resultsRef = useRef<HTMLElement>(null);
   const { t } = useTranslation();
   
   // Drug suggestions query
@@ -140,11 +141,18 @@ export function DrugInteractionPageScreen() {
       setResults([]);
     }
   }, [searchMode, selectedDrugs, selectedIngredients, searchMutation]);
-
+  
   const isLoading = searchMutation.isPending || isExtracting;
   const canCheck = searchMode === "drug" 
     ? selectedDrugs.length >= 1 && selectedDrugs.length <= 10
     : selectedIngredients.length >= 1 && selectedIngredients.length <= 10;
+
+  // Auto-scroll to results
+  useEffect(() => {
+    if (hasSearched && !isLoading) {
+      resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [hasSearched, isLoading]);
 
   return (
     <div className="relative pb-24">
@@ -245,7 +253,7 @@ export function DrugInteractionPageScreen() {
         </div>
       </section>
 
-      <section className="container mt-12 space-y-6">
+      <section ref={resultsRef} className="container mt-12 space-y-6">
         <div className="flex items-center gap-3">
           <Separator className="flex-1 border-[var(--glass-border)] bg-[var(--glass-border)] dark:border-white/10 dark:bg-white/10" />
           <span className="text-sm font-semibold uppercase tracking-[0.28em] text-secondary/70 dark:text-white/60">

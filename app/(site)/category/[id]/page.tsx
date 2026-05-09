@@ -62,6 +62,15 @@ export default function CategoryDetailPage() {
     }
   };
 
+  // Helper to rewrite relative URLs to absolute partner URLs
+  const rewriteRelativeUrls = (html: string) => {
+    if (!html) return "";
+    const baseUrl = "https://trungtamthuoc.com";
+    return html
+      .replace(/src="\/([^"]*)"/g, `src="${baseUrl}/$1"`)
+      .replace(/href="\/([^"]*)"/g, `href="${baseUrl}/$1"`);
+  };
+
   return (
     <div className="container space-y-8 pb-24 pt-10">
       {/* Breadcrumb */}
@@ -104,7 +113,7 @@ export default function CategoryDetailPage() {
         <CardContent className="py-8">
           {categoryDetail.content ? (
             <div
-              className="prose prose-slate dark:prose-invert max-w-none
+              className="prose prose-slate dark:prose-invert max-w-none content-renderer
                 prose-headings:text-secondary dark:prose-headings:text-white
                 prose-h2:text-xl prose-h2:font-bold prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-border/30 prose-h2:pb-2
                 prose-h3:text-lg prose-h3:font-semibold prose-h3:mt-6 prose-h3:mb-3
@@ -116,7 +125,7 @@ export default function CategoryDetailPage() {
                 prose-strong:text-secondary dark:prose-strong:text-white
                 prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-4 prose-blockquote:rounded-r-lg
               "
-              dangerouslySetInnerHTML={{ __html: categoryDetail.content }}
+              dangerouslySetInnerHTML={{ __html: rewriteRelativeUrls(categoryDetail.content) }}
             />
           ) : (
             <div className="py-12 text-center">

@@ -2,6 +2,7 @@
 
 import { DrugUpdateRequestDialog } from "@/components/drugs-info/drug-update-request-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuth } from "@/features/auth";
 import { useDrug } from "@/features/drugs";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, ExternalLink, FileText, Loader2, Pill } from "lucide-react";
@@ -30,6 +31,7 @@ export default function DrugInfoDetailPage() {
   const drugId = params.id ? Number(params.id) : undefined;
   const [activeSection, setActiveSection] = useState<string | null>(null);
   
+  const { user } = useAuth();
   const { data, isLoading, error } = useDrug(drugId);
   const drug = data?.result;
 
@@ -166,9 +168,11 @@ export default function DrugInfoDetailPage() {
               )}
 
               {/* Request to Update */}
-              <div className="pt-1">
-                <DrugUpdateRequestDialog drugName={drug.name} drugId={drugId!} />
-              </div>
+              {user?.role && user.role !== "USER" && (
+                <div className="pt-1">
+                  <DrugUpdateRequestDialog drugName={drug.name} drugId={drugId!} />
+                </div>
+              )}
             </div>
           </div>
         </CardHeader>

@@ -57,8 +57,15 @@ export default function AccountLayout({
       href: "/account/requests",
       icon: MessageSquareText,
       description: "Xem và theo dõi yêu cầu chỉnh sửa dữ liệu",
+      requiredRoles: ["MED", "ADMIN"],
     },
   ];
+
+  const { user } = useAuth();
+  const filteredNavItems = accountNavItems.filter((item) => {
+    if (!item.requiredRoles) return true;
+    return user?.role && item.requiredRoles.includes(user.role);
+  });
 
   // Wait for client-side mount to avoid hydration mismatch
   useEffect(() => {
@@ -103,7 +110,7 @@ export default function AccountLayout({
             {t("account.settings")}
           </h2>
           <nav className="space-y-1">
-            {accountNavItems.map((item) => {
+            {filteredNavItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.href;
 
