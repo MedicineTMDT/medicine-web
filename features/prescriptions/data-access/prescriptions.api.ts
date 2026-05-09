@@ -262,7 +262,7 @@ export async function analyzePrescription(
   prescription: any
 ): Promise<{ answer: string }> {
   const token = tokenStorage.getToken();
-  const response = await fetch(API_ENDPOINTS.CHATBOT.ANALYZE, {
+  const response = await fetch(API_ENDPOINTS.CHATBOT.COMPLETION, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

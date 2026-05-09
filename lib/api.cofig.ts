@@ -64,7 +64,7 @@ export const API_ENDPOINTS = {
     UPDATE_MESSAGE: "/api/v1/prescriptions", // /{id}/message
   },
   CHATBOT: {
-    ANALYZE: "/chatbot/analyze",
+    COMPLETION: "/chatbot/completion",
   },
 } as const;
 
