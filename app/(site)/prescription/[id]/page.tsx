@@ -208,132 +208,6 @@ export default function PrescriptionDetailPage() {
                   </>
                 )}
 
-                {(prescription.message || aiAnalysis || prescription?.info?.ai_analysis) ? (
-                  <>
-                    <Separator className="bg-border/30" />
-                    <div className="space-y-4">
-                      {prescription.message && (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm font-medium text-secondary dark:text-white">
-                            <MessageSquare className="h-4 w-4" />
-                            Lời dặn của bác sĩ
-                          </div>
-                          <p className="text-sm text-muted-foreground leading-relaxed">
-                            {prescription.message}
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2 text-sm font-medium text-primary">
-                            <Bot className="h-4 w-4" />
-                            Phân tích chuyên sâu từ AI
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-7 gap-1.5 text-xs font-semibold text-primary hover:bg-primary/5"
-                            onClick={async () => {
-                              setIsAnalyzing(true);
-                              try {
-                                const res = await analyzeMutation.mutateAsync(prescription);
-                                setAiAnalysis(res.answer);
-                                setIsUseful(res.is_useful);
-                              } catch (e) {}
-                              setIsAnalyzing(false);
-                            }}
-                            disabled={isAnalyzing}
-                          >
-                            {isAnalyzing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                            Phân tích lại
-                          </Button>
-                        </div>
-                        <div className="space-y-3">
-                          {isUseful === false && (
-                            <div className="flex items-start gap-2.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3.5 py-2.5 text-xs text-amber-700 dark:text-amber-300">
-                              <Info className="h-4 w-4 shrink-0 mt-0.5" />
-                              <span>
-                                <span className="font-semibold">Lưu ý:</span> Câu trả lời này được tạo ra từ kiến thức chung của AI, không dựa trên cơ sở dữ liệu chuyên khoa (RAG). Thông tin có thể chưa đầy đủ — hãy tham khảo ý kiến bác sĩ.
-                              </span>
-                            </div>
-                          )}
-                          <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 text-sm text-secondary dark:text-white leading-relaxed shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-strong:text-primary">
-                          {aiAnalysis || prescription?.info?.ai_analysis ? (
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {(aiAnalysis || prescription?.info?.ai_analysis) as string}
-                            </ReactMarkdown>
-                          ) : (
-                            <span className="text-muted-foreground">Chưa có phân tích AI cho đơn thuốc này.</span>
-                          )}
-                          </div>
-                        </div>
-                        {aiAnalysis && aiAnalysis !== prescription?.info?.ai_analysis && (
-                          <Button
-                            size="sm"
-                            className="w-full mt-2 rounded-xl gap-2"
-                            onClick={() => updateMessageMutation.mutate({ id: prescriptionId, message: aiAnalysis })}
-                            disabled={updateMessageMutation.isPending}
-                          >
-                            <Save className="h-4 w-4" />
-                            Lưu bản phân tích mới này
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <Separator className="bg-border/30" />
-                    <div className="flex flex-col items-center justify-center py-6 text-center">
-                      <Bot className="mb-3 h-10 w-10 text-primary/40" />
-                      <p className="text-sm text-muted-foreground mb-4">
-                        Đơn thuốc này chưa có lời dặn hoặc phân tích AI.
-                      </p>
-                      <Button
-                        size="sm"
-                        className="rounded-full gap-2 px-6"
-                        onClick={async () => {
-                          setIsAnalyzing(true);
-                          try {
-                            const res = await analyzeMutation.mutateAsync(prescription);
-                            setAiAnalysis(res.answer);
-                            setIsUseful(res.is_useful);
-                          } catch (e) {}
-                          setIsAnalyzing(false);
-                        }}
-                        disabled={isAnalyzing}
-                      >
-                        {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
-                        Phân tích bằng AI ngay
-                      </Button>
-
-                      {aiAnalysis && (
-                        <div className="mt-6">
-                           <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 text-sm text-secondary dark:text-white leading-relaxed shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-strong:text-primary">
-                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                {aiAnalysis}
-                              </ReactMarkdown>
-                           </div>
-                           <Button
-                              variant="outline"
-                              className="w-full mt-4 rounded-xl gap-2 border-primary/30 text-primary hover:bg-primary/5"
-                              onClick={() => updateMessageMutation.mutate({ id: prescriptionId, message: aiAnalysis })}
-                              disabled={updateMessageMutation.isPending}
-                           >
-                              <Save className="h-4 w-4" />
-                              Lưu vào đơn thuốc
-                           </Button>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
-
-
-              </CardContent>
-            </Card>
-
             {/* Intake Schedule */}
             <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
@@ -643,40 +517,132 @@ export default function PrescriptionDetailPage() {
               </CardContent>
             </Card>
 
-            {/* Drug Information Cards */}
-            <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl text-secondary dark:text-white">
-                  <Pill className="h-5 w-5" />
-                  Thông tin thuốc
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid gap-4 md:grid-cols-2">
-                  {/* Get unique drugs from all intakes */}
-                  {(() => {
-                    const uniqueDrugs = new Map<string, { drugId: string; drugName: string }>();
-                    prescription.intakes?.forEach((intake: any) => {
-                      intake.info?.forEach((drug: any) => {
-                        if (drug.drugId && !uniqueDrugs.has(drug.drugId)) {
-                          uniqueDrugs.set(drug.drugId, {
-                            drugId: drug.drugId,
-                            drugName: drug.drugName || 'Thuốc',
-                          });
-                        }
-                      });
-                    });
-                    return Array.from(uniqueDrugs.values()).map((drug) => (
-                      <DrugInfoCard
-                        key={drug.drugId}
-                        drugId={drug.drugId}
-                        drugName={drug.drugName}
-                      />
-                    ));
-                  })()}
-                </div>
+                {(prescription.message || aiAnalysis || prescription?.info?.ai_analysis) ? (
+                  <>
+                    <Separator className="bg-border/30" />
+                    <div className="space-y-4">
+                      {prescription.message && (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-sm font-medium text-secondary dark:text-white">
+                            <MessageSquare className="h-4 w-4" />
+                            Lời dặn của bác sĩ
+                          </div>
+                          <p className="text-sm text-muted-foreground leading-relaxed">
+                            {prescription.message}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-sm font-medium text-primary">
+                            <Bot className="h-4 w-4" />
+                            Phân tích chuyên sâu từ AI
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 gap-1.5 text-xs font-semibold text-primary hover:bg-primary/5"
+                            onClick={async () => {
+                              setIsAnalyzing(true);
+                              try {
+                                const res = await analyzeMutation.mutateAsync(prescription);
+                                setAiAnalysis(res.answer);
+                                setIsUseful(res.is_useful);
+                              } catch (e) {}
+                              setIsAnalyzing(false);
+                            }}
+                            disabled={isAnalyzing}
+                          >
+                            {isAnalyzing ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                            Phân tích lại
+                          </Button>
+                        </div>
+                        <div className="space-y-3">
+                          {isUseful === false && (
+                            <div className="flex items-start gap-2.5 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3.5 py-2.5 text-xs text-amber-700 dark:text-amber-300">
+                              <Info className="h-4 w-4 shrink-0 mt-0.5" />
+                              <span>
+                                <span className="font-semibold">Lưu ý:</span> Câu trả lời này được tạo ra từ kiến thức chung của AI, không dựa trên cơ sở dữ liệu chuyên khoa (RAG). Thông tin có thể chưa đầy đủ — hãy tham khảo ý kiến bác sĩ.
+                              </span>
+                            </div>
+                          )}
+                          <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 text-sm text-secondary dark:text-white leading-relaxed shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-strong:text-primary">
+                          {aiAnalysis || prescription?.info?.ai_analysis ? (
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {(aiAnalysis || prescription?.info?.ai_analysis) as string}
+                            </ReactMarkdown>
+                          ) : (
+                            <span className="text-muted-foreground">Chưa có phân tích AI cho đơn thuốc này.</span>
+                          )}
+                          </div>
+                        </div>
+                        {aiAnalysis && aiAnalysis !== prescription?.info?.ai_analysis && (
+                          <Button
+                            size="sm"
+                            className="w-full mt-2 rounded-xl gap-2"
+                            onClick={() => updateMessageMutation.mutate({ id: prescriptionId, message: aiAnalysis })}
+                            disabled={updateMessageMutation.isPending}
+                          >
+                            <Save className="h-4 w-4" />
+                            Lưu bản phân tích mới này
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Separator className="bg-border/30" />
+                    <div className="flex flex-col items-center justify-center py-6 text-center">
+                      <Bot className="mb-3 h-10 w-10 text-primary/40" />
+                      <p className="text-sm text-muted-foreground mb-4">
+                        Đơn thuốc này chưa có lời dặn hoặc phân tích AI.
+                      </p>
+                      <Button
+                        size="sm"
+                        className="rounded-full gap-2 px-6"
+                        onClick={async () => {
+                          setIsAnalyzing(true);
+                          try {
+                            const res = await analyzeMutation.mutateAsync(prescription);
+                            setAiAnalysis(res.answer);
+                            setIsUseful(res.is_useful);
+                          } catch (e) {}
+                          setIsAnalyzing(false);
+                        }}
+                        disabled={isAnalyzing}
+                      >
+                        {isAnalyzing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Bot className="h-4 w-4" />}
+                        Phân tích bằng AI ngay
+                      </Button>
+
+                      {aiAnalysis && (
+                        <div className="mt-6">
+                           <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 text-sm text-secondary dark:text-white leading-relaxed shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-strong:text-primary">
+                              <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {aiAnalysis}
+                              </ReactMarkdown>
+                           </div>
+                           <Button
+                              variant="outline"
+                              className="w-full mt-4 rounded-xl gap-2 border-primary/30 text-primary hover:bg-primary/5"
+                              onClick={() => updateMessageMutation.mutate({ id: prescriptionId, message: aiAnalysis })}
+                              disabled={updateMessageMutation.isPending}
+                           >
+                              <Save className="h-4 w-4" />
+                              Lưu vào đơn thuốc
+                           </Button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+
+
               </CardContent>
             </Card>
+
           </div>
 
           {/* Sidebar */}
