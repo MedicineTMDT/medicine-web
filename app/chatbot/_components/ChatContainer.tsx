@@ -255,7 +255,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
 
   const handleCopyChat = () => {
     const text = state.messages
-      .map((m) => `[${m.role === "user" ? "Bệnh nhân" : "Bác sĩ AI"}] (${m.timestamp.toLocaleTimeString()}): ${m.content}`)
+      .map((m) => `[${m.role === "user" ? "Bệnh nhân" : "Trợ lý AI"}] (${m.timestamp.toLocaleTimeString()}): ${m.content}`)
       .join("\n\n");
     navigator.clipboard.writeText(text);
     alert("Đã sao chép lịch sử hội thoại!");

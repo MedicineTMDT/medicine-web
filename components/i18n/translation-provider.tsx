@@ -460,7 +460,7 @@ const viTranslations: { [K in TranslationKey]: string } = {
   "nav.drugInfo": "Thông tin thuốc",
   "nav.drugInteraction": "Tương tác thuốc",
   "nav.prescription": "Đơn thuốc",
-  "nav.chatbot": "Bác sĩ AI",
+  "nav.chatbot": "Trợ lý AI",
   "nav.signIn": "Đăng nhập",
   "nav.register": "Đăng ký",
   "nav.signOut": "Đăng xuất",

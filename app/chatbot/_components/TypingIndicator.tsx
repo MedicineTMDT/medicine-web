@@ -12,7 +12,7 @@ const TypingIndicator: React.FC = () => {
           />
         ))}
       </div>
-      <span className="text-xs text-muted-foreground ml-2 font-medium">Bác sĩ AI đang trả lời...</span>
+      <span className="text-xs text-muted-foreground ml-2 font-medium">Trợ lý AI đang trả lời...</span>
     </div>
   );
 };
