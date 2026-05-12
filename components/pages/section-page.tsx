@@ -42,6 +42,60 @@ export function SectionPageScreen({
   const articles = showNews ? allNews : [];
   const tools = showTools ? allTools : [];
 
+  if (content.isLegal) {
+    return (
+      <div className="container max-w-4xl py-24 sm:py-32">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="space-y-12"
+        >
+          {/* Header */}
+          <div className="space-y-6 border-b border-border pb-12">
+            <h1 className="text-4xl font-heading font-bold text-secondary dark:text-white md:text-5xl">
+              {t(content.title, { fallback: content.title })}
+            </h1>
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              {content.lastUpdated && (
+                <p>
+                  {t("legal.lastUpdated")}: {content.lastUpdated}
+                </p>
+              )}
+              <span className="h-1 w-1 rounded-full bg-border" />
+              <p>AnalyticsPill Clinical Platform</p>
+            </div>
+            <p className="text-xl text-secondary/80 dark:text-white/80 leading-relaxed">
+              {t(content.description, { fallback: content.description })}
+            </p>
+          </div>
+
+          {/* Content Body */}
+          <div className="prose prose-slate dark:prose-invert max-w-none">
+            <div className="space-y-10">
+              {content.bodyContent?.map((paragraph, idx) => (
+                <div key={idx} className="space-y-4">
+                  <p className="text-lg leading-relaxed text-secondary/80 dark:text-white/80">
+                    {t(paragraph, { fallback: paragraph })}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Simple CTA */}
+          <div className="pt-12 border-t border-border">
+            <Button variant="outline" className="rounded-full" asChild>
+              <Link href="/">
+                {t("common.backToHome")}
+              </Link>
+            </Button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative pb-24">
       {/* HERO SECTION */}
@@ -222,8 +276,20 @@ export function SectionPageScreen({
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4 text-sm text-secondary/80 dark:text-muted-foreground">
-                <p>{t("section.inDepthBody1")}</p>
-                <p>{t("section.inDepthBody2")}</p>
+                {content.bodyContent ? (
+                  <div className="space-y-6">
+                    {content.bodyContent.map((paragraph, idx) => (
+                      <p key={idx} className="leading-relaxed">
+                        {t(paragraph, { fallback: paragraph })}
+                      </p>
+                    ))}
+                  </div>
+                ) : (
+                  <>
+                    <p>{t("section.inDepthBody1")}</p>
+                    <p>{t("section.inDepthBody2")}</p>
+                  </>
+                )}
               </CardContent>
             </Card>
 

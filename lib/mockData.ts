@@ -55,7 +55,7 @@ export const categories: Category[] = [
     title: "Top Medications",
     description:
       "Most prescribed and researched medications with clinical guidance and patient tips.",
-    href: "/drugs",
+    href: "/drugs-info",
     cta: "Browse",
     icon: Pill,
     accent: "from-[#D8F2FF] via-[#F0FAFF] to-[#E0F6FF]",
@@ -65,7 +65,7 @@ export const categories: Category[] = [
     title: "Health Conditions",
     description:
       "Evidence-based summaries covering symptoms, diagnostics, and treatment pathways.",
-    href: "/supplements",
+    href: "/category/health-conditions",
     cta: "Explore",
     icon: HeartPulse,
     accent: "from-[#E6EBFF] via-[#EEF1FF] to-[#F5F8FF]",
@@ -75,7 +75,7 @@ export const categories: Category[] = [
     title: "Drug Interactions",
     description:
       "Check for medication conflicts, contraindications, and clinical monitoring guidance.",
-    href: "/interactions",
+    href: "/drug-interaction",
     cta: "Check",
     icon: Microscope,
     accent: "from-[#FFE7EE] via-[#FFF3F6] to-[#FFEFF3]",
@@ -143,45 +143,9 @@ export const tools: ToolItem[] = [
     title: "Interaction Checker",
     description:
       "Quickly evaluate potential interactions between prescription and OTC medications.",
-    href: "/interactions",
+    href: "/drug-interaction",
     icon: ShieldCheck,
     gradient: "from-[#DAFFF3] via-[#E8FFF8] to-[#F2FFFA]",
-  },
-  {
-    translationKey: "tools.dosageCalculator",
-    title: "Dosage Calculator",
-    description:
-      "Calculate weight-based or renal-adjusted medication dosages with clinical safeguards.",
-    href: "/dosage-calculator",
-    icon: Syringe,
-    gradient: "from-[#FFEBD8] via-[#FFF2E6] to-[#FFF6EE]",
-  },
-  {
-    translationKey: "tools.labReference",
-    title: "Lab Reference Ranges",
-    description:
-      "Search age-specific and condition-specific laboratory reference ranges instantly.",
-    href: "/tools/lab-reference",
-    icon: TestTubes,
-    gradient: "from-[#EAE6FF] via-[#F4F2FF] to-[#F8F6FF]",
-  },
-  {
-    translationKey: "tools.immunization",
-    title: "Immunization Schedules",
-    description:
-      "Stay updated with CDC-recommended immunization schedules tailored for each age group.",
-    href: "/tools/immunization-schedules",
-    icon: Activity,
-    gradient: "from-[#E6FFF2] via-[#F1FFF8] to-[#F5FFF9]",
-  },
-  {
-    translationKey: "tools.symptomChecker",
-    title: "Symptom Checker",
-    description:
-      "Assess symptoms with evidence-backed decision trees and next-step guidance.",
-    href: "/tools/symptom-checker",
-    icon: Brain,
-    gradient: "from-[#FFE8F1] via-[#FFF0F6] to-[#FFF5F9]",
   },
 ];
 
@@ -219,6 +183,9 @@ export type SectionContent = {
     description: string;
     icon: LucideIcon;
   }[];
+  bodyContent?: string[];
+  isLegal?: boolean;
+  lastUpdated?: string;
   actions: {
     label: string;
     href: string;
@@ -478,6 +445,69 @@ export const sectionContent: Record<string, SectionContent> = {
       { label: "View All Tools", href: "/tools#catalog" },
       { label: "Suggest a Tool", href: "/tools/request" },
     ],
+  },
+  "privacy-policy": {
+    slug: "privacy-policy",
+    title: "legal.privacy.title",
+    description: "legal.privacy.intro",
+    heroImage: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80",
+    highlights: [
+      { title: "legal.privacy.collection", description: "legal.privacy.security", icon: ShieldCheck },
+      { title: "legal.privacy.usage", description: "legal.privacy.rights", icon: UserSearch },
+    ],
+    actions: [
+      { label: "footer.contact", href: "/contact" },
+    ],
+    isLegal: true,
+    lastUpdated: "2026-05-10",
+    bodyContent: [
+      "legal.privacy.collection",
+      "legal.privacy.usage",
+      "legal.privacy.security",
+      "legal.privacy.rights"
+    ]
+  },
+  "terms-of-service": {
+    slug: "terms-of-service",
+    title: "legal.terms.title",
+    description: "legal.terms.intro",
+    heroImage: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?auto=format&fit=crop&w=1600&q=80",
+    highlights: [
+      { title: "legal.terms.medical", description: "legal.terms.liability", icon: Activity },
+      { title: "legal.terms.accounts", description: "legal.terms.conduct", icon: ShieldCheck },
+    ],
+    actions: [
+      { label: "footer.contact", href: "/contact" },
+    ],
+    isLegal: true,
+    lastUpdated: "2026-05-10",
+    bodyContent: [
+      "legal.terms.medical",
+      "legal.terms.accounts",
+      "legal.terms.conduct",
+      "legal.terms.liability"
+    ]
+  },
+  disclaimer: {
+    slug: "disclaimer",
+    title: "legal.disclaimer.title",
+    description: "legal.disclaimer.intro",
+    heroImage: "https://images.unsplash.com/photo-1576091160550-2173bdb999ef?auto=format&fit=crop&w=1600&q=80",
+    highlights: [
+      { title: "legal.disclaimer.consult", description: "legal.disclaimer.emergency", icon: Stethoscope },
+      { title: "legal.disclaimer.disregard", description: "legal.disclaimer.reliance", icon: HeartPulse },
+    ],
+    actions: [
+      { label: "footer.contact", href: "/contact" },
+    ],
+    isLegal: true,
+    lastUpdated: "2026-05-10",
+    bodyContent: [
+      "legal.disclaimer.consult",
+      "legal.disclaimer.disregard",
+      "legal.disclaimer.reliance",
+      "legal.disclaimer.emergency"
+    ]
   },
 };
 

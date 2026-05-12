@@ -5,6 +5,7 @@ import { MessageSquare, Plus, Trash2, Calendar, Loader2 } from "lucide-react";
 import { Conversation } from "@/lib/types/chatbot";
 import { fetchConversations, deleteConversation } from "@/lib/api/chatbot";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface ConversationSidebarProps {
   userId?: string;
@@ -22,6 +23,7 @@ const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -29,6 +31,11 @@ const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
 
   useEffect(() => {
     const load = async () => {
+      if (!userId) {
+        setConversations([]);
+        setIsLoading(false);
+        return;
+      }
       setIsLoading(true);
       try {
         const data = await fetchConversations(userId);
@@ -64,7 +71,15 @@ const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
     <div className="flex flex-col h-full">
       <div className="p-4">
         <button
-          onClick={() => onSelect(null)}
+          onClick={() => {
+            if (!userId) {
+              if (window.confirm("Vui lòng đăng nhập để tạo cuộc trò chuyện mới. Chuyển đến trang đăng nhập?")) {
+                router.push("/signin?redirect=/chatbot");
+              }
+              return;
+            }
+            onSelect(null);
+          }}
           className={cn(
             "w-full flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all duration-200 font-medium text-sm",
             !activeId

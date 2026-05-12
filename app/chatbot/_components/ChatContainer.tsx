@@ -6,6 +6,7 @@ import { Message, DocumentMetadata } from "@/lib/types/chatbot";
 import { streamChat, fetchMessages, deleteConversation, createConversation, generateChatTitle } from "@/lib/api/chatbot";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
+import { useRouter } from "next/navigation";
 
 type State = {
   messages: Message[];
@@ -104,6 +105,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
   const [state, dispatch] = useReducer(chatReducer, initialState);
   const abortControllerRef = useRef<AbortController | null>(null);
   const newlyCreatedConvIdRef = useRef<string | null>(null);
+  const router = useRouter();
 
   // Load messages when conversationId changes
   useEffect(() => {
@@ -269,7 +271,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
           {onToggleSidebar && (
             <button 
               onClick={onToggleSidebar}
-              className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground hidden lg:flex"
+              className="p-2 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground flex"
               title={isSidebarOpen ? "Đóng thanh bên" : "Mở thanh bên"}
             >
               {isSidebarOpen ? <PanelLeftClose className="w-5 h-5" /> : <PanelLeftOpen className="w-5 h-5" />}

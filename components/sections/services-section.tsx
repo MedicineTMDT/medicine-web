@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/components/i18n/translation-provider";
+import { Badge } from "@/components/ui/badge";
 import { useAnimeStaggerOnScroll } from "@/lib/hooks/use-anime";
 import {
     AlertTriangle, ArrowRight, BookOpen, FileText, Pill, Search,
@@ -20,31 +21,34 @@ const services = [
     icon: AlertTriangle,
     titleKey: "landing.services.interactions.title",
     descKey: "landing.services.interactions.description",
-    href: "/drug-interactions",
+    href: "/drug-interaction",
   },
   {
     icon: FileText,
     titleKey: "landing.services.prescriptions.title",
     descKey: "landing.services.prescriptions.description",
-    href: "/prescriptions",
+    href: "/prescription",
   },
   {
     icon: Search,
     titleKey: "landing.services.pillId.title",
     descKey: "landing.services.pillId.description",
     href: "/pill-identifier",
+    isComingSoon: true,
   },
   {
     icon: Stethoscope,
     titleKey: "landing.services.tools.title",
     descKey: "landing.services.tools.description",
     href: "/tools",
+    isComingSoon: true,
   },
   {
     icon: BookOpen,
     titleKey: "landing.services.guides.title",
     descKey: "landing.services.guides.description",
     href: "/guides",
+    isComingSoon: true,
   },
 ];
 
@@ -92,17 +96,29 @@ export function ServicesSection() {
             return (
               <Link
                 key={index}
-                href={service.href}
-                className="service-card group block"
+                href={service.isComingSoon ? "#" : service.href}
+                className={`service-card group block ${service.isComingSoon ? "cursor-not-allowed pointer-events-none" : ""}`}
+                onClick={(e) => service.isComingSoon && e.preventDefault()}
               >
-                <div className="relative h-full p-8 rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-sm overflow-hidden transition-all duration-300 hover:border-primary/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10 dark:border-white/10 dark:bg-white/5 dark:hover:border-primary/50">
+                <div className={`relative h-full p-8 rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-sm overflow-hidden transition-all duration-300 ${service.isComingSoon ? "opacity-75 grayscale-[0.3]" : "hover:border-primary/40 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/10"} dark:border-white/10 dark:bg-white/5 dark:hover:border-primary/50`}>
                   {/* Background on hover */}
-                  <div className="absolute inset-0 bg-primary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  {!service.isComingSoon && (
+                    <div className="absolute inset-0 bg-primary/5 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                  )}
+
+                  {/* Coming Soon Badge */}
+                  {service.isComingSoon && (
+                    <div className="absolute top-6 right-6 z-10">
+                      <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 text-[10px] py-0.5 px-2.5 font-bold uppercase tracking-wider backdrop-blur-md">
+                        {t("landing.status.comingSoon")}
+                      </Badge>
+                    </div>
+                  )}
 
                   {/* Content */}
                   <div className="relative">
                     {/* Icon */}
-                    <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform group-hover:scale-110 dark:bg-primary/20">
+                    <div className={`mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-transform ${!service.isComingSoon && "group-hover:scale-110"} dark:bg-primary/20`}>
                       <Icon className="h-8 w-8" aria-hidden />
                     </div>
 
@@ -115,10 +131,12 @@ export function ServicesSection() {
                     </p>
 
                     {/* Arrow link */}
-                    <div className="flex items-center text-primary font-medium">
-                      <span className="mr-2">{t("landing.services.explore")}</span>
-                      <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                    </div>
+                    {!service.isComingSoon && (
+                      <div className="flex items-center text-primary font-medium">
+                        <span className="mr-2">{t("landing.services.explore")}</span>
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </Link>

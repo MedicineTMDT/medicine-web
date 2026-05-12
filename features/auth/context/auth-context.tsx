@@ -182,6 +182,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
     userStorage.clearUser();
     setUser(null);
     setToken(null);
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("chatbot_active_id");
+    }
     router.push("/signin");
   }, [logoutMutation, router]);
 

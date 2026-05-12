@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/components/i18n/translation-provider";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { animate, stagger } from "animejs";
 import {
@@ -23,17 +24,18 @@ const quickActions = [
   {
     icon: ShieldCheck,
     labelKey: "landing.hero.actions.interactions",
-    href: "/drug-interactions",
+    href: "/drug-interaction",
   },
   {
     icon: FileText,
     labelKey: "landing.hero.actions.prescriptions",
-    href: "/prescriptions",
+    href: "/prescription",
   },
   {
     icon: Stethoscope,
     labelKey: "landing.hero.actions.tools",
     href: "/tools",
+    isComingSoon: true,
   },
 ];
 
@@ -167,17 +169,27 @@ export function HeroSection() {
               return (
                 <Link
                   key={action.labelKey}
-                  href={action.href}
-                  className="hero-action opacity-0 group h-full"
+                  href={action.isComingSoon ? "#" : action.href}
+                  className={`hero-action opacity-0 group h-full ${action.isComingSoon ? "cursor-not-allowed pointer-events-none" : ""}`}
+                  onClick={(e) => action.isComingSoon && e.preventDefault()}
                 >
-                  <div className="flex items-center gap-4 p-5 h-full min-h-[88px] rounded-2xl border border-[var(--glass-border)] bg-white/70 backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:bg-white hover:shadow-lg hover:-translate-y-1 dark:border-white/10 dark:bg-white/5 dark:hover:border-primary/50 dark:hover:bg-white/10">
+                  <div className={`relative flex items-center gap-4 p-5 h-full min-h-[88px] rounded-2xl border border-[var(--glass-border)] bg-white/70 backdrop-blur-sm transition-all duration-300 ${action.isComingSoon ? "opacity-75 grayscale-[0.5]" : "hover:border-primary/40 hover:bg-white hover:shadow-lg hover:-translate-y-1"} dark:border-white/10 dark:bg-white/5 dark:hover:border-primary/50 dark:hover:bg-white/10`}>
+                    {action.isComingSoon && (
+                      <div className="absolute -top-2 -right-2 z-10">
+                        <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 text-[10px] py-0 px-2 font-bold uppercase tracking-wider backdrop-blur-md">
+                          {t("landing.status.comingSoon")}
+                        </Badge>
+                      </div>
+                    )}
                     <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white dark:bg-primary/20">
                       <Icon className="h-6 w-6" aria-hidden />
                     </span>
                     <span className="flex-1 text-left font-semibold text-secondary dark:text-white">
                       {t(action.labelKey)}
                     </span>
-                    <ArrowRight className="h-5 w-5 text-secondary/30 transition-all group-hover:text-primary group-hover:translate-x-1 dark:text-white/30" />
+                    {!action.isComingSoon && (
+                      <ArrowRight className="h-5 w-5 text-secondary/30 transition-all group-hover:text-primary group-hover:translate-x-1 dark:text-white/30" />
+                    )}
                   </div>
                 </Link>
               );

@@ -60,9 +60,30 @@ const enTranslations = {
   "footer.description":
     "Your trusted source for accurate, up-to-date medical and pharmaceutical information. Always consult healthcare professionals for medical advice.",
   "footer.allRights": "All rights reserved.",
-  "footer.address": "221B Health Avenue, Suite 12, Boston, MA",
-  "footer.phone": "+1 (800) 555-1024",
-  "footer.email": "support@analyticspill.com",
+  "footer.phone": "+84 (0) 123 456 789",
+  "footer.email": "tmdt04k22@gmail.com",
+  "legal.lastUpdated": "Last Updated",
+  
+  "legal.privacy.title": "Privacy Policy",
+  "legal.privacy.intro": "We take your privacy seriously. This policy describes what personal information we collect and how we use it.",
+  "legal.privacy.collection": "Information Collection: When you use our services, we may collect information such as your name, email address, and medication search history to provide a personalized experience.",
+  "legal.privacy.usage": "Data Usage: Your data is used strictly for clinical decision support and service improvement. We do not sell your personal health information to third-party advertisers.",
+  "legal.privacy.security": "Security: We implement industry-standard encryption and security protocols to protect your data from unauthorized access.",
+  "legal.privacy.rights": "Your Rights: You have the right to access, update, or delete your personal information at any time through your account settings.",
+  
+  "legal.terms.title": "Terms of Service",
+  "legal.terms.intro": "By accessing or using AnalyticsPill, you agree to be bound by these terms of service.",
+  "legal.terms.medical": "Informational Use Only: The content on this platform is for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.",
+  "legal.terms.accounts": "User Accounts: You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.",
+  "legal.terms.conduct": "Prohibited Conduct: You agree not to use the platform for any unlawful purpose or in any way that could damage, disable, or impair the service.",
+  "legal.terms.liability": "Limitation of Liability: AnalyticsPill shall not be liable for any indirect, incidental, or consequential damages arising out of your use of the platform.",
+  
+  "legal.disclaimer.title": "Medical Disclaimer",
+  "legal.disclaimer.intro": "NO MEDICAL ADVICE: The information provided on AnalyticsPill is for general informational purposes only and does not constitute professional medical advice.",
+  "legal.disclaimer.consult": "CONSULT YOUR DOCTOR: Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.",
+  "legal.disclaimer.disregard": "DO NOT DISREGARD ADVICE: Never disregard professional medical advice or delay in seeking it because of something you have read on this platform.",
+  "legal.disclaimer.reliance": "NO RELIANCE: Any reliance on the information provided on this platform is solely at your own risk.",
+  "legal.disclaimer.emergency": "NOT FOR EMERGENCIES: If you think you may have a medical emergency, call your doctor or emergency services immediately.",
 
   "home.trustTagline": "Trusted • Accurate • Up-to-date",
   "home.heroTitle": "Your trusted medical intelligence hub",
@@ -174,6 +195,8 @@ const enTranslations = {
   "drugsInfo.searchAria": "Drug search",
   "drugsInfo.fdaApproved": "FDA Approved",
   "drugsInfo.loading": "Loading...",
+  "common.backToHome": "Back to Home",
+  "common.loading": "Loading...",
   "drugsInfo.pagination": "Page {{current}} of {{total}}",
   "drugsInfo.filterByCategory": "Filter by category",
 
@@ -360,6 +383,7 @@ const enTranslations = {
   "landing.cta.description": "Join thousands of healthcare professionals and patients who trust our platform for medication safety and health information.",
   "landing.cta.primaryButton": "Create Free Account",
   "landing.cta.secondaryButton": "Explore Drugs",
+  "landing.status.comingSoon": "Coming Soon",
 
   // Account Pages
   "account.settings": "Account Settings",
@@ -493,9 +517,30 @@ const viTranslations: { [K in TranslationKey]: string } = {
   "footer.description":
     "Nguồn thông tin y khoa chính xác, cập nhật. Không thay thế cho tư vấn, chẩn đoán hay điều trị y khoa. Luôn hỏi ý kiến bác sĩ hoặc dược sĩ trước khi quyết định điều trị.",
   "footer.allRights": "Bảo lưu mọi quyền.",
-  "footer.address": "221B Health Avenue, Tầng 12, Boston, MA",
-  "footer.phone": "+1 (800) 555-1024",
-  "footer.email": "support@analyticspill.com",
+  "footer.phone": "+84 (0) 123 456 789",
+  "footer.email": "tmdt04k22@gmail.com",
+  "legal.lastUpdated": "Cập nhật lần cuối",
+
+  "legal.privacy.title": "Chính sách bảo mật",
+  "legal.privacy.intro": "AnalyticsPill cam kết bảo vệ quyền riêng tư của người dùng. Chính sách này giải thích rõ những thông tin chúng tôi thu thập, mục đích sử dụng và cách thức bảo vệ dữ liệu của bạn khi sử dụng nền tảng.",
+  "legal.privacy.collection": "Thu thập thông tin: Chúng tôi có thể thu thập một số thông tin cần thiết để cung cấp dịch vụ, bao gồm họ tên, địa chỉ email, lịch sử tra cứu thuốc và thông tin thiết bị. Dữ liệu này được thu thập trực tiếp từ bạn hoặc tự động thông qua quá trình sử dụng nền tảng.",
+  "legal.privacy.usage": "Sử dụng dữ liệu: Thông tin thu thập được sử dụng nhằm cá nhân hóa trải nghiệm, cải thiện chất lượng dịch vụ và hỗ trợ các quyết định lâm sàng. Chúng tôi không chia sẻ, cho thuê hoặc bán thông tin sức khỏe cá nhân của bạn cho bất kỳ bên thứ ba nào vì mục đích thương mại.",
+  "legal.privacy.security": "Bảo mật dữ liệu: Chúng tôi áp dụng các biện pháp kỹ thuật và tổ chức phù hợp để bảo vệ thông tin của bạn khỏi truy cập trái phép, mất mát hoặc tiết lộ ngoài ý muốn. Tuy nhiên, không có phương thức truyền dữ liệu nào qua Internet được đảm bảo an toàn tuyệt đối.",
+  "legal.privacy.rights": "Quyền của bạn: Bạn có quyền truy cập, chỉnh sửa hoặc yêu cầu xóa thông tin cá nhân của mình bất kỳ lúc nào thông qua trang cài đặt tài khoản. Nếu cần hỗ trợ thêm, vui lòng liên hệ chúng tôi qua địa chỉ email được cung cấp.",
+
+  "legal.terms.title": "Điều khoản dịch vụ",
+  "legal.terms.intro": "Bằng việc truy cập hoặc sử dụng AnalyticsPill, bạn xác nhận đã đọc, hiểu và đồng ý tuân thủ các điều khoản dưới đây. Nếu không đồng ý với bất kỳ điều khoản nào, vui lòng ngừng sử dụng nền tảng.",
+  "legal.terms.medical": "Mục đích thông tin: Toàn bộ nội dung trên AnalyticsPill được cung cấp nhằm mục đích tra cứu và tham khảo. Nội dung này không thay thế cho việc thăm khám, chẩn đoán hoặc điều trị bởi bác sĩ, dược sĩ hay chuyên gia y tế có chuyên môn.",
+  "legal.terms.accounts": "Tài khoản người dùng: Bạn có trách nhiệm bảo mật thông tin đăng nhập và chịu toàn bộ trách nhiệm đối với các hoạt động phát sinh dưới tài khoản của mình. Vui lòng thông báo ngay cho chúng tôi nếu phát hiện bất kỳ dấu hiệu truy cập trái phép nào.",
+  "legal.terms.conduct": "Hành vi bị nghiêm cấm: Người dùng không được sử dụng nền tảng vào các mục đích vi phạm pháp luật, gây tổn hại đến người khác, hoặc cố ý làm gián đoạn, xâm phạm hoạt động bình thường của hệ thống. Chúng tôi có quyền đình chỉ hoặc chấm dứt tài khoản trong trường hợp vi phạm.",
+  "legal.terms.liability": "Giới hạn trách nhiệm: Trong phạm vi tối đa cho phép của pháp luật, AnalyticsPill không chịu trách nhiệm đối với bất kỳ thiệt hại trực tiếp, gián tiếp hoặc hậu quả nào phát sinh từ việc sử dụng hoặc không thể sử dụng nền tảng, kể cả khi đã được thông báo về khả năng xảy ra thiệt hại đó.",
+
+  "legal.disclaimer.title": "Tuyên bố miễn trừ trách nhiệm y tế",
+  "legal.disclaimer.intro": "Không phải lời khuyên y tế: Thông tin trên AnalyticsPill được cung cấp thuần túy cho mục đích tra cứu và giáo dục sức khỏe. Nội dung này không phải là lời khuyên y tế chuyên nghiệp và không thể thay thế cho mối quan hệ giữa bệnh nhân và người hành nghề y.",
+  "legal.disclaimer.consult": "Tham khảo ý kiến chuyên gia: Trước khi bắt đầu, thay đổi hoặc ngừng bất kỳ phác đồ điều trị nào, hãy luôn trao đổi trực tiếp với bác sĩ, dược sĩ hoặc chuyên gia y tế có thẩm quyền. Mỗi người bệnh có tình trạng sức khỏe riêng biệt và cần được đánh giá cá nhân.",
+  "legal.disclaimer.disregard": "Không trì hoãn việc thăm khám: Không căn cứ vào thông tin trên nền tảng này để trì hoãn hoặc từ chối tìm kiếm chăm sóc y tế cần thiết. Nếu bạn đang gặp các triệu chứng đáng lo ngại, hãy liên hệ với cơ sở y tế ngay lập tức.",
+  "legal.disclaimer.reliance": "Giới hạn độ tin cậy: Mặc dù chúng tôi nỗ lực duy trì tính chính xác và cập nhật của thông tin, AnalyticsPill không đảm bảo rằng mọi nội dung đều hoàn toàn đầy đủ hoặc phù hợp với từng trường hợp cụ thể. Việc sử dụng thông tin từ nền tảng là hoàn toàn theo quyết định và trách nhiệm của bạn.",
+  "legal.disclaimer.emergency": "Trường hợp khẩn cấp: Nền tảng này không được thiết kế cho các tình huống y tế cấp cứu. Nếu bạn hoặc người thân đang trong tình trạng nguy hiểm đến tính mạng, hãy gọi ngay đường dây cấp cứu 115 hoặc đến cơ sở y tế gần nhất.",
 
   "home.trustTagline": "Tin cậy • Chính xác • Cập nhật",
   "home.heroTitle": "Trung tâm tri thức y khoa tin cậy",
@@ -608,6 +653,8 @@ const viTranslations: { [K in TranslationKey]: string } = {
   "drugsInfo.searchAria": "Tìm kiếm thuốc",
   "drugsInfo.fdaApproved": "Được FDA phê duyệt",
   "drugsInfo.loading": "Đang tải...",
+  "common.backToHome": "Về Trang Chủ",
+  "common.loading": "Đang tải...",
   "drugsInfo.pagination": "Trang {{current}} / {{total}}",
   "drugsInfo.filterByCategory": "Lọc theo danh mục",
 
@@ -882,6 +929,7 @@ const viTranslations: { [K in TranslationKey]: string } = {
   "account.avatar.error": "Không thể tải lên ảnh đại diện.",
   "account.avatar.invalidType": "Vui lòng chọn tệp hình ảnh",
   "account.avatar.fileTooLarge": "Kích thước tệp phải nhỏ hơn 5MB",
+  "landing.status.comingSoon": "Đang phát triển",
 };
 
 const translations: Record<Language, Record<TranslationKey, string>> = {
@@ -912,15 +960,15 @@ export function TranslationProvider({
 }) {
   const [language, setLanguage] = useState<Language>("vi");
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const stored = window.localStorage.getItem(
-      "app-language"
-    ) as Language | null;
-    if (stored === "en" || stored === "vi") {
-      setLanguage(stored);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (typeof window === "undefined") return;
+  //   const stored = window.localStorage.getItem(
+  //     "app-language"
+  //   ) as Language | null;
+  //   if (stored === "en" || stored === "vi") {
+  //     setLanguage(stored);
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
