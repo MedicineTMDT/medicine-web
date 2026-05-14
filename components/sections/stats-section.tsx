@@ -2,8 +2,7 @@
 
 import { useTranslation } from "@/components/i18n/translation-provider";
 import { useAnimeCounter, useAnimeStaggerOnScroll } from "@/lib/hooks/use-anime";
-import { FileCheck, Pill, ShieldCheck, Users } from "lucide-react";
-import { useRef } from "react";
+import { FileText, Pill, ShieldCheck } from "lucide-react";
 
 function StatItem({
   value,
@@ -46,7 +45,7 @@ function StatItem({
 
 const stats = [
   {
-    value: 8000,
+    value: 11000,
     labelKey: "landing.stats.drugs",
     icon: Pill,
   },
@@ -56,20 +55,14 @@ const stats = [
     icon: ShieldCheck,
   },
   {
-    value: 1000,
-    labelKey: "landing.stats.users",
-    icon: Users,
-  },
-  {
-    value: 1000,
-    labelKey: "landing.stats.prescriptions",
-    icon: FileCheck,
+    value: 110,
+    labelKey: "landing.stats.healthMinistryDocs",
+    icon: FileText,
   },
 ];
 
 export function StatsSection() {
   const { t } = useTranslation();
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const animatedRef = useAnimeStaggerOnScroll<HTMLDivElement>(
     ".stat-item",
@@ -106,7 +99,7 @@ export function StatsSection() {
           ref={(node) => {
             (animatedRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
           }}
-          className="grid gap-8 md:grid-cols-2 lg:grid-cols-4"
+          className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
         >
           {stats.map((stat, index) => (
             <div

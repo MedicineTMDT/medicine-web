@@ -5,6 +5,7 @@ import { fetchWithAuth } from "@/lib/fetch-with-auth";
 import type {
     DrugInteractionApiResponse,
     DrugInteractionListApiResponse,
+    DrugInteractionPagedApiResponse,
     MergedIngredientListApiResponse,
 } from "../types";
 
@@ -93,6 +94,25 @@ export async function searchInteractionsByIngredients(
   });
 
   return handleResponse<DrugInteractionListApiResponse>(response);
+}
+
+export async function getDrugInteractionsPaged(
+  page = 0,
+  size = 12
+): Promise<DrugInteractionPagedApiResponse> {
+  const params = new URLSearchParams({
+    page: String(page),
+    size: String(size),
+  });
+  const response = await fetchWithAuth(
+    `${API_BASE_URL}${API_ENDPOINTS.DRUG_INTERACTIONS.GET_BY_ID}?${params}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+
+  return handleResponse<DrugInteractionPagedApiResponse>(response);
 }
 
 // ============================================

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DrugSearchSelect } from "@/components/prescription/drug-search-select";
 import { PrescriptionListCard } from "@/components/prescription/prescription-list-card";
@@ -45,7 +45,6 @@ import {
   UsageLabels,
   useCreatePrescription,
   useReviewPrescription,
-  useScanPrescription,
   useSearchPrescriptionsByDate,
   useSearchPrescriptionsByName,
   type CreatePrescriptionFormValues,
@@ -60,7 +59,6 @@ import {
   Camera,
   CheckCircle2,
   Clock,
-  Edit2,
   Eye,
   FileText,
   Loader2,
@@ -69,9 +67,9 @@ import {
   Plus,
   ScanLine,
   Search,
-  Trash2,
+  Trash2
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 
 // Type for drug entry in the preview list
@@ -103,9 +101,11 @@ export function PrescriptionPageScreen() {
   const [patientScannedData, setPatientScannedData] = useState<CreatePrescriptionRequest | null>(null);
   const [patientScanError, setPatientScanError] = useState<string | null>(null);
   const [patientSuccessPrescriptionId, setPatientSuccessPrescriptionId] = useState<string | null>(null);
+  const [historyPage, setHistoryPage] = useState(0);
+  const [historyPageSize] = useState(20);
 
   // Create flow step state
-  const [createStep, setCreateStep] = useState<CreateStep>("method-select");
+  const [createStep, setCreateStep] = useState<CreateStep>("manual");
   const [scannedData, setScannedData] = useState<CreatePrescriptionRequest | null>(null);
   const [scanError, setScanError] = useState<string | null>(null);
   
@@ -142,7 +142,7 @@ export function PrescriptionPageScreen() {
     isLoading: nameSearchLoading,
   } = useSearchPrescriptionsByName(
     searchQuery || "",
-    { page: 0, size: 20 },
+    { page: historyPage, size: historyPageSize },
     isAuthenticated && !!searchQuery
   );
 
@@ -153,15 +153,30 @@ export function PrescriptionPageScreen() {
   } = useSearchPrescriptionsByDate(
     pastDate.toISOString().split('T')[0],
     futureDate.toISOString().split('T')[0],
-    { page: 0, size: 20 },
+    { page: historyPage, size: historyPageSize },
     isAuthenticated && !searchQuery
   );
 
+  const activePageData = searchQuery ? nameSearchResults : dateSearchResults;
   const prescriptions = searchQuery 
     ? nameSearchResults?.content || []
     : dateSearchResults?.content || [];
 
   const prescriptionsLoading = searchQuery ? nameSearchLoading : dateSearchLoading;
+  const totalPages = activePageData?.totalPages ?? 0;
+  const currentPage = activePageData?.number ?? historyPage;
+  const isFirstPage = activePageData?.first ?? historyPage === 0;
+  const isLastPage = activePageData?.last ?? totalPages <= 1;
+
+  useEffect(() => {
+    setHistoryPage(0);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (!prescriptionsLoading && totalPages > 0 && historyPage >= totalPages) {
+      setHistoryPage(totalPages - 1);
+    }
+  }, [historyPage, prescriptionsLoading, totalPages]);
 
   // Mutations
   const createMutation = useCreatePrescription();
@@ -190,7 +205,7 @@ export function PrescriptionPageScreen() {
       const prescription = (result as any).result || result;
       if ((prescription as any)?.id) {
         setSuccessPrescriptionId((prescription as any).id);
-        setCreateStep("method-select");
+        setCreateStep("manual");
         setScannedData(null);
       }
     } catch (err) {
@@ -199,7 +214,7 @@ export function PrescriptionPageScreen() {
   };
 
   const resetCreateFlow = () => {
-    setCreateStep("method-select");
+    setCreateStep("manual");
     setScannedData(null);
     setScanError(null);
     setDrugList([]);
@@ -285,8 +300,17 @@ export function PrescriptionPageScreen() {
     if (drugIds.length > 1) {
       try {
         const reviewResult = await reviewMutation.mutateAsync(drugIds);
-        if (reviewResult.result?.drugInteractionResponseList?.length > 0) {
-          setInteractions(reviewResult.result.drugInteractionResponseList);
+        const interactionList =
+          (reviewResult as any)?.result?.drugInteractionResponseList ??
+          (reviewResult as any)?.drugInteractionResponseList ??
+          [];
+
+        const matchedInteractions = interactionList.filter(
+          (interaction: DrugInteractionDetail) => interaction.matchedFromSelected !== false
+        );
+
+        if (matchedInteractions.length > 0) {
+          setInteractions(matchedInteractions);
           setShowInteractionModal(true);
           return;
         }
@@ -516,7 +540,7 @@ export function PrescriptionPageScreen() {
                     </div>
                     <div>
                       <p className="text-lg font-semibold text-secondary dark:text-white">
-                        Nhập thủ công
+                        Tạo đơn thuốc
                       </p>
                       <p className="mt-1 text-sm text-muted-foreground">
                         Tìm thuốc và nhập thông tin liều dùng từng bước
@@ -540,14 +564,6 @@ export function PrescriptionPageScreen() {
                   className="space-y-4"
                 >
                   <div className="flex items-center gap-3">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-full"
-                      onClick={() => setCreateStep("method-select")}
-                    >
-                      ← Quay lại
-                    </Button>
                     <h3 className="text-lg font-semibold text-secondary dark:text-white">
                       Quét ảnh đơn thuốc
                     </h3>
@@ -609,16 +625,8 @@ export function PrescriptionPageScreen() {
                   className="space-y-1"
                 >
                   <div className="flex items-center gap-3 mb-6">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="rounded-full"
-                      onClick={() => setCreateStep("method-select")}
-                    >
-                      ← Quay lại
-                    </Button>
                     <h3 className="text-lg font-semibold text-secondary dark:text-white">
-                      Nhập thủ công
+                      Tạo đơn thuốc
                     </h3>
                   </div>
 
@@ -1108,15 +1116,40 @@ export function PrescriptionPageScreen() {
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
             ) : prescriptions.length > 0 ? (
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {prescriptions.map((prescription, index) => (
-                  <PrescriptionListCard
-                    key={prescription.id}
-                    prescription={prescription}
-                    index={index}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {prescriptions.map((prescription, index) => (
+                    <PrescriptionListCard
+                      key={prescription.id}
+                      prescription={prescription}
+                      index={index}
+                    />
+                  ))}
+                </div>
+                {totalPages > 1 && (
+                  <div className="mt-6 flex items-center justify-center gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => setHistoryPage((prev) => Math.max(0, prev - 1))}
+                      disabled={prescriptionsLoading || isFirstPage}
+                      className="rounded-full"
+                    >
+                      Trước
+                    </Button>
+                    <span className="text-sm text-muted-foreground">
+                      Trang {currentPage + 1}/{Math.max(1, totalPages)}
+                    </span>
+                    <Button
+                      variant="outline"
+                      onClick={() => setHistoryPage((prev) => prev + 1)}
+                      disabled={prescriptionsLoading || isLastPage}
+                      className="rounded-full"
+                    >
+                      Sau
+                    </Button>
+                  </div>
+                )}
+              </>
             ) : (
               <Card className="mx-auto max-w-lg border-none bg-white/95 shadow-card dark:bg-secondary/70">
                 <CardContent className="py-12 text-center">
@@ -1245,6 +1278,7 @@ export function PrescriptionPageScreen() {
                     >
                       <PrescriptionScanPreview
                         scannedData={patientScannedData}
+                        showStorageNotice
                         onConfirm={async (editedData) => {
                           try {
                             const result = await createMutation.mutateAsync(editedData);
@@ -1290,15 +1324,40 @@ export function PrescriptionPageScreen() {
                   <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
               ) : prescriptions.length > 0 ? (
-                <div className="grid gap-6 md:grid-cols-2">
-                  {prescriptions.map((prescription, index) => (
-                    <PrescriptionListCard
-                      key={prescription.id}
-                      prescription={prescription}
-                      index={index}
-                    />
-                  ))}
-                </div>
+                <>
+                  <div className="grid gap-6 md:grid-cols-2">
+                    {prescriptions.map((prescription, index) => (
+                      <PrescriptionListCard
+                        key={prescription.id}
+                        prescription={prescription}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                  {totalPages > 1 && (
+                    <div className="mt-6 flex items-center justify-center gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={() => setHistoryPage((prev) => Math.max(0, prev - 1))}
+                        disabled={prescriptionsLoading || isFirstPage}
+                        className="rounded-full"
+                      >
+                        Trước
+                      </Button>
+                      <span className="text-sm text-muted-foreground">
+                        Trang {currentPage + 1}/{Math.max(1, totalPages)}
+                      </span>
+                      <Button
+                        variant="outline"
+                        onClick={() => setHistoryPage((prev) => prev + 1)}
+                        disabled={prescriptionsLoading || isLastPage}
+                        className="rounded-full"
+                      >
+                        Sau
+                      </Button>
+                    </div>
+                  )}
+                </>
               ) : (
                 <Card className="mx-auto max-w-lg border-none bg-white/95 shadow-card dark:bg-secondary/70">
                   <CardContent className="py-12 text-center">
@@ -1359,6 +1418,9 @@ export function PrescriptionPageScreen() {
                       <strong>Hậu quả:</strong> {interaction.hauQuaCuaTuongTac}
                     </p>
                     <p className="text-sm">
+                      <strong>Cơ chế:</strong> {interaction.coCheTuongTac}
+                    </p>
+                    <p className="text-sm">
                       <strong>Xử trí:</strong> {interaction.xuTriTuongTac}
                     </p>
                   </div>
@@ -1391,3 +1453,5 @@ export function PrescriptionPageScreen() {
     </div>
   );
 }
+
+

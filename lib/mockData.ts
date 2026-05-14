@@ -459,11 +459,15 @@ export const sectionContent: Record<string, SectionContent> = {
       { label: "footer.contact", href: "/contact" },
     ],
     isLegal: true,
-    lastUpdated: "2026-05-10",
+    lastUpdated: "2026-05-15",
     bodyContent: [
       "legal.privacy.collection",
+      "legal.privacy.prescriptionScanCollection",
       "legal.privacy.usage",
+      "legal.privacy.prescriptionScanUsage",
       "legal.privacy.security",
+      "legal.privacy.prescriptionScanRetention",
+      "legal.privacy.prescriptionScanSharing",
       "legal.privacy.rights"
     ]
   },

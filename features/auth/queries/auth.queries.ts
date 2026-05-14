@@ -8,6 +8,7 @@ import {
   introspect,
   getUserById,
   verifyEmail,
+  verifyForgotPassword,
 } from "../data-access/auth.api";
 import { tokenStorage } from "@/lib/token-storage";
 import type {
@@ -21,6 +22,8 @@ import type {
   UserApiResponse,
   VerifyEmailPayload,
   VerifyEmailApiResponse,
+  VerifyForgotPasswordPayload,
+  VerifyForgotPasswordApiResponse,
   ApiError,
 } from "../types";
 
@@ -126,3 +129,12 @@ export function useVerifyEmail() {
   });
 }
 
+export function useVerifyForgotPassword() {
+  return useMutation<
+    VerifyForgotPasswordApiResponse,
+    ApiError,
+    VerifyForgotPasswordPayload
+  >({
+    mutationFn: verifyForgotPassword,
+  });
+}

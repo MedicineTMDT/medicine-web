@@ -455,11 +455,11 @@ export function SignUpForm() {
             className="text-center text-xs text-white/40"
           >
             By creating an account, you agree to our{" "}
-            <Link href="/legal/terms" className="text-accent hover:underline">
+            <Link href="/terms-of-service" className="text-accent hover:underline">
               Terms
             </Link>{" "}
             and{" "}
-            <Link href="/legal/privacy" className="text-accent hover:underline">
+            <Link href="/privacy-policy" className="text-accent hover:underline">
               Privacy Policy
             </Link>
           </motion.p>

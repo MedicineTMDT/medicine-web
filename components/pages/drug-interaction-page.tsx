@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { IngredientSearch } from "@/components/drug-interaction/ingredient-search";
 import { InteractionCard } from "@/components/drug-interaction/interaction-card";
@@ -8,17 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
   normalizeSeverity,
+  useDrugInteractionsList,
   useSearchInteractions,
   type DrugInteraction,
-  type MergedIngredientResponse
+  type MergedIngredientResponse,
 } from "@/features/drug-interactions";
 import { getDrugIngredients, useDrugSuggestions } from "@/features/drugs";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { CheckCircle2, FlaskConical, Loader2, Pill, ShieldAlert } from "lucide-react";
+import { CheckCircle2, ChevronLeft, ChevronRight, FlaskConical, Loader2, Pill } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
-type SearchMode = "drug" | "ingredient";
+type SearchMode = "drug" | "ingredient" | "all";
 
 type Summary = {
   total: number;
@@ -26,32 +27,42 @@ type Summary = {
   conditional: number;
 };
 
+type SourceDrug = { id: string; label: string; imageUrl?: string };
+
+type InteractionResultViewModel = {
+  interaction: DrugInteraction;
+  ingredient1SourceDrugs?: SourceDrug[];
+  ingredient2SourceDrugs?: SourceDrug[];
+};
+
+function normalizeIngredientName(name: string): string {
+  return name.trim().toLowerCase();
+}
+
 export function DrugInteractionPageScreen() {
-  // Search mode state
   const [searchMode, setSearchMode] = useState<SearchMode>("drug");
-  
-  // Drug mode state
+  const [listPage, setListPage] = useState(0);
+  const listPageSize = 12;
+
   const [drugQuery, setDrugQuery] = useState("");
-  const [selectedDrugs, setSelectedDrugs] = useState<{ id: string; label: string; meta?: string }[]>([]);
-  
-  // Ingredient mode state
+  const [selectedDrugs, setSelectedDrugs] = useState<{ id: string; label: string; meta?: string; imageUrl?: string }[]>([]);
   const [selectedIngredients, setSelectedIngredients] = useState<MergedIngredientResponse[]>([]);
-  
-  // Results state
-  const [results, setResults] = useState<DrugInteraction[]>([]);
+
+  const [results, setResults] = useState<InteractionResultViewModel[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
-  
+
   const resultsRef = useRef<HTMLElement>(null);
   const { t } = useTranslation();
-  
-  // Drug suggestions query
+
   const { data: drugSuggestions, isLoading: isDrugLoading } = useDrugSuggestions(drugQuery);
-  
-  // Search interactions mutation
   const searchMutation = useSearchInteractions();
-  
-  // Format drug suggestions for MultiDrugSearch
+  const {
+    data: allInteractionsData,
+    isLoading: isAllInteractionsLoading,
+    isFetching: isAllInteractionsFetching,
+  } = useDrugInteractionsList(listPage, listPageSize, searchMode === "all");
+
   const formattedDrugSuggestions = useMemo(() => {
     if (!drugSuggestions?.result) return [];
     return drugSuggestions.result
@@ -60,22 +71,32 @@ export function DrugInteractionPageScreen() {
         id: String(drug.id),
         label: drug.name,
         meta: drug.slug,
+        imageUrl: drug.imageLink || undefined,
       }));
   }, [drugSuggestions, selectedDrugs]);
 
-  // Calculate summary
   const summary: Summary = useMemo(() => {
+    if (searchMode === "all") {
+      const list = allInteractionsData?.result?.content || [];
+      const base = { total: list.length, contraindicated: 0, conditional: 0 };
+      list.forEach((item) => {
+        const severity = normalizeSeverity(item.mucDoNghiemTrong);
+        if (severity === "contraindicated") base.contraindicated += 1;
+        else if (severity === "conditional") base.conditional += 1;
+      });
+      return base;
+    }
+
     const base = { total: results.length, contraindicated: 0, conditional: 0 };
     results.forEach((r) => {
-      const severity = normalizeSeverity(r.mucDoNghiemTrong);
+      const severity = normalizeSeverity(r.interaction.mucDoNghiemTrong);
       if (severity === "contraindicated") base.contraindicated += 1;
       else if (severity === "conditional") base.conditional += 1;
     });
     return base;
-  }, [results]);
+  }, [results, searchMode, allInteractionsData]);
 
-  // Drug mode handlers
-  const handleAddDrug = (item: { id: string; label: string; meta?: string }) => {
+  const handleAddDrug = (item: { id: string; label: string; meta?: string; imageUrl?: string }) => {
     if (selectedDrugs.length >= 10) return;
     setSelectedDrugs((prev) => [...prev, item]);
   };
@@ -84,7 +105,6 @@ export function DrugInteractionPageScreen() {
     setSelectedDrugs((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // Ingredient mode handlers
   const handleAddIngredient = (ingredient: MergedIngredientResponse) => {
     if (selectedIngredients.length >= 10) return;
     setSelectedIngredients((prev) => [...prev, ingredient]);
@@ -94,65 +114,111 @@ export function DrugInteractionPageScreen() {
     setSelectedIngredients((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // Run interaction check
   const runCheck = useCallback(async () => {
     setHasSearched(true);
-    
+
     let ingredientNames: string[] = [];
-    
+    let ingredientToDrugsMap = new Map<string, Map<string, SourceDrug>>();
+
     if (searchMode === "drug") {
-      // Extract ingredients from selected drugs
       setIsExtracting(true);
       try {
-        const ingredientPromises = selectedDrugs.map((drug) =>
-          getDrugIngredients(Number(drug.id))
-        );
+        const ingredientPromises = selectedDrugs.map((drug) => getDrugIngredients(Number(drug.id)));
         const ingredientResults = await Promise.all(ingredientPromises);
-        
-        // Collect all unique ingredient names
-        const allIngredients = new Set<string>();
-        ingredientResults.forEach((result) => {
-          if (result.result) {
-            result.result.forEach((ing) => allIngredients.add(ing));
-          }
+
+        const allIngredients = new Map<string, string>();
+        ingredientResults.forEach((result, idx) => {
+          const sourceDrug = selectedDrugs[idx];
+          if (!result.result) return;
+
+          result.result.forEach((ing) => {
+            const normalized = normalizeIngredientName(ing);
+            if (!normalized) return;
+
+            if (!allIngredients.has(normalized)) {
+              allIngredients.set(normalized, ing.trim());
+            }
+
+            if (!ingredientToDrugsMap.has(normalized)) {
+              ingredientToDrugsMap.set(normalized, new Map<string, SourceDrug>());
+            }
+
+            if (sourceDrug?.label) {
+              ingredientToDrugsMap.get(normalized)?.set(sourceDrug.id, {
+                id: sourceDrug.id,
+                label: sourceDrug.label,
+                imageUrl: sourceDrug.imageUrl,
+              });
+            }
+          });
         });
-        ingredientNames = Array.from(allIngredients);
+
+        ingredientNames = Array.from(allIngredients.values());
       } catch (error) {
         console.error("Error extracting ingredients:", error);
       } finally {
         setIsExtracting(false);
       }
-    } else {
-      // Use selected ingredients directly
+    } else if (searchMode === "ingredient") {
       ingredientNames = selectedIngredients.map((ing) => ing.name);
+      ingredientToDrugsMap = new Map<string, Map<string, SourceDrug>>();
     }
-    
+
     if (ingredientNames.length === 0) {
       setResults([]);
       return;
     }
-    
-    // Search for interactions
+
     try {
       const response = await searchMutation.mutateAsync(ingredientNames);
-      setResults(response.result || []);
+      const interactions = response.result || [];
+      const mappedResults: InteractionResultViewModel[] = interactions.map((interaction) => {
+        const ingredient1SourceDrugs = Array.from(
+          ingredientToDrugsMap.get(normalizeIngredientName(interaction.hoatChat1Name)) ?? []
+        ).map(([, drug]) => drug);
+
+        const ingredient2SourceDrugs = Array.from(
+          ingredientToDrugsMap.get(normalizeIngredientName(interaction.hoatChat2Name)) ?? []
+        ).map(([, drug]) => drug);
+
+        return {
+          interaction,
+          ingredient1SourceDrugs: ingredient1SourceDrugs.length > 0 ? ingredient1SourceDrugs : undefined,
+          ingredient2SourceDrugs: ingredient2SourceDrugs.length > 0 ? ingredient2SourceDrugs : undefined,
+        };
+      });
+
+      setResults(mappedResults);
     } catch (error) {
       console.error("Error searching interactions:", error);
       setResults([]);
     }
   }, [searchMode, selectedDrugs, selectedIngredients, searchMutation]);
-  
-  const isLoading = searchMutation.isPending || isExtracting;
-  const canCheck = searchMode === "drug" 
+
+  const checkerLoading = searchMutation.isPending || isExtracting;
+  const isLoading = searchMode === "all"
+    ? isAllInteractionsLoading
+    : checkerLoading;
+  const isPageFetching = searchMode === "all" ? isAllInteractionsFetching : false;
+
+  const canCheck = searchMode === "drug"
     ? selectedDrugs.length >= 1 && selectedDrugs.length <= 10
     : selectedIngredients.length >= 1 && selectedIngredients.length <= 10;
 
-  // Auto-scroll to results
   useEffect(() => {
-    if (hasSearched && !isLoading) {
+    if (searchMode !== "all" && hasSearched && !isLoading) {
       resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }
-  }, [hasSearched, isLoading]);
+  }, [hasSearched, isLoading, searchMode]);
+
+  useEffect(() => {
+    setResults([]);
+    setHasSearched(false);
+    if (searchMode === "all") {
+      setListPage(0);
+      setHasSearched(true);
+    }
+  }, [searchMode]);
 
   return (
     <div className="relative pb-24">
@@ -182,102 +248,142 @@ export function DrugInteractionPageScreen() {
             transition={{ duration: 0.45, delay: 0.08 }}
             className="mx-auto mt-10 w-full max-w-4xl space-y-4"
           >
-            {/* Search Mode Tabs */}
-            <div className="flex justify-center gap-2">
+            <div className="grid w-full max-w-md grid-cols-3 gap-2 sm:flex sm:max-w-none sm:justify-center">
               <button
                 type="button"
-                onClick={() => setSearchMode("drug")}
+                onClick={() => {
+                  setHasSearched(false);
+                  setSearchMode("drug");
+                }}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition border",
+                  "inline-flex min-h-[54px] items-center justify-center gap-1.5 rounded-2xl px-3 py-2 text-center text-xs font-semibold leading-tight transition border sm:min-h-0 sm:rounded-full sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm",
                   searchMode === "drug"
                     ? "bg-primary text-white shadow-lg border-primary"
                     : "bg-white/80 text-secondary/70 border-secondary/20 hover:bg-white hover:text-secondary dark:bg-white/10 dark:text-white/80 dark:border-white/20 dark:hover:bg-white/20"
                 )}
               >
                 <Pill className="h-4 w-4" aria-hidden />
-                Tra theo thuốc
+                <span className="whitespace-normal">Tra theo thuốc</span>
               </button>
               <button
                 type="button"
-                onClick={() => setSearchMode("ingredient")}
+                onClick={() => {
+                  setHasSearched(false);
+                  setSearchMode("ingredient");
+                }}
                 className={cn(
-                  "inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition border",
+                  "inline-flex min-h-[54px] items-center justify-center gap-1.5 rounded-2xl px-3 py-2 text-center text-xs font-semibold leading-tight transition border sm:min-h-0 sm:rounded-full sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm",
                   searchMode === "ingredient"
                     ? "bg-primary text-white shadow-lg border-primary"
                     : "bg-white/80 text-secondary/70 border-secondary/20 hover:bg-white hover:text-secondary dark:bg-white/10 dark:text-white/80 dark:border-white/20 dark:hover:bg-white/20"
                 )}
               >
                 <FlaskConical className="h-4 w-4" aria-hidden />
-                Tra theo hoạt chất
+                <span className="whitespace-normal">Tra theo hoạt chất</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setHasSearched(false);
+                  setSearchMode("all");
+                }}
+                className={cn(
+                  "inline-flex min-h-[54px] items-center justify-center gap-1.5 rounded-2xl px-3 py-2 text-center text-xs font-semibold leading-tight transition border sm:min-h-0 sm:rounded-full sm:gap-2 sm:px-5 sm:py-2.5 sm:text-sm",
+                  searchMode === "all"
+                    ? "bg-primary text-white shadow-lg border-primary"
+                    : "bg-white/80 text-secondary/70 border-secondary/20 hover:bg-white hover:text-secondary dark:bg-white/10 dark:text-white/80 dark:border-white/20 dark:hover:bg-white/20"
+                )}
+              >
+                <span className="whitespace-normal">Danh sách tương tác</span>
               </button>
             </div>
 
-            {/* Search Container */}
-            <div className="rounded-[2.25rem] border border-white/15 bg-white/60 p-6 shadow-xl backdrop-blur dark:border-white/10 dark:bg-white/5">
-              {searchMode === "drug" ? (
-                <MultiDrugSearch
-                  suggestions={formattedDrugSuggestions}
-                  loading={isDrugLoading}
-                  onQueryChange={setDrugQuery}
-                  onAdd={handleAddDrug}
-                  onRemove={handleRemoveDrug}
-                  selected={selectedDrugs}
-                />
-              ) : (
-                <IngredientSearch
-                  onSelect={handleAddIngredient}
-                  onRemove={handleRemoveIngredient}
-                  selected={selectedIngredients}
-                  disabled={isLoading}
-                />
-              )}
-            </div>
-            
-            <div className="flex flex-col items-center gap-3 text-center text-sm text-secondary/80 sm:flex-row sm:justify-between sm:text-left dark:text-white/80">
-              <p>
-                {searchMode === "drug"
-                  ? t("drugInteraction.selectPrompt", { values: { count: selectedDrugs.length } })
-                  : `Đã chọn ${selectedIngredients.length} hoạt chất`}
-              </p>
-              <Button
-                size="lg"
-                className="w-full rounded-full sm:w-auto"
-                disabled={!canCheck || isLoading}
-                onClick={runCheck}
-              >
-                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
-                {isExtracting ? "Đang trích xuất hoạt chất..." : t("drugInteraction.checkButton")}
-              </Button>
-            </div>
+            {searchMode === "all" ? null : (
+              <>
+                <div className="rounded-[2.25rem] border border-white/15 bg-white/60 p-6 shadow-xl backdrop-blur dark:border-white/10 dark:bg-white/5">
+                  {searchMode === "drug" ? (
+                    <MultiDrugSearch
+                      suggestions={formattedDrugSuggestions}
+                      loading={isDrugLoading}
+                      onQueryChange={setDrugQuery}
+                      onAdd={handleAddDrug}
+                      onRemove={handleRemoveDrug}
+                      selected={selectedDrugs}
+                    />
+                  ) : (
+                    <IngredientSearch
+                      onSelect={handleAddIngredient}
+                      onRemove={handleRemoveIngredient}
+                      selected={selectedIngredients}
+                      disabled={isLoading}
+                    />
+                  )}
+                </div>
+
+                <div className="flex flex-col items-center gap-3 text-center text-sm text-secondary/80 sm:flex-row sm:justify-between sm:text-left dark:text-white/80">
+                  <p>
+                    {searchMode === "drug"
+                      ? t("drugInteraction.selectPrompt", { values: { count: selectedDrugs.length } })
+                      : `Đã chọn ${selectedIngredients.length} hoạt chất`}
+                  </p>
+                  <Button
+                    size="lg"
+                    className="w-full rounded-full sm:w-auto"
+                    disabled={!canCheck || isLoading}
+                    onClick={runCheck}
+                  >
+                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden /> : null}
+                    {isExtracting ? "Đang trích xuất hoạt chất..." : t("drugInteraction.checkButton")}
+                  </Button>
+                </div>
+              </>
+            )}
           </motion.div>
         </div>
       </section>
 
       <section ref={resultsRef} className="container mt-12 space-y-6">
-        <div className="flex items-center gap-3">
-          <Separator className="flex-1 border-[var(--glass-border)] bg-[var(--glass-border)] dark:border-white/10 dark:bg-white/10" />
-          <span className="text-sm font-semibold uppercase tracking-[0.28em] text-secondary/70 dark:text-white/60">
-            {t("drugInteraction.results")}
-          </span>
-          <Separator className="flex-1 border-[var(--glass-border)] bg-[var(--glass-border)] dark:border-white/10 dark:bg-white/10" />
-        </div>
+        {searchMode !== "all" ? (
+          <div className="flex items-center gap-3">
+            <Separator className="flex-1 border-[var(--glass-border)] bg-[var(--glass-border)] dark:border-white/10 dark:bg-white/10" />
+            <span className="text-sm font-semibold uppercase tracking-[0.28em] text-secondary/70 dark:text-white/60">
+              {t("drugInteraction.results")}
+            </span>
+            <Separator className="flex-1 border-[var(--glass-border)] bg-[var(--glass-border)] dark:border-white/10 dark:bg-white/10" />
+          </div>
+        ) : null}
 
         <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex flex-wrap gap-2 text-xs font-semibold text-secondary/80 dark:text-white/70">
-            <SeverityBadge label="Chống chỉ định" count={summary.contraindicated} tone="contraindicated" />
-            <SeverityBadge label="CCĐ có điều kiện" count={summary.conditional} tone="conditional" />
-          </div>
-          {hasSearched ? (
-            <div className="sticky top-4 flex items-center gap-2 rounded-full border border-[var(--glass-border)] bg-[var(--glass-bg)] px-4 py-2 text-sm font-semibold text-secondary shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/5 dark:text-white">
-              <ShieldAlert className="h-4 w-4 text-primary" aria-hidden />
-              {t("drugInteraction.interactionsFound", { values: { count: summary.total } })}
+          {searchMode === "all" && (allInteractionsData?.result?.totalPages ?? 0) > 1 ? (
+            <div className="ml-auto flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setListPage((p) => Math.max(0, p - 1))}
+                disabled={!!allInteractionsData?.result?.first || isPageFetching}
+                className="rounded-full"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <span className="text-sm text-secondary/80 dark:text-white/80">
+                Trang {listPage + 1}/{Math.max(1, allInteractionsData?.result?.totalPages ?? 1)}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setListPage((p) => p + 1)}
+                disabled={!!allInteractionsData?.result?.last || isPageFetching}
+                className="rounded-full"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
             </div>
           ) : null}
         </div>
 
-        {!hasSearched ? (
+        {searchMode !== "all" && !hasSearched ? (
           <div className="rounded-2xl border border-dashed border-[var(--glass-border)] bg-[var(--glass-bg)] p-10 text-center text-muted-foreground dark:border-white/10 dark:bg-white/5">
-            {searchMode === "drug" 
+            {searchMode === "drug"
               ? t("drugInteraction.addDrugs")
               : "Thêm hoạt chất và nhấn kiểm tra để xem tương tác"}
           </div>
@@ -285,20 +391,65 @@ export function DrugInteractionPageScreen() {
           <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-10 text-center dark:border-white/10 dark:bg-white/5">
             <Loader2 className="h-6 w-6 animate-spin text-primary" aria-hidden />
             <p className="text-sm text-muted-foreground">
-              {isExtracting ? "Đang trích xuất hoạt chất từ thuốc..." : t("drugInteraction.checking")}
+              {searchMode !== "all" && isExtracting
+                ? "Đang trích xuất hoạt chất từ thuốc..."
+                : t("drugInteraction.checking")}
             </p>
           </div>
+        ) : searchMode === "all" ? (
+          (allInteractionsData?.result?.content?.length ?? 0) === 0 ? (
+            <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-10 text-center text-emerald-700 dark:border-white/10 dark:bg-white/5 dark:text-emerald-200">
+              <CheckCircle2 className="mx-auto mb-2 h-6 w-6" aria-hidden />
+              Không có tương tác ở trang hiện tại.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
+                {allInteractionsData?.result?.content?.map((interaction) => (
+                  <InteractionCard key={interaction.id} interaction={interaction} />
+                ))}
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                {(allInteractionsData?.result?.totalPages ?? 0) > 1 ? (
+                  <>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full"
+                      disabled={!!allInteractionsData?.result?.first || isPageFetching}
+                      onClick={() => setListPage((prev) => Math.max(0, prev - 1))}
+                    >
+                      <ChevronLeft className="mr-1 h-4 w-4" />
+                      Trang trước
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full"
+                      disabled={!!allInteractionsData?.result?.last || isPageFetching}
+                      onClick={() => setListPage((prev) => prev + 1)}
+                    >
+                      Trang sau
+                      <ChevronRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  </>
+                ) : null}
+              </div>
+            </div>
+          )
         ) : results.length === 0 ? (
           <div className="rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-10 text-center text-emerald-700 dark:border-white/10 dark:bg-white/5 dark:text-emerald-200">
             <CheckCircle2 className="mx-auto mb-2 h-6 w-6" aria-hidden />
             {t("drugInteraction.noInteractions")}
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {results.map((interaction) => (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-3">
+            {results.map(({ interaction, ingredient1SourceDrugs, ingredient2SourceDrugs }) => (
               <InteractionCard
                 key={interaction.id}
                 interaction={interaction}
+                ingredient1SourceDrugs={ingredient1SourceDrugs}
+                ingredient2SourceDrugs={ingredient2SourceDrugs}
               />
             ))}
           </div>
@@ -328,3 +479,4 @@ function SeverityBadge({
     </span>
   );
 }
+

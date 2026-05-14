@@ -70,6 +70,10 @@ const enTranslations = {
   "legal.privacy.usage": "Data Usage: Your data is used strictly for clinical decision support and service improvement. We do not sell your personal health information to third-party advertisers.",
   "legal.privacy.security": "Security: We implement industry-standard encryption and security protocols to protect your data from unauthorized access.",
   "legal.privacy.rights": "Your Rights: You have the right to access, update, or delete your personal information at any time through your account settings.",
+  "legal.privacy.prescriptionScanCollection": "Prescription Scan Data: If you scan or upload a prescription, we may collect the prescription image and extracted fields such as medication names, dosage, timing, diagnosis notes, and related metadata.",
+  "legal.privacy.prescriptionScanUsage": "Prescription Scan Usage: We use this data to save prescriptions to your account, show your history, and support medication safety features. We do not use scanned prescription data for advertising.",
+  "legal.privacy.prescriptionScanRetention": "Retention and Deletion: Prescription data is retained in your account to support ongoing access unless you delete it, request deletion, or your account is removed according to platform policy.",
+  "legal.privacy.prescriptionScanSharing": "Sharing: We do not sell your prescription data. We only share it when required for core service operations, legal obligations, or with your explicit direction.",
   
   "legal.terms.title": "Terms of Service",
   "legal.terms.intro": "By accessing or using AnalyticsPill, you agree to be bound by these terms of service.",
@@ -363,6 +367,7 @@ const enTranslations = {
   "landing.stats.description": "Our platform powers medication safety decisions across the healthcare spectrum.",
   "landing.stats.drugs": "Medications in Database",
   "landing.stats.interactions": "Interaction Checks",
+  "landing.stats.healthMinistryDocs": "Health Ministry Decision Documents",
   "landing.stats.users": "Active Users",
   "landing.stats.prescriptions": "Prescriptions Managed",
 
@@ -527,6 +532,10 @@ const viTranslations: { [K in TranslationKey]: string } = {
   "legal.privacy.usage": "Sử dụng dữ liệu: Thông tin thu thập được sử dụng nhằm cá nhân hóa trải nghiệm, cải thiện chất lượng dịch vụ và hỗ trợ các quyết định lâm sàng. Chúng tôi không chia sẻ, cho thuê hoặc bán thông tin sức khỏe cá nhân của bạn cho bất kỳ bên thứ ba nào vì mục đích thương mại.",
   "legal.privacy.security": "Bảo mật dữ liệu: Chúng tôi áp dụng các biện pháp kỹ thuật và tổ chức phù hợp để bảo vệ thông tin của bạn khỏi truy cập trái phép, mất mát hoặc tiết lộ ngoài ý muốn. Tuy nhiên, không có phương thức truyền dữ liệu nào qua Internet được đảm bảo an toàn tuyệt đối.",
   "legal.privacy.rights": "Quyền của bạn: Bạn có quyền truy cập, chỉnh sửa hoặc yêu cầu xóa thông tin cá nhân của mình bất kỳ lúc nào thông qua trang cài đặt tài khoản. Nếu cần hỗ trợ thêm, vui lòng liên hệ chúng tôi qua địa chỉ email được cung cấp.",
+  "legal.privacy.prescriptionScanCollection": "Dữ liệu quét đơn thuốc: Khi bạn chụp hoặc tải lên đơn thuốc, chúng tôi có thể thu thập ảnh đơn thuốc và các trường được trích xuất như tên thuốc, liều dùng, thời điểm sử dụng, ghi chú chẩn đoán và siêu dữ liệu liên quan.",
+  "legal.privacy.prescriptionScanUsage": "Mục đích sử dụng dữ liệu đơn thuốc: Dữ liệu này được dùng để lưu đơn thuốc vào tài khoản của bạn, hiển thị lịch sử, và hỗ trợ các tính năng an toàn thuốc. Chúng tôi không sử dụng dữ liệu đơn thuốc đã quét cho mục đích quảng cáo.",
+  "legal.privacy.prescriptionScanRetention": "Lưu trữ và xóa dữ liệu: Dữ liệu đơn thuốc được lưu trong tài khoản để phục vụ tra cứu liên tục, trừ khi bạn chủ động xóa, yêu cầu xóa, hoặc tài khoản bị xóa theo chính sách nền tảng.",
+  "legal.privacy.prescriptionScanSharing": "Chia sẻ dữ liệu: Chúng tôi không bán dữ liệu đơn thuốc của bạn. Chúng tôi chỉ chia sẻ khi cần thiết cho vận hành dịch vụ cốt lõi, theo yêu cầu pháp lý, hoặc theo chỉ định rõ ràng từ bạn.",
 
   "legal.terms.title": "Điều khoản dịch vụ",
   "legal.terms.intro": "Bằng việc truy cập hoặc sử dụng AnalyticsPill, bạn xác nhận đã đọc, hiểu và đồng ý tuân thủ các điều khoản dưới đây. Nếu không đồng ý với bất kỳ điều khoản nào, vui lòng ngừng sử dụng nền tảng.",
@@ -818,10 +827,11 @@ const viTranslations: { [K in TranslationKey]: string } = {
   "landing.services.guides.description": "Đọc các hướng dẫn từ chuyên gia về bệnh lý, điều trị và khuyến cáo lối sống.",
 
   // Landing Page - Stats Section
-  "landing.stats.title": "Được tin dùng bởi Chuyên gia Y tế",
+  "landing.stats.title": "Được các chuyên gia y tế tin dùng",
   "landing.stats.description": "Nền tảng của chúng tôi hỗ trợ quyết định an toàn thuốc trên toàn bộ hệ thống chăm sóc sức khỏe.",
   "landing.stats.drugs": "Thuốc trong cơ sở dữ liệu",
   "landing.stats.interactions": "Kiểm tra tương tác",
+  "landing.stats.healthMinistryDocs": "Tài liệu quyết định của Bộ Y tế",
   "landing.stats.users": "Người dùng hoạt động",
   "landing.stats.prescriptions": "Đơn thuốc được quản lý",
 
@@ -838,7 +848,7 @@ const viTranslations: { [K in TranslationKey]: string } = {
 
   // Landing Page - CTA Section
   "landing.cta.badge": "Bắt đầu ngay",
-  "landing.cta.title": "Sẵn sàng đưa ra Quyết định Thuốc Tốt hơn?",
+  "landing.cta.title": "Sẵn sàng đưa ra quyết định dùng thuốc tốt hơn?",
   "landing.cta.description": "Tham gia cùng hàng nghìn chuyên gia y tế và bệnh nhân tin tưởng nền tảng của chúng tôi về an toàn thuốc và thông tin sức khỏe.",
   "landing.cta.primaryButton": "Tạo tài khoản miễn phí",
   "landing.cta.secondaryButton": "Khám phá thuốc",

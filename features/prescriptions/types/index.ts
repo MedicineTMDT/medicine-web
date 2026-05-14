@@ -189,6 +189,7 @@ export interface DrugInteractionDetail {
   hauQuaCuaTuongTac: string;
   coCheTuongTac: string;
   xuTriTuongTac: string;
+  matchedFromSelected?: boolean;
 }
 
 export interface PrescriptionInfo {

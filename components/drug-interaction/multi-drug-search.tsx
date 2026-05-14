@@ -60,7 +60,17 @@ export function MultiDrugSearch({
               exit={{ opacity: 0, y: -6 }}
               className="inline-flex items-center gap-2 rounded-full border border-[var(--glass-border)] bg-white/80 px-3 py-1 text-sm font-semibold text-secondary shadow-sm backdrop-blur dark:border-white/10 dark:bg-white/10 dark:text-white/80"
               >
-                {item.label}
+                {item.imageUrl ? (
+                  <img
+                    src={item.imageUrl}
+                    alt={item.label}
+                    className="h-5 w-5 rounded-sm object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <span className="h-5 w-5 rounded-sm bg-muted/70" />
+                )}
+                <span>{item.label}</span>
                 <button
                   type="button"
                   aria-label={t("drugsInfo.removeItem", { values: { item: item.label } })}

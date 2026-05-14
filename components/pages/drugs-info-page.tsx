@@ -128,8 +128,11 @@ export function DrugsInfoPageScreen() {
   const categories = categoryData?.result?.content ?? [];
   
   const isLoading = searchMode === "drugs" 
-    ? (drugsLoading || drugsFetching)
-    : (categoriesLoading2 || categoriesFetching);
+    ? drugsLoading
+    : categoriesLoading2;
+  const isPageFetching = searchMode === "drugs"
+    ? drugsFetching
+    : categoriesFetching;
 
   const totalPages = searchMode === "drugs"
     ? drugsData?.result?.totalPages ?? 0
@@ -333,7 +336,7 @@ export function DrugsInfoPageScreen() {
                 variant="outline"
                 size="sm"
                 onClick={() => setPage((p) => Math.max(0, p - 1))}
-                disabled={isFirstPage || isLoading}
+                disabled={isFirstPage || isPageFetching}
                 className="rounded-full"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -347,7 +350,7 @@ export function DrugsInfoPageScreen() {
                 variant="outline"
                 size="sm"
                 onClick={() => setPage((p) => p + 1)}
-                disabled={isLastPage || isLoading}
+                disabled={isLastPage || isPageFetching}
                 className="rounded-full"
               >
                 <ChevronRight className="h-4 w-4" />
@@ -402,7 +405,7 @@ export function DrugsInfoPageScreen() {
               variant="outline"
               size="sm"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
-              disabled={isFirstPage || isLoading}
+              disabled={isFirstPage || isPageFetching}
               className="rounded-full"
             >
               <ChevronLeft className="mr-1 h-4 w-4" />
@@ -412,7 +415,7 @@ export function DrugsInfoPageScreen() {
               variant="outline"
               size="sm"
               onClick={() => setPage((p) => p + 1)}
-              disabled={isLastPage || isLoading}
+              disabled={isLastPage || isPageFetching}
               className="rounded-full"
             >
               {t("actions.next")}

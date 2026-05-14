@@ -12,6 +12,7 @@ export type DrugInfoSuggestion = {
   id: string;
   label: string;
   meta?: string;
+  imageUrl?: string;
 };
 
 type SearchBarProps = {
@@ -152,12 +153,24 @@ export function DrugInfoSearchBar({
                     highlight === index && "bg-primary/10 dark:bg-white/15"
                   )}
                 >
-                  <span className="font-semibold">{suggestion.label}</span>
-                  {suggestion.meta ? (
-                    <span className="text-xs text-muted-foreground">
-                      {suggestion.meta}
-                    </span>
-                  ) : null}
+                  {suggestion.imageUrl ? (
+                    <img
+                      src={suggestion.imageUrl}
+                      alt={suggestion.label}
+                      className="h-8 w-8 shrink-0 rounded-md object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className="h-8 w-8 shrink-0 rounded-md bg-muted/70" />
+                  )}
+                  <span className="min-w-0">
+                    <span className="block truncate font-semibold">{suggestion.label}</span>
+                    {suggestion.meta ? (
+                      <span className="block truncate text-xs text-muted-foreground">
+                        {suggestion.meta}
+                      </span>
+                    ) : null}
+                  </span>
                 </button>
               </li>
             ))}

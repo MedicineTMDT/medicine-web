@@ -23,12 +23,25 @@ export interface MergedIngredientResponse {
   name: string;
 }
 
+export interface DrugInteractionPageResponse {
+  content: DrugInteraction[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  numberOfElements: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
+
 // ============================================
 // API Response Types
 // ============================================
 
 export type DrugInteractionApiResponse = ApiResponse<DrugInteraction>;
 export type DrugInteractionListApiResponse = ApiResponse<DrugInteraction[]>;
+export type DrugInteractionPagedApiResponse = ApiResponse<DrugInteractionPageResponse>;
 export type MergedIngredientListApiResponse = MergedIngredientResponse[];
 
 // ============================================

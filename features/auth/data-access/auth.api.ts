@@ -11,7 +11,9 @@ import type {
   RegisterPayload,
   UserApiResponse,
   VerifyEmailApiResponse,
-  VerifyEmailPayload
+  VerifyEmailPayload,
+  VerifyForgotPasswordApiResponse,
+  VerifyForgotPasswordPayload,
 } from "../types";
 
 // ============================================
@@ -162,6 +164,33 @@ export async function verifyEmail(
   return handleResponse<VerifyEmailApiResponse>(response);
 }
 
+export async function verifyForgotPassword(
+  payload: VerifyForgotPasswordPayload
+): Promise<VerifyForgotPasswordApiResponse> {
+  const params = new URLSearchParams({
+    email: payload.email,
+    token: payload.token,
+  });
+
+  const response = await fetch(
+    `${API_BASE_URL}${API_ENDPOINTS.AUTH.VERIFY_FORGOT_PASSWORD}?${params}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  const data = await handleResponse<VerifyForgotPasswordApiResponse>(response);
+
+  if (data.result?.authenticated && data.result?.token) {
+    tokenStorage.setToken(data.result.token);
+  }
+
+  return data;
+}
+
 // ============================================
 // JWT Helper Functions
 // ============================================
@@ -307,5 +336,4 @@ export async function getMyInfo(): Promise<UserApiResponse> {
     return getUserByUsername(payload.sub);
   }
 }
-
 

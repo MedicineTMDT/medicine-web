@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Logo } from "@/components/logo";
 import { motion } from "framer-motion";
@@ -86,6 +86,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.5 }}
+              className="hidden sm:block"
             >
               <span className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-5 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white/80 backdrop-blur-sm">
                 Trusted by Healthcare Professionals
@@ -111,7 +112,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.5 }}
-              className="text-base text-white/70 sm:text-lg"
+              className="hidden text-base text-white/70 sm:block sm:text-lg"
             >
               Search meds, run interaction checks, and keep patient tools in one streamlined workspace.
             </motion.p>
@@ -122,7 +123,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.5 }}
-            className="flex flex-wrap items-center justify-center gap-3 lg:justify-start"
+            className="hidden flex-wrap items-center justify-center gap-3 sm:flex lg:justify-start"
           >
             {["Drug Monographs", "Interaction Alerts", "Clinical Tools"].map((feature, index) => (
               <motion.span
@@ -142,21 +143,21 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.5 }}
-            className="flex flex-wrap items-center justify-center gap-4 pt-4 text-sm text-white/50 lg:justify-start"
+            className="hidden flex-wrap items-center justify-center gap-4 pt-4 text-sm text-white/50 sm:flex lg:justify-start"
           >
-            <Link href="/legal/terms" className="transition hover:text-white/80">
+            <Link href="/terms-of-service" className="transition hover:text-white/80">
               Terms
             </Link>
-            <span className="text-white/30">•</span>
-            <Link href="/legal/privacy" className="transition hover:text-white/80">
+            <span className="text-white/30">&bull;</span>
+            <Link href="/privacy-policy" className="transition hover:text-white/80">
               Privacy
             </Link>
-            <span className="text-white/30">•</span>
-            <Link href="/legal/disclaimer" className="transition hover:text-white/80">
+            <span className="text-white/30">&bull;</span>
+            <Link href="/disclaimer" className="transition hover:text-white/80">
               Disclaimer
             </Link>
             <span className="hidden text-xs uppercase tracking-[0.2em] text-white/40 lg:block">
-              © {new Date().getFullYear()} AnalyticsPill
+              &copy; {new Date().getFullYear()} AnalyticsPill
             </span>
           </motion.div>
         </motion.div>
@@ -177,3 +178,4 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
     </div>
   );
 }
+

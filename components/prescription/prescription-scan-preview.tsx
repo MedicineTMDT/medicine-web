@@ -49,6 +49,7 @@ import {
   Image as ImageIcon,
   Info,
 } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 interface PrescriptionScanPreviewProps {
@@ -56,6 +57,7 @@ interface PrescriptionScanPreviewProps {
   onConfirm: (editedData: CreatePrescriptionRequest) => void;
   onRescan: () => void;
   isSubmitting?: boolean;
+  showStorageNotice?: boolean;
 }
 
 export function PrescriptionScanPreview({
@@ -63,6 +65,7 @@ export function PrescriptionScanPreview({
   onConfirm,
   onRescan,
   isSubmitting = false,
+  showStorageNotice = false,
 }: PrescriptionScanPreviewProps) {
   // Editable state — initialize from scanned data
   const [name, setName] = useState(scannedData.name ?? "");
@@ -475,6 +478,15 @@ export function PrescriptionScanPreview({
       </div>
 
       {/* Action Buttons */}
+      {showStorageNotice ? (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-secondary dark:border-primary/30 dark:bg-primary/10 dark:text-white/85">
+          Thông tin đơn thuốc của bạn sẽ được lưu vào tài khoản để tra cứu lại sau này. Xem thêm{" "}
+          <Link href="/privacy-policy" className="font-semibold text-primary hover:underline">
+            Chính sách quyền riêng tư
+          </Link>
+          .
+        </div>
+      ) : null}
       <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
         <Button
           type="button"

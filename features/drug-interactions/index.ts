@@ -3,6 +3,8 @@ export type {
     DrugInteraction,
     DrugInteractionApiResponse,
     DrugInteractionListApiResponse,
+    DrugInteractionPagedApiResponse,
+    DrugInteractionPageResponse,
     MergedIngredientListApiResponse,
     MergedIngredientResponse,
     SeverityLevel
@@ -12,6 +14,7 @@ export { normalizeSeverity } from "./types";
 
 // API
 export {
+    getDrugInteractionsPaged,
     getDrugInteractionById,
     searchInteractionsByIngredients,
     suggestIngredients
@@ -22,7 +25,7 @@ export {
     drugInteractionKeys,
     ingredientKeys,
     useDrugInteraction,
+    useDrugInteractionsList,
     useIngredientSuggestions,
     useSearchInteractions
 } from "./queries/drug-interactions.queries";
-

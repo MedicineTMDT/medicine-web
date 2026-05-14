@@ -1,8 +1,9 @@
 "use client";
 
 import type { ApiError } from "@/features/auth/types";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery } from "@tanstack/react-query";
 import {
+    getDrugInteractionsPaged,
     getDrugInteractionById,
     searchInteractionsByIngredients,
     suggestIngredients,
@@ -10,6 +11,7 @@ import {
 import type {
     DrugInteractionApiResponse,
     DrugInteractionListApiResponse,
+    DrugInteractionPagedApiResponse,
     MergedIngredientListApiResponse,
 } from "../types";
 
@@ -20,6 +22,8 @@ import type {
 export const drugInteractionKeys = {
   all: ["drugInteractions"] as const,
   detail: (id: number) => [...drugInteractionKeys.all, "detail", id] as const,
+  list: (page: number, size: number) =>
+    [...drugInteractionKeys.all, "list", page, size] as const,
   search: (ingredients: string[]) =>
     [...drugInteractionKeys.all, "search", ingredients] as const,
 } as const;
@@ -54,6 +58,16 @@ export function useSearchInteractions() {
   return useMutation<DrugInteractionListApiResponse, ApiError, string[]>({
     mutationFn: (ingredientNames: string[]) =>
       searchInteractionsByIngredients(ingredientNames),
+  });
+}
+
+export function useDrugInteractionsList(page: number, size: number, enabled = true) {
+  return useQuery<DrugInteractionPagedApiResponse, ApiError>({
+    queryKey: drugInteractionKeys.list(page, size),
+    queryFn: () => getDrugInteractionsPaged(page, size),
+    enabled,
+    placeholderData: keepPreviousData,
+    staleTime: 60 * 1000,
   });
 }
 

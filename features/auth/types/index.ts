@@ -77,6 +77,11 @@ export interface VerifyEmailPayload {
   token: string; // OTP code
 }
 
+export interface VerifyForgotPasswordPayload {
+  email: string;
+  token: string; // OTP code
+}
+
 // ============================================
 // Response Types (from backend)
 // ============================================
@@ -125,6 +130,7 @@ export type LogoutApiResponse = ApiResponse<object>;
 export type IntrospectApiResponse = ApiResponse<IntrospectResponse>;
 export type UserApiResponse = ApiResponse<UserResponse>;
 export type VerifyEmailApiResponse = ApiResponse<object>;
+export type VerifyForgotPasswordApiResponse = ApiResponse<AuthenticationResponse>;
 
 // ============================================
 // Error Types
@@ -146,4 +152,3 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
 }
-
