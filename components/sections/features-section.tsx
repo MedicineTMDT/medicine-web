@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslation } from "@/components/i18n/translation-provider";
+import { Badge } from "@/components/ui/badge";
 import { useAnimeStaggerOnScroll } from "@/lib/hooks/use-anime";
 import {
     BookOpen,
@@ -32,16 +33,19 @@ const features = [
     icon: Pill,
     titleKey: "landing.features.pillIdentifier.title",
     descKey: "landing.features.pillIdentifier.description",
+    isComingSoon: true,
   },
   {
     icon: BookOpen,
     titleKey: "landing.features.healthInfo.title",
     descKey: "landing.features.healthInfo.description",
+    isComingSoon: true,
   },
   {
     icon: Calculator,
     titleKey: "landing.features.clinicalTools.title",
     descKey: "landing.features.clinicalTools.description",
+    isComingSoon: true,
   },
 ];
 
@@ -93,8 +97,16 @@ export function FeaturesSection() {
             return (
               <div
                 key={index}
-                className="feature-card group relative p-8 rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-sm transition-all duration-300 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 dark:border-white/10 dark:bg-white/5 dark:hover:border-primary/50"
+                className={`feature-card group relative p-8 rounded-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-sm transition-all duration-300 dark:border-white/10 dark:bg-white/5 ${feature.isComingSoon ? "opacity-75 grayscale-[0.3]" : "hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 dark:hover:border-primary/50"}`}
               >
+                {feature.isComingSoon && (
+                  <div className="absolute top-6 right-6 z-10">
+                    <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/30 text-[10px] py-0.5 px-2.5 font-bold uppercase tracking-wider backdrop-blur-md">
+                      {t("landing.status.comingSoon")}
+                    </Badge>
+                  </div>
+                )}
+
                 {/* Icon container */}
                 <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 text-primary transition-transform group-hover:scale-110 dark:from-primary/30 dark:to-primary/10">
                   <Icon className="h-7 w-7" aria-hidden />
