@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { ArrowUp, Paperclip } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ChatInputProps {
@@ -61,14 +61,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled }) =>
         />
 
         <div className="flex items-center justify-between px-4 pb-3">
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-all"
-              title="Đính kèm tài liệu"
-            >
-              <Paperclip className="w-5 h-5" />
-            </button>
+          <div className="flex items-center">
             <div className={cn(
               "text-[10px] font-medium transition-opacity ml-2",
               value.length > MAX_CHARS * 0.9 ? "text-destructive" : "text-muted-foreground/50",
@@ -102,3 +95,4 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled }) =>
 
 
 export default ChatInput;
+
