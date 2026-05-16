@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { DrugSimpleResponse } from "@/features/drugs";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 type DrugSearchCardProps = {
@@ -15,9 +14,10 @@ type DrugSearchCardProps = {
 };
 
 export function DrugSearchCard({ drug, href, index = 0 }: DrugSearchCardProps) {
-  const fallbackImage =
-    "https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&w=900&q=80";
-  const imageSrc = drug.imageLink || fallbackImage;
+  const imageSrc =
+    typeof drug.imageLink === "string" && drug.imageLink.trim().length > 0
+      ? drug.imageLink
+      : "";
   const { t } = useTranslation();
 
   return (
@@ -29,13 +29,16 @@ export function DrugSearchCard({ drug, href, index = 0 }: DrugSearchCardProps) {
     >
       <Card className="group h-full border-none bg-white/95 shadow-card ring-1 ring-border/25 backdrop-blur-sm transition hover:-translate-y-1 hover:ring-primary/40 dark:bg-secondary/70">
         <div className="relative h-40 overflow-hidden rounded-t-3xl">
-          <Image
-            src={imageSrc}
-            alt={drug.name}
-            fill
-            className="object-cover transition duration-500 group-hover:scale-105"
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
+          {imageSrc ? (
+            <img
+              src={imageSrc}
+              alt={drug.name}
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+              loading="lazy"
+            />
+          ) : (
+            <span className="block h-full w-full bg-muted/70" />
+          )}
           <div className="absolute inset-0 bg-gradient-to-t from-secondary/70 via-secondary/30 to-transparent" />
         </div>
         <CardHeader className="space-y-3">

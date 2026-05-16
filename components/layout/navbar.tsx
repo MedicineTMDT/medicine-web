@@ -44,7 +44,7 @@ export function Navbar() {
           <Logo />
 
           {/* Desktop Centered Navigation */}
-          <div className="hidden absolute left-1/2 -translate-x-1/2 items-center gap-8 lg:gap-10 md:flex">
+          <div className="hidden absolute left-1/2 -translate-x-1/2 items-center gap-8 lg:gap-10 xl:flex">
             {NAV_LINKS.map((link) => {
               const isActive =
                 link.href === "/"
@@ -73,7 +73,7 @@ export function Navbar() {
           </div>
 
           {/* Desktop Right Actions */}
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-2 xl:flex">
             <ThemeToggle />
             {/* <LanguageToggle /> */}
             {isAuthenticated ? (
@@ -135,7 +135,7 @@ export function Navbar() {
             )}
           </div>
 
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-2 xl:hidden">
             <ThemeToggle />
             <Button
               variant="ghost"
@@ -156,7 +156,7 @@ export function Navbar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.25, ease: "easeOut" }}
-              className="md:hidden"
+              className="xl:hidden"
             >
               <div className="space-y-4 px-4 pb-4">
                 <div className="flex flex-col gap-3">

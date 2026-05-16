@@ -120,6 +120,7 @@ export function DrugsInfoPageScreen() {
       id: drug.id.toString(),
       label: drug.name,
       meta: drug.slug,
+      imageUrl: drug.imageLink || undefined,
     }));
   }, [suggestionsData, searchMode]);
 
