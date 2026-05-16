@@ -71,7 +71,7 @@ const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full min-h-0 flex-col">
       <div className="p-4">
         <button
           onClick={() => {
@@ -99,7 +99,7 @@ const ConversationSidebar: React.FC<ConversationSidebarProps> = ({
         </button>
       </div>
 
-      <div className="custom-scrollbar flex-1 space-y-2 overflow-y-auto px-4 pb-4">
+      <div className="custom-scrollbar min-h-0 flex-1 space-y-2 overflow-y-auto px-4 pb-4">
         <div className="mb-2 px-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
           Lịch sử trò chuyện
         </div>

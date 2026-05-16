@@ -89,6 +89,11 @@ interface DrugEntry {
 // Step type for create flow
 type CreateStep = "method-select" | "scan" | "scan-preview" | "manual";
 
+const PATIENT_EMAIL_CONFIRMATION_TEXT =
+  "Nếu có email, hệ thống sẽ gửi thông báo để bệnh nhân xác nhận đơn thuốc.";
+const CALENDAR_OWNERSHIP_NOTE_TEXT =
+  "Lịch Google Calendar sẽ được tạo trên tài khoản của bạn.";
+
 export function PrescriptionPageScreen() {
   const { user, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
@@ -610,6 +615,9 @@ export function PrescriptionPageScreen() {
                     onConfirm={handleScanConfirm}
                     onRescan={handleRescan}
                     isSubmitting={createMutation.isPending}
+                    patientEmailHelperText={PATIENT_EMAIL_CONFIRMATION_TEXT}
+                    calendarOwnershipNote={CALENDAR_OWNERSHIP_NOTE_TEXT}
+                    showCalendarOwnershipNote={false}
                   />
                 </motion.div>
               )}
@@ -721,7 +729,7 @@ export function PrescriptionPageScreen() {
                               />
                             </FormControl>
                             <FormDescription className="text-xs">
-                              Nếu có email, hệ thống sẽ gửi thông báo để bệnh nhân xác nhận đơn thuốc.
+                              {PATIENT_EMAIL_CONFIRMATION_TEXT}
                             </FormDescription>
                             <FormMessage />
                           </FormItem>
@@ -1279,6 +1287,9 @@ export function PrescriptionPageScreen() {
                       <PrescriptionScanPreview
                         scannedData={patientScannedData}
                         showStorageNotice
+                        showPatientEmailInput={false}
+                        showCalendarOwnershipNote
+                        calendarOwnershipNote={CALENDAR_OWNERSHIP_NOTE_TEXT}
                         onConfirm={async (editedData) => {
                           try {
                             const result = await createMutation.mutateAsync(editedData);

@@ -31,6 +31,7 @@ import {
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion } from "framer-motion";
+import { sanitizeAiAnalysis } from "@/lib/utils";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -58,6 +59,10 @@ interface PrescriptionScanPreviewProps {
   onRescan: () => void;
   isSubmitting?: boolean;
   showStorageNotice?: boolean;
+  showPatientEmailInput?: boolean;
+  patientEmailHelperText?: string;
+  calendarOwnershipNote?: string;
+  showCalendarOwnershipNote?: boolean;
 }
 
 export function PrescriptionScanPreview({
@@ -66,6 +71,10 @@ export function PrescriptionScanPreview({
   onRescan,
   isSubmitting = false,
   showStorageNotice = false,
+  showPatientEmailInput = true,
+  patientEmailHelperText = "Hệ thống sẽ gửi email xác nhận nếu có địa chỉ.",
+  calendarOwnershipNote = "Lịch Google Calendar sẽ được tạo trên tài khoản của bạn.",
+  showCalendarOwnershipNote = false,
 }: PrescriptionScanPreviewProps) {
   // Editable state — initialize from scanned data
   const [name, setName] = useState(scannedData.name ?? "");
@@ -76,7 +85,7 @@ export function PrescriptionScanPreview({
   const [diagnosisNote, setDiagnosisNote] = useState(scannedData.diagnosisNote ?? "");
   const [message, setMessage] = useState(scannedData.message ?? "");
   const [aiAnalysis, setAiAnalysis] = useState<string | null>(
-    (scannedData.info?.ai_analysis as string) ?? null
+    sanitizeAiAnalysis((scannedData.info?.ai_analysis as string) ?? null) || null
   );
   const [isUseful, setIsUseful] = useState<boolean | null>(null);
   const [patientEmailAddress, setPatientEmailAddress] = useState(
@@ -104,7 +113,7 @@ export function PrescriptionScanPreview({
         diagnosisNote,
         intakes
       });
-      setAiAnalysis(result.answer);
+      setAiAnalysis(sanitizeAiAnalysis(result.answer) || null);
       setIsUseful(result.is_useful);
     } catch (error) {
       console.error("Analysis failed", error);
@@ -129,11 +138,11 @@ export function PrescriptionScanPreview({
       startDate,
       diagnosisNote,
       message,
-      patientEmailAddress,
+      patientEmailAddress: showPatientEmailInput ? patientEmailAddress : "",
       intakes,
       info: {
         ...scannedData.info,
-        ai_analysis: aiAnalysis,
+        ai_analysis: sanitizeAiAnalysis(aiAnalysis),
       },
     });
   };
@@ -283,23 +292,30 @@ export function PrescriptionScanPreview({
             />
           </div>
 
-          <div>
-            <label className="text-sm font-medium flex items-center gap-1">
-              <User className="h-3.5 w-3.5" />
-              Email bệnh nhân{" "}
-              <span className="ml-1 text-muted-foreground font-normal">(không bắt buộc)</span>
-            </label>
-            <Input
-              type="email"
-              value={patientEmailAddress}
-              onChange={(e) => setPatientEmailAddress(e.target.value)}
-              placeholder="patient@example.com"
-              className="mt-1"
-            />
+          {showPatientEmailInput ? (
+            <div>
+              <label className="text-sm font-medium flex items-center gap-1">
+                <User className="h-3.5 w-3.5" />
+                Email bệnh nhân{" "}
+                <span className="ml-1 text-muted-foreground font-normal">(không bắt buộc)</span>
+              </label>
+              <Input
+                type="email"
+                value={patientEmailAddress}
+                onChange={(e) => setPatientEmailAddress(e.target.value)}
+                placeholder="patient@example.com"
+                className="mt-1"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                {patientEmailHelperText}
+              </p>
+            </div>
+          ) : null}
+          {showCalendarOwnershipNote ? (
             <p className="mt-1 text-xs text-muted-foreground">
-              Hệ thống sẽ gửi email xác nhận nếu có địa chỉ.
+              {calendarOwnershipNote}
             </p>
-          </div>
+          ) : null}
         </CardContent>
       </Card>
 

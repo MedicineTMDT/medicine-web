@@ -15,7 +15,7 @@ import {
   useAnalyzePrescription,
   useUpdatePrescriptionMessage
 } from "@/features/prescriptions";
-import { cn } from "@/lib/utils";
+import { cn, sanitizeAiAnalysis } from "@/lib/utils";
 import { motion } from "framer-motion";
 import {
   Calendar as CalendarIcon,
@@ -60,7 +60,7 @@ export default function PrescriptionDetailPage() {
 
   useEffect(() => {
     if (prescription?.info?.ai_analysis) {
-      setAiAnalysis(prescription.info.ai_analysis as string);
+      setAiAnalysis(sanitizeAiAnalysis(prescription.info.ai_analysis as string) || null);
     }
   }, [prescription?.info?.ai_analysis]);
 
@@ -547,7 +547,7 @@ export default function PrescriptionDetailPage() {
                               setIsAnalyzing(true);
                               try {
                                 const res = await analyzeMutation.mutateAsync(prescription);
-                                setAiAnalysis(res.answer);
+                                setAiAnalysis(sanitizeAiAnalysis(res.answer) || null);
                                 setIsUseful(res.is_useful);
                               } catch (e) {}
                               setIsAnalyzing(false);
@@ -570,18 +570,18 @@ export default function PrescriptionDetailPage() {
                           <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 text-sm text-secondary dark:text-white leading-relaxed shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-strong:text-primary">
                           {aiAnalysis || prescription?.info?.ai_analysis ? (
                             <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {(aiAnalysis || prescription?.info?.ai_analysis) as string}
+                              {sanitizeAiAnalysis((aiAnalysis || prescription?.info?.ai_analysis) as string)}
                             </ReactMarkdown>
                           ) : (
                             <span className="text-muted-foreground">Chưa có phân tích AI cho đơn thuốc này.</span>
                           )}
                           </div>
                         </div>
-                        {aiAnalysis && aiAnalysis !== prescription?.info?.ai_analysis && (
+                        {aiAnalysis && aiAnalysis !== sanitizeAiAnalysis((prescription?.info?.ai_analysis as string) || "") && (
                           <Button
                             size="sm"
                             className="w-full mt-2 rounded-xl gap-2"
-                            onClick={() => updateMessageMutation.mutate({ id: prescriptionId, message: aiAnalysis })}
+                            onClick={() => updateMessageMutation.mutate({ id: prescriptionId, message: sanitizeAiAnalysis(aiAnalysis) })}
                             disabled={updateMessageMutation.isPending}
                           >
                             <Save className="h-4 w-4" />
@@ -606,7 +606,7 @@ export default function PrescriptionDetailPage() {
                           setIsAnalyzing(true);
                           try {
                             const res = await analyzeMutation.mutateAsync(prescription);
-                            setAiAnalysis(res.answer);
+                            setAiAnalysis(sanitizeAiAnalysis(res.answer) || null);
                             setIsUseful(res.is_useful);
                           } catch (e) {}
                           setIsAnalyzing(false);
@@ -621,13 +621,13 @@ export default function PrescriptionDetailPage() {
                         <div className="mt-6">
                            <div className="rounded-xl border border-primary/10 bg-primary/5 p-4 text-sm text-secondary dark:text-white leading-relaxed shadow-sm prose prose-sm max-w-none dark:prose-invert prose-p:my-1 prose-ul:my-1 prose-li:my-0 prose-strong:text-primary">
                               <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                {aiAnalysis}
+                                {sanitizeAiAnalysis(aiAnalysis)}
                               </ReactMarkdown>
                            </div>
                            <Button
                               variant="outline"
                               className="w-full mt-4 rounded-xl gap-2 border-primary/30 text-primary hover:bg-primary/5"
-                              onClick={() => updateMessageMutation.mutate({ id: prescriptionId, message: aiAnalysis })}
+                              onClick={() => updateMessageMutation.mutate({ id: prescriptionId, message: sanitizeAiAnalysis(aiAnalysis) })}
                               disabled={updateMessageMutation.isPending}
                            >
                               <Save className="h-4 w-4" />

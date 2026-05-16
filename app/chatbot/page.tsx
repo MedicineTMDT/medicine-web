@@ -61,14 +61,14 @@ export default function ChatbotPage() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden">
       <div className="shrink-0 px-4 pb-0 pt-3">
         <DisclaimerBanner />
       </div>
 
       <div
         className={cn(
-          "relative flex flex-1 overflow-hidden px-4 py-3 transition-all duration-300 ease-in-out",
+          "relative flex min-h-0 flex-1 overflow-hidden px-4 py-3 transition-all duration-300 ease-in-out",
           isSidebarOpen ? "gap-0 lg:gap-3" : "gap-0"
         )}
       >
@@ -81,12 +81,12 @@ export default function ChatbotPage() {
 
         <aside
           className={cn(
-            "absolute inset-y-3 left-4 z-40 h-[calc(100%-1.5rem)] shrink-0 overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 ease-in-out",
-            "lg:relative lg:inset-auto lg:z-auto lg:h-auto",
+            "absolute inset-y-3 left-4 z-40 flex h-[calc(100%-1.5rem)] shrink-0 flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-300 ease-in-out",
+            "lg:relative lg:inset-auto lg:z-auto lg:h-auto lg:min-h-0",
             isSidebarOpen ? "w-72 opacity-100" : "pointer-events-none w-0 border-none opacity-0"
           )}
         >
-          <div className="flex-1 overflow-hidden">
+          <div className="h-full min-h-0 flex-1 overflow-hidden">
             <ConversationSidebar
               userId={user?.id}
               activeId={activeConversationId}
