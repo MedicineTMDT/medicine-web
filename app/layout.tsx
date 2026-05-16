@@ -22,6 +22,11 @@ const beVietnamPro = Be_Vietnam_Pro({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://analyticspill.example.com"),
+  icons: {
+    icon: "/MedLogo.svg",
+    shortcut: "/MedLogo.svg",
+    apple: "/MedLogo.svg",
+  },
   title: {
     default: "AnalyticsPill | Trusted Medical Information",
     template: "%s | AnalyticsPill",
