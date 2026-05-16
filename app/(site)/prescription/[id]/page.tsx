@@ -77,7 +77,7 @@ export default function PrescriptionDetailPage() {
 
   if (error || !prescription) {
     return (
-      <div className="container py-12">
+      <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6">
         <Card className="mx-auto max-w-lg border-destructive/50 bg-destructive/5">
           <CardContent className="py-8 text-center">
             <FileText className="mx-auto mb-4 h-12 w-12 text-destructive" />
@@ -123,18 +123,18 @@ export default function PrescriptionDetailPage() {
   })();
 
   return (
-    <div className="relative pb-24">
+    <div className="relative overflow-x-hidden pb-24">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#04121f]/85 via-[#0a2542]/90 to-[#071b2f]" />
-        <div className="container relative flex flex-col items-center gap-6 py-12 text-center text-secondary dark:text-white">
+        <div className="mx-auto flex w-full max-w-7xl flex-col items-center gap-6 px-4 py-12 text-center text-secondary sm:px-6 dark:text-white">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45 }}
             className="mx-auto max-w-2xl space-y-4"
           >
-            <p className="inline-flex items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/80 px-5 py-1 text-xs font-semibold uppercase tracking-[0.35em] text-secondary dark:border-white/20 dark:bg-white/10 dark:text-white">
+            <p className="inline-flex max-w-full items-center justify-center rounded-full border border-[var(--glass-border)] bg-white/80 px-4 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-secondary sm:px-5 sm:text-xs sm:tracking-[0.35em] dark:border-white/20 dark:bg-white/10 dark:text-white">
               Chi tiết đơn thuốc
             </p>
             <h1 className="text-3xl font-heading font-semibold leading-tight text-secondary dark:text-white md:text-4xl">
@@ -149,7 +149,7 @@ export default function PrescriptionDetailPage() {
         </div>
       </section>
 
-      <section className="container mt-8 space-y-8">
+      <section className="mx-auto mt-8 w-full max-w-7xl space-y-8 px-4 sm:px-6">
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           {/* Main Content */}
           <div className="space-y-6">
@@ -210,17 +210,17 @@ export default function PrescriptionDetailPage() {
 
             {/* Intake Schedule */}
             <Card className="border-none bg-white/95 shadow-card ring-1 ring-border/15 backdrop-blur-sm dark:bg-secondary/70">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+              <CardHeader className="flex flex-col items-start gap-3 pb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-0">
                 <CardTitle className="flex items-center gap-2 text-xl text-secondary dark:text-white">
                   <Clock className="h-5 w-5" />
                   Lịch uống thuốc
                 </CardTitle>
-                <div className="flex items-center gap-1 rounded-lg border border-[var(--glass-border)] bg-muted/30 p-1 dark:border-white/10">
+                <div className="flex w-full items-center gap-1 rounded-lg border border-[var(--glass-border)] bg-muted/30 p-1 sm:w-auto dark:border-white/10">
                   <Button
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "h-8 gap-2 rounded-md px-3 text-xs transition-all",
+                      "h-8 flex-1 gap-2 rounded-md px-3 text-xs transition-all sm:flex-none",
                       viewMode === "calendar"
                         ? "bg-white text-secondary shadow-sm dark:bg-white/10 dark:text-white"
                         : "text-muted-foreground hover:text-secondary dark:hover:text-white"
@@ -234,7 +234,7 @@ export default function PrescriptionDetailPage() {
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "h-8 gap-2 rounded-md px-3 text-xs transition-all",
+                      "h-8 flex-1 gap-2 rounded-md px-3 text-xs transition-all sm:flex-none",
                       viewMode === "list"
                         ? "bg-white text-secondary shadow-sm dark:bg-white/10 dark:text-white"
                         : "text-muted-foreground hover:text-secondary dark:hover:text-white"
@@ -260,7 +260,7 @@ export default function PrescriptionDetailPage() {
                       
                       {/* Selected Date Details */}
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                           <h3 className="text-sm font-semibold text-secondary dark:text-white">
                             Chi tiết ngày {selectedDateKey}
                           </h3>
@@ -291,8 +291,8 @@ export default function PrescriptionDetailPage() {
                                       : "border-[var(--glass-border)] bg-[var(--glass-bg)] dark:border-white/10 dark:bg-white/5"
                                   )}
                                 >
-                                  <div className="flex items-start justify-between mb-3">
-                                    <div className="flex items-center gap-3">
+                                  <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                    <div className="flex min-w-0 items-center gap-3">
                                       {intake.status ? (
                                         <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                                       ) : (
@@ -333,7 +333,7 @@ export default function PrescriptionDetailPage() {
                                     )}
                                   </div>
                                   
-                                  <div className="space-y-2 ml-8">
+                                  <div className="space-y-2 ml-0 sm:ml-8">
                                     {intake.info.map((drug: any, idx: number) => (
                                       <div
                                         key={idx}
@@ -345,9 +345,9 @@ export default function PrescriptionDetailPage() {
                                             <p className="font-medium text-secondary dark:text-white">
                                               {drug.drugName || `Thuốc ${idx + 1}`}
                                             </p>
-                                            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                            <div className="flex flex-wrap gap-2 text-xs text-muted-foreground min-w-0">
                                               {drug.medicineForm && (
-                                                <span className="flex items-center gap-1">
+                                                <span className="flex min-w-0 flex-wrap items-center gap-1 break-words">
                                                   <span className="font-medium">Dạng:</span>
                                                   {drug.medicineForm === 'TABLET' && 'Viên'}
                                                   {drug.medicineForm === 'POWDER' && 'Gói'}
@@ -358,7 +358,7 @@ export default function PrescriptionDetailPage() {
                                                 </span>
                                               )}
                                               {drug.usage && (
-                                                <span className="flex items-center gap-1">
+                                                <span className="flex min-w-0 flex-wrap items-center gap-1 break-words">
                                                   <span className="font-medium">Cách dùng:</span>
                                                   {drug.usage === 'ORAL' && 'Uống'}
                                                   {drug.usage === 'SUBLINGUAL' && 'Ngậm'}
@@ -418,8 +418,8 @@ export default function PrescriptionDetailPage() {
                                     : "border-[var(--glass-border)] bg-[var(--glass-bg)] dark:border-white/10 dark:bg-white/5"
                                 )}
                               >
-                                <div className="flex items-start justify-between mb-3">
-                                  <div className="flex items-center gap-3">
+                                <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                  <div className="flex min-w-0 items-center gap-3">
                                     {intake.status ? (
                                       <CheckCircle2 className="h-5 w-5 text-emerald-500" />
                                     ) : (
@@ -460,7 +460,7 @@ export default function PrescriptionDetailPage() {
                                   )}
                                 </div>
                                 
-                                <div className="space-y-2 ml-8">
+                                <div className="space-y-2 ml-0 sm:ml-8">
                                   {intake.info.map((drug: any, idx: number) => (
                                     <div
                                       key={idx}
@@ -472,9 +472,9 @@ export default function PrescriptionDetailPage() {
                                           <p className="font-medium text-secondary dark:text-white">
                                             {drug.drugName || `Thuốc ${idx + 1}`}
                                           </p>
-                                          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
+                                          <div className="flex flex-wrap gap-2 text-xs text-muted-foreground min-w-0">
                                             {drug.medicineForm && (
-                                              <span className="flex items-center gap-1">
+                                              <span className="flex min-w-0 flex-wrap items-center gap-1 break-words">
                                                 <span className="font-medium">Dạng:</span>
                                                 {drug.medicineForm === 'TABLET' && 'Viên'}
                                                 {drug.medicineForm === 'POWDER' && 'Gói'}
@@ -485,7 +485,7 @@ export default function PrescriptionDetailPage() {
                                               </span>
                                             )}
                                             {drug.usage && (
-                                              <span className="flex items-center gap-1">
+                                              <span className="flex min-w-0 flex-wrap items-center gap-1 break-words">
                                                 <span className="font-medium">Cách dùng:</span>
                                                 {drug.usage === 'ORAL' && 'Uống'}
                                                 {drug.usage === 'SUBLINGUAL' && 'Ngậm'}
@@ -534,7 +534,7 @@ export default function PrescriptionDetailPage() {
                       )}
 
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
                           <div className="flex items-center gap-2 text-sm font-medium text-primary">
                             <Bot className="h-4 w-4" />
                             Phân tích chuyên sâu từ AI
@@ -706,3 +706,6 @@ export default function PrescriptionDetailPage() {
     </div>
   );
 }
+
+
+

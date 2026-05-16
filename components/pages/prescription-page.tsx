@@ -446,11 +446,11 @@ export function PrescriptionPageScreen() {
         // MED Role: Show tabs for create and history
         <section className="container mt-12 space-y-8">
           {/* Tab Navigation */}
-          <div className="flex items-center gap-2 border-b border-border/50 pb-4">
+          <div className="flex flex-wrap items-center gap-2 border-b border-border/50 pb-4">
             <Button
               variant={activeTab === "create" ? "default" : "ghost"}
               onClick={() => setActiveTab("create")}
-              className="rounded-full"
+              className="min-w-0 flex-1 rounded-full sm:flex-none"
             >
               <Plus className="mr-2 h-4 w-4" />
               Kê đơn mới
@@ -458,7 +458,7 @@ export function PrescriptionPageScreen() {
             <Button
               variant={activeTab === "history" ? "default" : "ghost"}
               onClick={() => setActiveTab("history")}
-              className="rounded-full"
+              className="min-w-0 flex-1 rounded-full sm:flex-none"
             >
               <Clock className="mr-2 h-4 w-4" />
               Lịch sử kê đơn
@@ -1178,11 +1178,11 @@ export function PrescriptionPageScreen() {
         // USER Role: Tabs — Scan image | My prescriptions
         <section className="container mt-12 space-y-8">
           {/* Tab Navigation */}
-          <div className="flex items-center gap-2 border-b border-border/50 pb-4">
+          <div className="flex flex-wrap items-center gap-2 border-b border-border/50 pb-4">
             <Button
               variant={patientTab === "scan" ? "default" : "ghost"}
               onClick={() => setPatientTab("scan")}
-              className="rounded-full"
+              className="min-w-0 flex-1 rounded-full sm:flex-none"
             >
               <ScanLine className="mr-2 h-4 w-4" />
               Quét đơn thuốc
@@ -1190,7 +1190,7 @@ export function PrescriptionPageScreen() {
             <Button
               variant={patientTab === "history" ? "default" : "ghost"}
               onClick={() => setPatientTab("history")}
-              className="rounded-full"
+              className="min-w-0 flex-1 rounded-full sm:flex-none"
             >
               <Clock className="mr-2 h-4 w-4" />
               Đơn thuốc của tôi
