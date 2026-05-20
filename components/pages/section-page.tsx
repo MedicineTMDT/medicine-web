@@ -75,7 +75,7 @@ export function SectionPageScreen({
             <div className="space-y-10">
               {content.bodyContent?.map((paragraph, idx) => (
                 <div key={idx} className="space-y-4">
-                  <p className="text-lg leading-relaxed text-secondary/80 dark:text-white/80">
+                  <p className="text-lg leading-relaxed text-secondary/80 dark:text-white/80 whitespace-pre-line">
                     {t(paragraph, { fallback: paragraph })}
                   </p>
                 </div>
@@ -279,7 +279,7 @@ export function SectionPageScreen({
                 {content.bodyContent ? (
                   <div className="space-y-6">
                     {content.bodyContent.map((paragraph, idx) => (
-                      <p key={idx} className="leading-relaxed">
+                      <p key={idx} className="leading-relaxed whitespace-pre-line">
                         {t(paragraph, { fallback: paragraph })}
                       </p>
                     ))}

@@ -459,16 +459,22 @@ export const sectionContent: Record<string, SectionContent> = {
       { label: "footer.contact", href: "/contact" },
     ],
     isLegal: true,
-    lastUpdated: "2026-05-15",
+    lastUpdated: "2026-01-19",
     bodyContent: [
-      "legal.privacy.collection",
-      "legal.privacy.prescriptionScanCollection",
-      "legal.privacy.usage",
-      "legal.privacy.prescriptionScanUsage",
-      "legal.privacy.security",
-      "legal.privacy.prescriptionScanRetention",
-      "legal.privacy.prescriptionScanSharing",
-      "legal.privacy.rights"
+      "legal.privacy.collection.title",
+      "legal.privacy.collection.body",
+      "legal.privacy.google.title",
+      "legal.privacy.google.body",
+      "legal.privacy.usage.title",
+      "legal.privacy.usage.body",
+      "legal.privacy.sharing.title",
+      "legal.privacy.sharing.body",
+      "legal.privacy.security.title",
+      "legal.privacy.security.body",
+      "legal.privacy.retention.title",
+      "legal.privacy.retention.body",
+      "legal.privacy.contact.title",
+      "legal.privacy.contact.body"
     ]
   },
   "terms-of-service": {
