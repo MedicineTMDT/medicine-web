@@ -31,7 +31,8 @@ export default function AcceptPrescriptionPage() {
   );
   const acceptMutation = useAcceptPrescription();
 
-  const prescription = prescriptionData?.result;
+  const rawData = prescriptionData as any;
+  const prescription = rawData?.result || rawData;
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
