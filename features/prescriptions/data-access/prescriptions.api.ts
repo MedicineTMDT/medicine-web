@@ -19,7 +19,8 @@ import type {
 const SUCCESS_CODES = [0, 1000];
 
 async function handleResponse<T>(response: Response): Promise<T> {
-  const data = await response.json();
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : {};
 
   if (!response.ok) {
     const error: ApiError = {
