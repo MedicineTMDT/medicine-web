@@ -32,6 +32,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { motion } from "framer-motion";
 import { sanitizeAiAnalysis } from "@/lib/utils";
+import { MedicalSafetyNotice } from "@/components/shared/medical-safety-notice";
 import {
   AlertTriangle,
   ArrowLeft,
@@ -156,6 +157,7 @@ export function PrescriptionScanPreview({
       transition={{ duration: 0.3 }}
       className="space-y-6"
     >
+      <MedicalSafetyNotice />
       {/* AI Banner */}
       <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 dark:border-primary/20 dark:bg-primary/10">
         <Bot className="h-5 w-5 shrink-0 text-primary" />

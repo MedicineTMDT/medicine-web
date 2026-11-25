@@ -38,6 +38,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState, useEffect } from "react";
 import { PrescriptionCalendar } from "@/components/prescription/prescription-calendar";
+import { MedicalSafetyNotice } from "@/components/shared/medical-safety-notice";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -150,6 +151,7 @@ export default function PrescriptionDetailPage() {
       </section>
 
       <section className="mx-auto mt-8 w-full max-w-7xl space-y-8 px-4 sm:px-6">
+        <MedicalSafetyNotice />
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           {/* Main Content */}
           <div className="space-y-6">

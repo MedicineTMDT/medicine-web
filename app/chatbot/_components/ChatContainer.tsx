@@ -6,6 +6,7 @@ import { Message, DocumentMetadata } from "@/lib/types/chatbot";
 import { streamChat, fetchMessages, deleteConversation, createConversation, generateChatTitle } from "@/lib/api/chatbot";
 import MessageList from "./MessageList";
 import ChatInput from "./ChatInput";
+import { MedicalSafetyNotice } from "@/components/shared/medical-safety-notice";
 import { useRouter } from "next/navigation";
 
 type State = {
@@ -321,6 +322,7 @@ const ChatContainer: React.FC<ChatContainerProps> = ({
       {/* Input Area — Floating style */}
       <div className="shrink-0 w-full relative z-10">
         <div className="max-w-4xl mx-auto">
+          <MedicalSafetyNotice className="mx-4 mb-2" />
           <ChatInput onSend={handleSendMessage} isLoading={state.isLoading} />
           <p className="text-[10px] md:text-xs text-center text-muted-foreground/60 my-3 px-4 font-medium">
             Dữ liệu được trích xuất từ các tài liệu chuẩn của Bộ Y tế. Hãy sử dụng có trách nhiệm.

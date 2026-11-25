@@ -12,9 +12,7 @@ export default function ChatbotLayout({ children }: { children: ReactNode }) {
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,_rgba(0,194,255,0.12),_transparent_45%),radial-gradient(circle_at_top_right,_rgba(2,135,190,0.10),_transparent_45%)]" />
       <Navbar />
       {/* main fills all remaining height without overflow on the page level */}
-      <main className="flex-1 overflow-hidden">
-        {children}
-      </main>
+      <main className="flex-1 overflow-hidden">{children}</main>
     </div>
   );
 }

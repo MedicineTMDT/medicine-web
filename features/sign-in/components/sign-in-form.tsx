@@ -3,15 +3,19 @@
 import { GoogleIcon } from "@/components/icons/google";
 import { Button } from "@/components/ui/button";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { loginRequestSchema, useAuth, type LoginRequest } from "@/features/auth";
+import {
+  loginRequestSchema,
+  useAuth,
+  type LoginRequest,
+} from "@/features/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
 import { Eye, EyeOff, Loader2, Lock, Mail } from "lucide-react";
@@ -56,7 +60,7 @@ export function SignInForm() {
     >
       {/* Header */}
       <div className="mb-8 space-y-3">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
@@ -75,8 +79,8 @@ export function SignInForm() {
             </Link>
           </span>
         </motion.div>
-        
-        <motion.h1 
+
+        <motion.h1
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
@@ -88,7 +92,7 @@ export function SignInForm() {
 
       {/* Error message */}
       {loginError && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300 backdrop-blur-sm"
@@ -219,7 +223,7 @@ export function SignInForm() {
       </Form>
 
       {/* Divider */}
-      <motion.div 
+      {/* <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
@@ -230,10 +234,10 @@ export function SignInForm() {
           or
         </span>
         <div className="h-px flex-1 bg-white/10" />
-      </motion.div>
+      </motion.div> */}
 
       {/* Social login */}
-      <motion.div 
+      {/* <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.7 }}
@@ -257,7 +261,7 @@ export function SignInForm() {
             </Button>
           );
         })}
-      </motion.div>
+      </motion.div> */}
     </motion.div>
   );
 }

@@ -7,26 +7,31 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
-        hostname: 'trungtamthuoc.com',
+        protocol: "https",
+        hostname: "trungtamthuoc.com",
+        pathname: "/**",
       },
       {
-        protocol: 'http',
-        hostname: 'trungtamthuoc.com',
+        protocol: "http",
+        hostname: "trungtamthuoc.com",
+        pathname: "/**",
       },
       // Bổ sung luôn domain của Google để ảnh đại diện user không bị lỗi khi làm Google Auth
       {
-        protocol: 'https',
-        hostname: 'lh3.googleusercontent.com', 
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        pathname: "/**",
       },
       {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-      }
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+        pathname: "/**",
+      },
     ],
   },
 

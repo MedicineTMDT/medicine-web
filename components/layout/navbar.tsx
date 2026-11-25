@@ -19,7 +19,6 @@ const NAV_LINKS = [
   { nameKey: "nav.drugInfo", href: "/drugs-info" },
   { nameKey: "nav.drugInteraction", href: "/drug-interaction" },
   { nameKey: "nav.prescription", href: "/prescription" },
-  { nameKey: "nav.chatbot", href: "/chatbot" },
 ];
 
 export function Navbar() {
@@ -36,7 +35,7 @@ export function Navbar() {
     <header
       className={cn(
         "sticky top-4 z-50 mx-auto w-full px-4",
-        language === "vi" ? "max-w-7xl" : "max-w-6xl"
+        language === "vi" ? "max-w-7xl" : "max-w-6xl",
       )}
     >
       <div className="relative rounded-[calc(var(--radius)_+_0.5rem)] border border-border bg-white/90 shadow-[0_24px_80px_-40px_rgba(12,39,60,0.55)] backdrop-blur-md transition-colors dark:border-white/10 dark:bg-secondary/80">
@@ -56,7 +55,7 @@ export function Navbar() {
                   href={link.href}
                   className={cn(
                     "relative text-sm font-semibold text-secondary transition hover:text-primary dark:text-white/75",
-                    isActive && "text-primary dark:text-accent"
+                    isActive && "text-primary dark:text-accent",
                   )}
                 >
                   {t(link.nameKey)}
@@ -101,7 +100,7 @@ export function Navbar() {
                     <div
                       className={cn(
                         "absolute -bottom-1 -right-1 flex h-4.5 w-4.5 items-center justify-center rounded-full border-2 border-white shadow-md dark:border-secondary",
-                        user.role === "ADMIN" ? "bg-red-500" : "bg-blue-500"
+                        user.role === "ADMIN" ? "bg-red-500" : "bg-blue-500",
                       )}
                     >
                       {user.role === "ADMIN" ? (
@@ -125,7 +124,11 @@ export function Navbar() {
               </>
             ) : (
               <>
-                <Button variant="ghost" asChild className="text-sm font-semibold">
+                <Button
+                  variant="ghost"
+                  asChild
+                  className="text-sm font-semibold"
+                >
                   <Link href="/signin">{t("nav.signIn")}</Link>
                 </Button>
                 <Button size="sm" className="rounded-full px-5 text-sm">
@@ -172,7 +175,7 @@ export function Navbar() {
                         className={cn(
                           "rounded-2xl border border-transparent px-4 py-3 text-sm font-semibold text-secondary dark:text-white transition hover:border-primary/30 hover:bg-primary/5 hover:text-primary",
                           isActive &&
-                            "border-primary/30 bg-primary/10 text-primary"
+                            "border-primary/30 bg-primary/10 text-primary",
                         )}
                       >
                         {t(link.nameKey)}
@@ -210,7 +213,9 @@ export function Navbar() {
                           <div
                             className={cn(
                               "absolute -bottom-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-white shadow-md dark:border-secondary",
-                              user.role === "ADMIN" ? "bg-red-500" : "bg-blue-500"
+                              user.role === "ADMIN"
+                                ? "bg-red-500"
+                                : "bg-blue-500",
                             )}
                           >
                             {user.role === "ADMIN" ? (
@@ -233,16 +238,16 @@ export function Navbar() {
                     </>
                   ) : (
                     <>
-                  <Button
-                    variant="outline"
-                    className="flex-1 rounded-full"
-                    asChild
-                  >
-                    <Link href="/signin">{t("nav.signIn")}</Link>
-                  </Button>
-                  <Button className="flex-1 rounded-full" asChild>
-                    <Link href="/signup">{t("nav.register")}</Link>
-                  </Button>
+                      <Button
+                        variant="outline"
+                        className="flex-1 rounded-full"
+                        asChild
+                      >
+                        <Link href="/signin">{t("nav.signIn")}</Link>
+                      </Button>
+                      <Button className="flex-1 rounded-full" asChild>
+                        <Link href="/signup">{t("nav.register")}</Link>
+                      </Button>
                     </>
                   )}
                 </div>

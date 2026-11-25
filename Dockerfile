@@ -20,10 +20,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Ép Next.js nhận diện URL ngay từ lúc build proxy
-ARG BACKEND_URL="http://medicine-backend:8080"
 ENV BACKEND_URL=$BACKEND_URL
 
-ARG CHATBOT_URL="http://medicine-chatbot:8000"
 ENV CHATBOT_URL=$CHATBOT_URL
 
 # Tắt gửi dữ liệu ẩn về Vercel để tăng tốc build

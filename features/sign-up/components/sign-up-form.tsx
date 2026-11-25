@@ -3,18 +3,18 @@
 import { GoogleIcon } from "@/components/icons/google";
 import { Button } from "@/components/ui/button";
 import {
-    Form,
-    FormControl,
-    FormField,
-    FormItem,
-    FormLabel,
-    FormMessage,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-    registerRequestSchema,
-    useAuth,
-    type RegisterRequest,
+  registerRequestSchema,
+  useAuth,
+  type RegisterRequest,
 } from "@/features/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion } from "framer-motion";
@@ -40,11 +40,11 @@ function usePasswordStrength(password: string) {
       { label: "Contains lowercase", met: /[a-z]/.test(password) },
       { label: "Contains number", met: /\d/.test(password) },
     ];
-    
-    const metCount = requirements.filter(r => r.met).length;
+
+    const metCount = requirements.filter((r) => r.met).length;
     let strength: "weak" | "fair" | "good" | "strong" = "weak";
     let color = "bg-red-500";
-    
+
     if (metCount >= 4) {
       strength = "strong";
       color = "bg-green-500";
@@ -55,8 +55,14 @@ function usePasswordStrength(password: string) {
       strength = "fair";
       color = "bg-orange-500";
     }
-    
-    return { requirements, metCount, strength, color, percentage: (metCount / 4) * 100 };
+
+    return {
+      requirements,
+      metCount,
+      strength,
+      color,
+      percentage: (metCount / 4) * 100,
+    };
   }, [password]);
 }
 
@@ -96,7 +102,8 @@ export function SignUpForm() {
     }
   };
 
-  const inputWrapperClass = "relative h-11 rounded-xl border-white/10 bg-white/5 text-white placeholder:text-white/40 focus-within:border-primary/50 dark:bg-white/5";
+  const inputWrapperClass =
+    "relative h-11 rounded-xl border-white/10 bg-white/5 text-white placeholder:text-white/40 focus-within:border-primary/50 dark:bg-white/5";
   const inputClass = "h-11 text-sm text-white placeholder:text-white/40";
 
   return (
@@ -108,14 +115,14 @@ export function SignUpForm() {
     >
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           className="text-2xl font-semibold text-white"
         >
           Create Account
         </motion.h1>
-        <motion.span 
+        <motion.span
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           className="text-sm text-white/50"
@@ -132,7 +139,7 @@ export function SignUpForm() {
 
       {/* Error message */}
       {registerError && (
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300 backdrop-blur-sm"
@@ -144,7 +151,7 @@ export function SignUpForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           {/* Row 1: Username & Email */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
@@ -201,7 +208,7 @@ export function SignUpForm() {
           </motion.div>
 
           {/* Row 2: First Name & Last Name */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -255,7 +262,7 @@ export function SignUpForm() {
           </motion.div>
 
           {/* Row 3: Password & Confirm Password */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
@@ -356,12 +363,17 @@ export function SignUpForm() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-white/50">Password strength</span>
-                  <span className={`font-medium capitalize ${
-                    passwordStrength.strength === "strong" ? "text-green-400" :
-                    passwordStrength.strength === "good" ? "text-yellow-400" :
-                    passwordStrength.strength === "fair" ? "text-orange-400" :
-                    "text-red-400"
-                  }`}>
+                  <span
+                    className={`font-medium capitalize ${
+                      passwordStrength.strength === "strong"
+                        ? "text-green-400"
+                        : passwordStrength.strength === "good"
+                          ? "text-yellow-400"
+                          : passwordStrength.strength === "fair"
+                            ? "text-orange-400"
+                            : "text-red-400"
+                    }`}
+                  >
                     {passwordStrength.strength}
                   </span>
                 </div>
@@ -396,7 +408,7 @@ export function SignUpForm() {
           )}
 
           {/* Submit & Social section */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -419,15 +431,15 @@ export function SignUpForm() {
             </Button>
 
             {/* Divider */}
-            <div className="flex items-center gap-3">
+            {/* <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-white/10" />
               <span className="text-[10px] uppercase tracking-widest text-white/40">
                 or
               </span>
               <div className="h-px flex-1 bg-white/10" />
-            </div>
+            </div> */}
             {/* Social login */}
-            {socialProviders.map((provider) => {
+            {/* {socialProviders.map((provider) => {
               const Icon = provider.icon;
               return (
                 <Button
@@ -444,22 +456,28 @@ export function SignUpForm() {
                   Continue with {provider.name}
                 </Button>
               );
-            })}
+            })} */}
           </motion.div>
 
           {/* Terms notice */}
-          <motion.p 
+          <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
             className="text-center text-xs text-white/40"
           >
             By creating an account, you agree to our{" "}
-            <Link href="/terms-of-service" className="text-accent hover:underline">
+            <Link
+              href="/terms-of-service"
+              className="text-accent hover:underline"
+            >
               Terms
             </Link>{" "}
             and{" "}
-            <Link href="/privacy-policy" className="text-accent hover:underline">
+            <Link
+              href="/privacy-policy"
+              className="text-accent hover:underline"
+            >
               Privacy Policy
             </Link>
           </motion.p>
